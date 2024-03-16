@@ -10,6 +10,7 @@
 /usage.statistics.xml
 /dictionaries
 /shelf
+/misc.xml
 
 # AWS User-specific
 /aws.xml
