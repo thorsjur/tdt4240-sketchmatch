@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">sketchmatch</string>
+    <string name="show_less">Show less</string>
+    <string name="show_more">Show more</string>
+    <string name="creating_a_game_title">Creating a game</string>
+    <string name="joining_a_game_title">Show less</string>
+    <string name="how_to_play_title">Show more</string>
+    <string name="desc1_1">Click on the \'Create Game\' button from the main menu</string>
+    <string name="desc1_2">Choose a name for your game</string>
+    <string name="desc1_3">Confirm your choices by pressing the \'Create Game\' button</string>
+    <string name="desc1_4">After being transferred to the game lobby, you\'ll see a code at the top off the screen.</string>
+    <string name="desc1_5">Share this code with the people you want to play with.</string>
+    <string name="desc2_1">Click on the \'Join Game\' button from the main menu</string>
+    <string name="desc2_2">Input the game code you got from the host of the game you want to join</string>
+    <string name="desc2_3">Join the game by pressing the \'Join Game\' button</string>
+    <string name="desc3_1">Wait for all player slots to be filled to start the game</string>
+    <string name="desc3_2">Each round, players will be assigned as drawers or guessers</string>
+    <string name="desc3_3">If you\'re a drawer, choose a word or phrase to draw from three options, each with different difficulty levels (easy, medium, hard). Drawers earn points each time a guesser guesses correctly, with harder words earning more points. A countdown from 3 will signal the start of the round after the word is chosen.</string>
+    <string name="desc3_4">During the round, each player gets one turn to draw</string>
+    <string name="desc3_5">Use the pencil and eraser to draw if you\'re the drawer</string>
+    <string name="desc3_6">Guessers input their guesses in a text field to guess the word being drawn. Guessers earn more points the earlier they guess correctly in the turn</string>
+    <string name="desc3_7">Each turn lasts for 1 minute, displayed at the top of the screen</string>
+    <string name="desc3_8">After a turn, players are directed back to their roles (drawer or guesser) for the next round</string>
+    <string name="desc3_9">After all players have drawn once, a high score list displays ranking each player by points</string>
+    <string name="desc3_10">After 5 seconds, the next round automatically begins</string>
+    <string name="desc3_11">After three rounds, the player with the most points is declared the winner</string>
 </resources>
