@@ -34,7 +34,7 @@ android {
         }
 
         debug {
-            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://10.0.2.2:40401\"")
+            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://creativecode.tu-varna.bg:40401\"")
         }
     }
     compileOptions {
