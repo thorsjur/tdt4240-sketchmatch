@@ -31,14 +31,13 @@ fun MainMenuScreen(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             if (shouldShowHelp){
                 HelpScreen()
             }
             else {
                 Text(text = "Sketch Match")
                 CreateGameButton(onCreateGameClicked = {})
-                JoinGameButton(onJoinGameClicked = {})
+                JoinGameButton(onJoinGameClicked = { })
                 HelpButton(onHelpClicked = { shouldShowHelp = true })
             }
         }
