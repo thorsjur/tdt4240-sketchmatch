@@ -50,7 +50,6 @@ fun MainMenuScreen(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-
             if (shouldShowHelp){
                 HelpScreen()
             }
@@ -58,7 +57,7 @@ fun MainMenuScreen(modifier: Modifier = Modifier) {
                 Image(painter = painterResource(id = R.drawable.logog), contentDescription = null, modifier = Modifier.size(250.dp)
                 )
                 CreateGameButton(onCreateGameClicked = {})
-                JoinGameButton(onJoinGameClicked = {})
+                JoinGameButton(onJoinGameClicked = { })
                 HelpButton(onHelpClicked = { shouldShowHelp = true })
             }
         }

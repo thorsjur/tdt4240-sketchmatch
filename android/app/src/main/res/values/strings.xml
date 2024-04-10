@@ -24,4 +24,11 @@
     <string name="desc3_9">After all players have drawn once, a high score list displays ranking each player by points</string>
     <string name="desc3_10">After 5 seconds, the next round automatically begins</string>
     <string name="desc3_11">After three rounds, the player with the most points is declared the winner</string>
+    <string name="game_list_label">Games list</string>
+    <string name="join_game_room_button">Join</string>
+    <string name="create_game_room_button">Create game</string>
+    <string name="join_by_code_button">Join by code</string>
+    <string name="room_list_row_name">Room name: %1$s</string>
+    <string name="room_list_row_players">Players: %1$s / %2$s</string>
+    <string name="room_list_row_status">Status: %1$s</string>
 </resources>
