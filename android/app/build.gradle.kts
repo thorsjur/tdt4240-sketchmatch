@@ -34,7 +34,7 @@ android {
         }
 
         debug {
-            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://10.0.2.2:40401\"")
+            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://creativecode.tu-varna.bg:40401\"")
         }
     }
     compileOptions {
@@ -69,10 +69,13 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("dev.icerock.moko:socket-io-android:0.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("com.google.code.gson:gson:2.10")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.5")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
