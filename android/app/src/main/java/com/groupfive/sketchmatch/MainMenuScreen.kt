@@ -1,13 +1,20 @@
 package com.groupfive.sketchmatch
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.paddingFromBaseline
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +24,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
@@ -27,16 +41,22 @@ fun MainMenuScreen(modifier: Modifier = Modifier) {
 
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier
+                .padding(vertical = 80.dp, horizontal = 25.dp)
+                .clip(shape = RoundedCornerShape(15.dp))
+                .background(color = MaterialTheme.colorScheme.primaryContainer)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
+
         ) {
 
             if (shouldShowHelp){
                 HelpScreen()
             }
             else {
-                Text(text = "Sketch Match")
+                Image(painter = painterResource(id = R.drawable.logog), contentDescription = null, modifier = Modifier.size(250.dp)
+                )
                 CreateGameButton(onCreateGameClicked = {})
                 JoinGameButton(onJoinGameClicked = {})
                 HelpButton(onHelpClicked = { shouldShowHelp = true })
