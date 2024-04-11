@@ -41,7 +41,7 @@ fun GuessScreenContent(innerPadding: PaddingValues) {
         }
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
                 .fillMaxSize()
                 .weight(2f)
                 .border(2.dp, MaterialTheme.colorScheme.outlineVariant)
