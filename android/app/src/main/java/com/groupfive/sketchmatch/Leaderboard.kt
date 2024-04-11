@@ -23,18 +23,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.text.font.FontWeight
+import com.groupfive.sketchmatch.models.Player
 
-data class Player(
-    val id: Int,
-    val name: String,
-    var score: Int,
-    var rank: Int? = null
-)
 
-val p1 = Player(1, "Ola", 10)
-val p2 = Player(2, "Kari", 8)
-val p3 = Player(3, "Arne", 7)
-val p4 = Player(4, "Gunn", 14)
+val p1 = Player("1", "Ola", 10)
+val p2 = Player("2", "Kari", 8)
+val p3 = Player("3", "Arne", 7)
+val p4 = Player("4", "Gunn", 14)
 
 @Composable
 fun Scorelist(
