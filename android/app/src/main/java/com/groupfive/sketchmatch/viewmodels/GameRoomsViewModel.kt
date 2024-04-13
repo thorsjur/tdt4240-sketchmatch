@@ -145,4 +145,12 @@ class GameRoomsViewModel : ViewModel() {
             Log.e("GameRoomsViewModel", "Error removing game room: ${e.message}")
         }
     }
+
+    // Remove all callbacks
+    fun removeAllCallbacks() {
+        client.removeAllCallbacks(ROOMS_LIST_EVENT)
+        client.removeAllCallbacks(ROOM_CREATED_EVENT)
+        client.removeAllCallbacks(ROOM_UPDATED_EVENT)
+        client.removeAllCallbacks(ROOM_DESTROYED_EVENT)
+    }
 }

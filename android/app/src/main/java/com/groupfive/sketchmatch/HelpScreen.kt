@@ -1,6 +1,7 @@
 package com.groupfive.sketchmatch
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -21,6 +22,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,11 +40,20 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 
 
 @Composable
-fun HelpScreen(modifier: Modifier = Modifier) {
+fun HelpScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
+
+    BackHandler {
+        navController.popBackStack()
+    }
 
     val desc1 = arrayOf(stringResource(R.string.desc1_1), stringResource(R.string.desc1_2), stringResource(R.string.desc1_3), stringResource(R.string.desc1_4), stringResource(R.string.desc1_5))
     val desc2 = arrayOf(stringResource(R.string.desc2_1), stringResource(R.string.desc2_2), stringResource(R.string.desc2_3))
@@ -53,44 +64,51 @@ fun HelpScreen(modifier: Modifier = Modifier) {
     val card3 = arrayOf(stringResource(R.string.how_to_play_title), desc3)
     val cardList = arrayOf(card1, card2, card3)
 
-    Column(modifier = modifier
-                        .fillMaxSize()
-                        .padding(5.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = "How to play",
-                modifier = Modifier.padding(10.dp),
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.ExtraBold
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(modifier = modifier
+            .fillMaxSize()
+            .padding(5.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = "How to play",
+                    modifier = Modifier.padding(10.dp),
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    )
                 )
-            )
-        }
+            }
 
-        LazyColumn(
-            modifier = modifier
-                .weight(9f)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.Start
-        ) {
-            items(items = cardList) { card ->
+            LazyColumn(
+                modifier = modifier
+                    .weight(9f)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.Start
+            ) {
+                items(items = cardList) { card ->
 
-                val title = card[0] as String
+                    val title = card[0] as String
 
-                @Suppress("UNCHECKED_CAST")
-                val description = card[1] as Array<String>
+                    @Suppress("UNCHECKED_CAST")
+                    val description = card[1] as Array<String>
 
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                        .height(IntrinsicSize.Min)
-                        .wrapContentHeight()
-                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ),
+                        modifier = modifier
+                            .padding(vertical = 4.dp, horizontal = 8.dp)
+                            .height(IntrinsicSize.Min)
+                            .wrapContentHeight()
+                    ) {
 
-                    HelpCardContent(title, description)
+                        HelpCardContent(title, description)
+                    }
                 }
             }
         }
@@ -164,6 +182,6 @@ fun NumberedList(textList: Array<String>) {
 @Composable
 fun HelpScreenPreview() {
     SketchmatchTheme {
-        HelpScreen()
+        HelpScreen(navController = rememberNavController())
     }
 }
