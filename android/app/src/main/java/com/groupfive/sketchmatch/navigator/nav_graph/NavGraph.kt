@@ -22,14 +22,6 @@ fun SetupNavGraph(navController: NavHostController) {
 
     You can follow this tutorial:
     https://www.youtube.com/watch?v=glyqjzkc4fk&list=PLSrm9z4zp4mFYcmFGcJmdsps_lpsaWvKM&index=1
-
-    There is also shown how to implement bottom navigation bar with using the NavHost,
-    but I am not sure that we need it. It will create some difficulties with managing the states.
-    E.g if we want to go to the main menu from the game screen while the game is in progress,
-    we have to do it from a designated button, not from the bottom navigation bar in order to
-    properly process the game state (send to the server that the player left the game, etc.)
-    And as we do not have so many screens out of the game context, we can use the build in back
-    button of the OS to navigate back to the main menu from the help screen for example.
      */
     
     NavHost(
