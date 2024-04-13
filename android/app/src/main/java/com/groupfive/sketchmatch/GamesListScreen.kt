@@ -2,6 +2,7 @@ package com.groupfive.sketchmatch
 
 import android.content.res.Configuration
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,14 +29,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.groupfive.sketchmatch.models.GameRoom
+import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
 
 @Composable
-fun GamesListScreen(modifier: Modifier = Modifier) {
+fun GamesListScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
     val viewModel: GameRoomsViewModel = viewModel()
     val gameRooms by viewModel.gameRooms.observeAsState()
+
+    // Handle back button press
+    BackHandler {
+        // Remove all callbacks for events from the server as we are leaving the screen and don't need them anymore to update the UI
+        viewModel.removeAllCallbacks()
+        navController.popBackStack()
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -97,8 +111,10 @@ fun GamesListScreen(modifier: Modifier = Modifier) {
                     GameRoomItem(gameRoom = gameRoom) {
                         // Handle join button click here
                         Log.i("GamesListScreen", "Joining room ${gameRoom.id}")
+                        viewModel.removeAllCallbacks()
 
                         // TODO: Implement join game room functionality
+                        navController.navigate(Screen.MainMenu.route)
                     }
                 }
 
@@ -146,7 +162,9 @@ fun JoinButton(onJoinClicked: () -> Unit) {
 @Composable
 fun Divider(height: Int = 1) {
     Surface(
-        modifier = Modifier.fillMaxWidth().height(height.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height.dp),
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
     ) {}
 }
@@ -156,6 +174,6 @@ fun Divider(height: Int = 1) {
 @Composable
 fun GamesListPreview() {
     SketchmatchTheme {
-        GamesListScreen()
+        GamesListScreen(navController = rememberNavController())
     }
 }

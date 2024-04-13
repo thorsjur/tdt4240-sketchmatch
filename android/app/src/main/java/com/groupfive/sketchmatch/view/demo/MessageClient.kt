@@ -152,6 +152,7 @@ class MessageClient private constructor() {
         list?.remove(callback)
     }
 
+    // Remove all callbacks for a specific event
     fun removeAllCallbacks(event: String) {
         eventCallbacks.remove(event)
     }
