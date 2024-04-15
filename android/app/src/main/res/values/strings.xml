@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">sketchmatch</string>
+    <string name="main_menu_create_game_button">Create game</string>
+    <string name="main_menu_join_game_button">Join game</string>
+    <string name="main_menu_how_to_play_button">How to play</string>
     <string name="show_less">Show less</string>
     <string name="show_more">Show more</string>
     <string name="creating_a_game_title">Creating a game</string>
@@ -31,4 +34,15 @@
     <string name="room_list_row_name">Room name: %1$s</string>
     <string name="room_list_row_players">Players: %1$s / %2$s</string>
     <string name="room_list_row_status">Status: %1$s</string>
+    <string name="confirm">Confirm</string>
+    <string name="num_of_players">Number of players</string>
+    <string name="create_game_room_popup_title">Create game room</string>
+    <string name="create_game_room_popup_example_name">Game name (ex: Cool Cats)</string>
+    <string name="create_game_error">An error occurred while creating the game. Please try again or restart the app if the issue persists.</string>
+    <string name="error">Error</string>
+    <string name="error_outlined">Error outlined</string>
+    <string name="ok">OK</string>
+    <string name="stepper_increase_value">Increase value</string>
+    <string name="stepper_decrease_value">Decrease value</string>
+
 </resources>

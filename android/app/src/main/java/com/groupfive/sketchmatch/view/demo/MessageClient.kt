@@ -1,12 +1,15 @@
 package com.groupfive.sketchmatch.view.demo
 
 import android.util.Log
+import com.google.gson.Gson
 import com.groupfive.sketchmatch.BuildConfig
 import com.groupfive.sketchmatch.MESSAGE_EVENT
 import com.groupfive.sketchmatch.ROOMS_LIST_EVENT
 import com.groupfive.sketchmatch.ROOM_CREATED_EVENT
+import com.groupfive.sketchmatch.ROOM_CREATED_EVENT_APPROVAL
 import com.groupfive.sketchmatch.ROOM_DESTROYED_EVENT
 import com.groupfive.sketchmatch.ROOM_UPDATED_EVENT
+import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import dev.icerock.moko.socket.Socket
 import dev.icerock.moko.socket.SocketEvent
 import dev.icerock.moko.socket.SocketOptions
@@ -105,6 +108,11 @@ class MessageClient private constructor() {
                     invokeCallbacks(ROOM_CREATED_EVENT, msg)
                 }
 
+                // On ROOM_CREATED_EVENT_APPROVAL
+                on(ROOM_CREATED_EVENT_APPROVAL) { msg ->
+                    invokeCallbacks(ROOM_CREATED_EVENT_APPROVAL, msg)
+                }
+
                 // On ROOM_UPDATED_EVENT
                 on(ROOM_UPDATED_EVENT) { msg ->
                     invokeCallbacks(ROOM_UPDATED_EVENT, msg)
@@ -134,6 +142,16 @@ class MessageClient private constructor() {
     fun sendMessage(eventName: String, msg: String = "") {
         if (!isConnected()) return
         socket.emit(eventName, msg)
+    }
+
+    @Synchronized
+    fun createGameRoom(msg: String = "", gameRoomName: String, roomCapacity: Int) {
+        val requestData = CreateGameRequestDTO(gameRoomName, roomCapacity)
+        val gson = Gson()
+        val data = gson.toJson(requestData)
+
+        if (!isConnected()) return
+        socket.emit(msg, data)
     }
 
     fun addCallback(event: String, callback: (String) -> Unit) {

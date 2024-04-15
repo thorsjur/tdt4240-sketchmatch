@@ -21,6 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,6 +46,7 @@ fun GamesListScreen(
 ) {
     val viewModel: GameRoomsViewModel = viewModel()
     val gameRooms by viewModel.gameRooms.observeAsState()
+    var openCreateGamePopup by remember { mutableStateOf(false) }
 
     // Handle back button press
     BackHandler {
@@ -71,7 +75,8 @@ fun GamesListScreen(
                 // Create game button
                 Button(
                     onClick = {
-                        // Handle create game button click here
+                        openCreateGamePopup = true
+                            // Handle create game button click here
                         Log.i("GamesListScreen", "Create game button clicked")
                     }
                 ) {
@@ -91,6 +96,9 @@ fun GamesListScreen(
                     Text(text = stringResource(R.string.join_by_code_button))
                 }
             }
+
+            CreateGamePopUp(openCreateGamePopup = openCreateGamePopup, onOpenCreateGamePopup = { openCreateGamePopup = it })
+
             Column(Modifier.height(20.dp)) {
                 Text(
                     text = stringResource(R.string.game_list_label),
