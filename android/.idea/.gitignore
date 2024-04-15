@@ -103,3 +103,5 @@ gradle-app.setting
 .classpath
 
 discord.xml
+
+deploymentTargetDropDown.xml
