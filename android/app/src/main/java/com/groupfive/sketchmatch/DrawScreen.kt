@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,9 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.view.draw.ControlBar
 import io.ak1.drawbox.DrawBox
@@ -54,7 +57,18 @@ fun DrawScreen(
         DrawBox(
             drawController = controller,
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { offset ->
+                            controller.insertNewPath(offset)
+                        },
+                        onDragEnd = { drawViewModel.publishFullDrawBoxPayload(controller) }
+                    ) { change, _ ->
+                        val newPoint = change.position
+                        controller.updateLatestPath(newPoint)
+                    }
+                },
             bitmapCallback = { _, _ -> }
         ) { _, _ ->
             drawViewModel.hideToolbars()
@@ -130,12 +144,11 @@ fun SizePickerSizing(size: Float, onClick: () -> Unit) {
 )
 @Preview(showBackground = true, widthDp = 360, name = "Light")
 @Composable
-fun DrawScreenPreview() {
-    val viewModel = DrawViewModel()
+fun DrawScreenPreview(drawViewModel: DrawViewModel = viewModel()) {
     SketchmatchTheme {
         DrawScreen(
             modifier = Modifier,
-            drawViewModel = viewModel
+            drawViewModel = drawViewModel
         )
     }
 }

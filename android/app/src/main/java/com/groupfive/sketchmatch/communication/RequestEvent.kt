@@ -12,4 +12,7 @@ enum class RequestEvent(val value: String) {
     // Event for when a user gets a list of rooms
     GET_ROOMS("get_game_rooms"),
 
+    // Event for publishing a path to a room
+    PUBLISH_PATH("publish_path"),
+
 }

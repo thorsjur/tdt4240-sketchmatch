@@ -2,17 +2,22 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.WordRepository
+import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.navigator.Screen
+import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class DrawViewModel : ViewModel() {
+class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
+
     private val _showWordDialog = mutableStateOf(true)
     val showWordDialog: State<Boolean> = _showWordDialog
 
@@ -43,9 +48,20 @@ class DrawViewModel : ViewModel() {
     private val _hardWord = mutableStateOf("")
     val hardWord: State<String> = _hardWord
 
-    private val _isDrawing = mutableStateOf(false)
+    private val _isDrawing = mutableStateOf(true)
     val isDrawing: State<Boolean> = _isDrawing
 
+    private val client = MessageClient.getInstance()
+
+    fun publishLatestPath(controller: DrawController) {
+        val payload = controller.exportPath()
+        client.publishPathToRoom(roomId.toInt(), payload.path.last())
+    }
+
+    fun publishFullDrawBoxPayload(controller: DrawController) {
+        val payload = controller.exportPath()
+        client.publishFullDrawBoxPayload(roomId.toInt(), payload)
+    }
 
     private suspend fun handleTimer() {
         while (_timeCount.intValue > 0 && _isTimerRunning.value) {

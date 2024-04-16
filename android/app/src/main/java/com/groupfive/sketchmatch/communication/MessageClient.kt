@@ -5,9 +5,15 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.BuildConfig
 import com.groupfive.sketchmatch.MESSAGE_EVENT
 import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
+import com.groupfive.sketchmatch.communication.dto.request.PublishPathRequestDTO
+import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
+import com.groupfive.sketchmatch.serialization.PathWrapperSerializer
 import dev.icerock.moko.socket.Socket
 import dev.icerock.moko.socket.SocketEvent
 import dev.icerock.moko.socket.SocketOptions
+import io.ak1.drawbox.DrawBoxPayLoad
+import io.ak1.drawbox.PathWrapper
+import kotlinx.serialization.json.Json
 import java.net.URISyntaxException
 
 /**
@@ -150,6 +156,34 @@ class MessageClient private constructor(
     fun sendMessage(eventName: String, msg: String = "") {
         if (!isConnected()) return
         socket.emit(eventName, msg)
+    }
+
+    @Synchronized
+    fun publishPathToRoom(roomId: Int, path: PathWrapper) {
+        val stringifiedPath = Json.encodeToString(PathWrapperSerializer, path)
+        val request = PublishPathRequestDTO(roomId, stringifiedPath)
+        val gson = Gson()
+        val data = gson.toJson(request)
+
+        if (!isConnected()) return
+        socket.emit(
+            RequestEvent.PUBLISH_PATH.value,
+            data
+        )
+    }
+
+    @Synchronized
+    fun publishFullDrawBoxPayload(roomId: Int, payLoad: DrawBoxPayLoad) {
+        val stringifiedPayload = Json.encodeToString(DrawBoxPayLoadSerializer, payLoad)
+        val request = PublishPathRequestDTO(roomId, stringifiedPayload)
+        val gson = Gson()
+        val data = gson.toJson(request)
+
+        if (!isConnected()) return
+        socket.emit(
+            RequestEvent.PUBLISH_PATH.value,
+            data
+        )
     }
 
     @Synchronized
