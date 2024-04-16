@@ -3,44 +3,30 @@ package com.groupfive.sketchmatch
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.navigator.nav_graph.SetupNavGraph
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
+import com.groupfive.sketchmatch.view.demo.MessageClient
 
 class MainActivity : ComponentActivity() {
+    // NavHostController
+    lateinit var navController: NavHostController
+
+    // Socket IO Client
+    private val client = MessageClient.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TODO: Check if failed to establish connection and show error message
+        client.establishConnection()
+
         setContent {
             SketchmatchTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
+                navController = rememberNavController()
+                SetupNavGraph(navController = navController)
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SketchmatchTheme {
-        Greeting("Android")
     }
 }
