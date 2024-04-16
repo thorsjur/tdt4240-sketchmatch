@@ -10,7 +10,7 @@ import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.JoinGameByCodeRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
-import com.groupfive.sketchmatch.navigator.NavigationEvent
+import com.groupfive.sketchmatch.utils.SingleLiveEvent
 
 class GameRoomsViewModel : ViewModel() {
     val gameRooms: MutableLiveData<List<GameRoom>> = MutableLiveData()
@@ -19,7 +19,7 @@ class GameRoomsViewModel : ViewModel() {
     val joinGameByCodeStatus: MutableLiveData<Boolean> = MutableLiveData()
     val joinGameByCodeMessage: MutableLiveData<String> = MutableLiveData()
 
-    val navigateToGameLobby = MutableLiveData<NavigationEvent<Unit>>()
+    val navigateToGameLobby = MutableLiveData<SingleLiveEvent<Unit>>()
 
     init {
         // Initialize the list of game rooms with fake data
@@ -101,7 +101,7 @@ class GameRoomsViewModel : ViewModel() {
                 // TODO: Save the game room data to the GameData singleton object
 
                 joinGameByCodeStatus.postValue(true)
-                navigateToGameLobby.postValue(NavigationEvent(Unit))  // Trigger the navigation event
+                navigateToGameLobby.postValue(SingleLiveEvent(Unit))  // Trigger the navigation event
 
                 // TODO: Navigate to the game room screen
             } else {

@@ -1,6 +1,9 @@
-package com.groupfive.sketchmatch.navigator
+package com.groupfive.sketchmatch.utils
 
-open class NavigationEvent<out T>(private val content: T) {
+/**
+ * Single live events pattern
+ */
+open class SingleLiveEvent<out T>(private val content: T) {
 
     var hasBeenHandled = false
         private set // Allow external read but not write
