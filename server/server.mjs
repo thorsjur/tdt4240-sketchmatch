@@ -123,7 +123,6 @@ io.on("connection", (socket) => {
         socket.emit("game_room_created_response", response);
 
         if (response.status == "success") {
-            console.log("Emitting game_room_created event: " + response.gameRoom);
             io.emit("game_room_created", response.gameRoom);
         }
     });
