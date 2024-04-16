@@ -1,4 +1,4 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.gameroomslist
 
 import android.content.res.Configuration
 import android.util.Log
@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.CreateGamePopUp
+import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
@@ -47,6 +49,7 @@ fun GamesListScreen(
     val viewModel: GameRoomsViewModel = viewModel()
     val gameRooms by viewModel.gameRooms.observeAsState()
     var openCreateGamePopup by remember { mutableStateOf(false) }
+    var openJoinGameRoomByCodePopup by remember { mutableStateOf(false) }
 
     // Handle back button press
     BackHandler {
@@ -61,13 +64,13 @@ fun GamesListScreen(
     ) {
         Column(modifier = modifier
             .fillMaxSize()
-            .padding(5.dp),
+            .padding(5.dp, top = 20.dp, bottom = 0.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp, bottom = 0.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -91,10 +94,26 @@ fun GamesListScreen(
                     onClick = {
                         // Handle join by code button click here
                         Log.i("GamesListScreen", "Join by code button clicked")
+
+                        openJoinGameRoomByCodePopup = true
                     }
                 ) {
                     Text(text = stringResource(R.string.join_by_code_button))
                 }
+
+                // Spacer
+                Spacer(modifier = Modifier.width(15.dp))
+            }
+
+            Button(
+                modifier = Modifier
+                    .padding(16.dp),
+                onClick = {
+                    // Handle refresh button click here
+                    viewModel.refreshGameRooms()
+                }
+            ) {
+                Text(text = stringResource(R.string.refresh))
             }
 
             CreateGamePopUp(openCreateGamePopup = openCreateGamePopup, onOpenCreateGamePopup = { openCreateGamePopup = it })
@@ -128,6 +147,27 @@ fun GamesListScreen(
 
             }
         }
+    }
+
+    if(openJoinGameRoomByCodePopup){
+        JoinGameRoomByCodePopup(
+            onSubmit = { gameCode ->
+                // Handle join game by code button click here
+                Log.i("GamesListScreen", "Joining room with code $gameCode")
+
+                viewModel.joinGameByCode(gameCode)
+
+                //viewModel.removeAllCallbacks()
+            },
+            onDismiss = { openJoinGameRoomByCodePopup = false },
+            onSuccess = {
+                Log.i("GamesListScreen", "Joined game room successfully")
+                openJoinGameRoomByCodePopup = false
+
+                // TODO: Navigate to the game lobby screen
+                navController.navigate(Screen.Draw.route)
+            }
+        )
     }
 }
 
