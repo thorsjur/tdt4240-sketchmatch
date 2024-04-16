@@ -6,10 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.groupfive.sketchmatch.GamesListScreen
 import com.groupfive.sketchmatch.HelpScreen
-import com.groupfive.sketchmatch.MainMenuScreen
+import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
 import com.groupfive.sketchmatch.navigator.Screen
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
