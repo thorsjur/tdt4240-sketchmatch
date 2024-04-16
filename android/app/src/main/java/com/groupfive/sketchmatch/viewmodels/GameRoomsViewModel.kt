@@ -32,7 +32,7 @@ class GameRoomsViewModel : ViewModel() {
         }
 
         // Add a callback to handle incoming room_created messages
-        client.addCallback(ResponseEvent.SET_NICKNAME_RESPONSE.value) { message ->
+        client.addCallback(ResponseEvent.ROOM_CREATED.value) { message ->
             Log.i("GameRoomsViewModel", "ROOM_CREATED_EVENT: $message")
 
             // Parse the game room from the json message string

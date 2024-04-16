@@ -112,8 +112,8 @@ class MessageClient private constructor(
                 }
 
                 // On ROOM_CREATED_EVENT
-                on(ResponseEvent.SET_NICKNAME_RESPONSE.value) { msg ->
-                    invokeCallbacks(ResponseEvent.SET_NICKNAME_RESPONSE.value, msg)
+                on(ResponseEvent.ROOM_CREATED.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROOM_CREATED.value, msg)
                 }
 
                 // On ROOM_CREATED_EVENT_APPROVAL
