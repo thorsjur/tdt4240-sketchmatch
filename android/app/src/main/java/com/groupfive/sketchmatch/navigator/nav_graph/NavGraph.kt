@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GamesListScreen
 import com.groupfive.sketchmatch.HelpScreen
 import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
@@ -21,7 +22,7 @@ fun SetupNavGraph(navController: NavHostController) {
     You can follow this tutorial:
     https://www.youtube.com/watch?v=glyqjzkc4fk&list=PLSrm9z4zp4mFYcmFGcJmdsps_lpsaWvKM&index=1
      */
-    
+
     NavHost(
         navController = navController,
         startDestination = Screen.MainMenu.route,
@@ -54,6 +55,13 @@ fun SetupNavGraph(navController: NavHostController) {
             route = Screen.GameRoomsList.route
         ) {
             GamesListScreen(navController = navController)
+        }
+
+        // Draw Screen Destination
+        composable(
+            route = Screen.Draw.route
+        ) {
+            DrawScreen(navController = navController)
         }
     }
 }

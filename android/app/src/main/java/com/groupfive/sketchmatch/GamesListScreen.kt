@@ -122,7 +122,7 @@ fun GamesListScreen(
                         viewModel.removeAllCallbacks()
 
                         // TODO: Implement join game room functionality
-                        navController.navigate(Screen.MainMenu.route)
+                        navController.navigate(Screen.Draw.route)
                     }
                 }
 
