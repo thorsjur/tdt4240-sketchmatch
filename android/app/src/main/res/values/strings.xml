@@ -44,5 +44,11 @@
     <string name="ok">OK</string>
     <string name="stepper_increase_value">Increase value</string>
     <string name="stepper_decrease_value">Decrease value</string>
+    <string name="set_nickname_modal_title">Please enter your nickname</string>
+    <string name="nickname">Nickname</string>
+    <string name="submit">Submit</string>
+    <string name="set_nickname_success_msg">Nickname set successfully</string>
+    <string name="set_nickname_error_msg">Something went wrong. Please try again or restart the game.</string>
+    <string name="greetings_message">Hey, %1$s!</string>
 
 </resources>

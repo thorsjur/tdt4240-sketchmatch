@@ -1,0 +1,15 @@
+package com.groupfive.sketchmatch.communication
+
+// Class defining the different types of socket events and their string representations which clients can send to the server
+enum class RequestEvent(val value: String) {
+
+    // Event for when a user joins a room
+    SET_NICKNAME("set_nickname"),
+
+    // Event for when a user creates a room
+    CREATE_ROOM("create_room"),
+
+    // Event for when a user gets a list of rooms
+    GET_ROOMS("get_game_rooms"),
+
+}

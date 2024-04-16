@@ -1,11 +1,17 @@
-import { log } from "console";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-import { Player } from "./Models/Player.mjs";
-import { GameRoom } from "./Models/GameRoom.mjs";
-import { GameStatus } from "./Models/GameRoom.mjs";
+// Repositories
+import { PlayersRepository } from './Repository/PlayersRepository.mjs';
+import { GameRoomsRepository } from './Repository/GameRoomsRepository.mjs';
+
+// DTOs
+import { SetNicknameRequestDTO } from './Dto/Request/SetNicknameRequestDTO.mjs';
+import { SetNicknameResponsetDTO } from './Dto/Response/SetNicknameResponseDTO.mjs';
+import { CreateGameRequestDTO } from './Dto/Request/CreateGameRequestDTO.mjs';
+import { CreateGameResponseDTO } from './Dto/Response/CreateGameResponseDTO.mjs';
+
 
 const app = express();
 const port = 40401;
@@ -21,159 +27,107 @@ const io = new Server(httpServer, {
     allowEIO3: true, // This seems to be necessary for the client to connect, i'm assuming the moko socket library is slightly outdated.
 });
 
-// GameRooms list
-var gameRooms = [];
+
+// Repositories
+//
+// TODO: Implement the DB in the repos !!!
+//
+// -----
+const playersRepository = new PlayersRepository();
+const gameRoomsRepository = new GameRoomsRepository();
+
+
 
 io.on("connection", (socket) => {
-    console.log("A user connected");
+    var hwid = socket.handshake.query.hwid;
+    console.log(`A user connected with HWID: ${hwid}`);
 
-    socket.on("message", (msg) => {
-        // Currently just echoing the message back to the clients
-        io.emit("message", msg);
+    socket.on("disconnect", () => {
+        var hwid = socket.handshake.query.hwid;
+        console.log(`User disconnected with HWID: ${hwid}`);
 
-        // Log the message
-        console.log(msg);
+        // TODO: Remove player from a game room if the game is not started
+        // TODO: Remove player from the players repository
+        // TODO: Decide what will happend with the game if the game is started
     });
 
     // On get_rooms event
     socket.on("get_game_rooms", () => {
-        socket.emit("game_room_list", gameRooms);
+        // Getting the game rooms from the repository
+        var dataToSend = gameRoomsRepository.getGameRooms();
+
+        // Sending the game rooms to the client
+        socket.emit("game_room_list", dataToSend);
     });
 
-    socket.on("disconnect", () => {
-        console.log("A user disconnected");
+    // On set_nickname event
+    socket.on("set_nickname", (data) => {
+        // Convert string json data to DTO object
+        let jsonData = JSON.parse(data);
+
+        // Create response object which will be sent to the client
+        var response = new SetNicknameResponsetDTO()
+        var hwid = socket.handshake.query.hwid;
+
+        try {
+            // Create DTO object from the json data sent by the client
+            let dto = new SetNicknameRequestDTO();
+
+            // Setting all properties from the json data to the DTO object
+            dto.setProperties(jsonData);
+            console.log(`Set nickname: ${dto.nickname}`);
+
+            // Add player to the repository
+            playersRepository.addPlayer(hwid, dto.nickname);
+            var player = playersRepository.getPlayerByHWID(hwid);
+            response.player = player;
+
+        } catch (error) {
+            console.error(error.message);
+            response.status = "error";
+            response.message = "set_nickname_error_msg";
+        }
+
+        // Emit set_nickname_response only to the sender
+        socket.emit("set_nickname_response", response);
     });
 
     // On create_room event
     socket.on("create_room", (data) => {
         let jsonData = JSON.parse(data);
-        const gameRoomName = jsonData.gameRoomName;
-        const roomCapacity = jsonData.roomCapacity;
+        var response = new CreateGameResponseDTO();
 
-        console.log(
-            `Creating room: ${gameRoomName} with capacity ${roomCapacity}`
-        );
-        const gameRoom = new GameRoom(
-            gameRooms.length,
-            `game_${gameRooms.length}`,
-            gameRoomName,
-            roomCapacity
-        );
+        try {
+            let dto = new CreateGameRequestDTO();
+            dto.setProperties(jsonData);
 
-        // TODO: Add room to database
-        // TODO: Implement logic for handling status from database
+            const player = playersRepository.getPlayerByHWID(hwid);
 
-        // Dummy values for now
-        const status = "success";
-        let message = "";
+            const gameRoom = gameRoomsRepository.createGameRoom(
+                dto.gameRoomName,
+                player,
+                dto.roomCapacity
+            );
 
-        if (status === "error") {
-            message = "Game room created successfully";
-        } else if (status === "success") {
-            message = "Error creating game room";
+            response.gameRoom = gameRoom;
+
+            console.log(
+                `Creating room: ${gameRoom.gameName} with capacity ${gameRoom.gameCapacity}`
+            );
+
+        } catch (error) {
+            response.status = "error";
+            response.message = "Error creating game room";
         }
 
-        const response = {
-            status: status,
-            gameRooms: gameRoom,
-            message: message,
-        };
-        socket.emit("game_room_created_approval", response);
+        socket.emit("game_room_created_response", response);
 
-        if (status == "success") {
-            io.emit("game_room_created", gameRoom);
+        if (response.status == "success") {
+            io.emit("game_room_created", response.gameRoom);
         }
     });
 });
+
 httpServer.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
-
-// Populate the gameRooms list with some dummy data
-// TODO: Remove this in production!!
-function populateGameRooms(numRooms = 3) {
-    for (let i = 0; i < numRooms; i++) {
-        // Random capacity between 2 and 6
-        const gameCapacity = Math.floor(Math.random() * 5) + 2;
-
-        // Random players count between 1 and gameCapacity
-        const playersCount = Math.floor(Math.random() * gameCapacity) + 1;
-
-        // Create a new game room
-        const gameRoom = new GameRoom(
-            i,
-            `game_${i}`,
-            `Game ${i}`,
-            gameCapacity
-        );
-
-        // Add some players to the game room
-        for (let j = 0; j < playersCount; j++) {
-            const player = new Player(j, `Player ${j}`);
-            gameRoom.addPlayer(player);
-        }
-
-        // Set the game status based on the number of players
-        if (gameCapacity === gameRoom.players.length) {
-            gameRoom.changeGameStatus(GameStatus.Playing);
-        }
-
-        // Add the game room to the list
-        gameRooms.push(gameRoom);
-    }
-}
-
-populateGameRooms(15);
-
-// Update the game status of the rooms every 5 seconds
-// TODO: Remove this in production!!
-setInterval(() => {
-    gameRooms.forEach((gameRoom) => {
-        // Random status
-        const status = Math.floor(Math.random() * 3);
-        gameRoom.changeGameStatus(Object.values(GameStatus)[status]);
-
-        // Emit the updated game room to all clients
-        io.emit("game_room_updated", gameRoom);
-    });
-
-    console.log("Game rooms updated");
-}, 5000);
-
-// Add one room every 1 seconds
-setInterval(() => {
-    const gameCapacity = Math.floor(Math.random() * 5) + 2;
-    const playersCount = Math.floor(Math.random() * gameCapacity) + 1;
-
-    const gameRoom = new GameRoom(
-        gameRooms.length,
-        `game_${gameRooms.length}`,
-        `Game ${gameRooms.length}`,
-        gameCapacity
-    );
-
-    for (let j = 0; j < playersCount; j++) {
-        const player = new Player(j, `Player ${j}`);
-        gameRoom.addPlayer(player);
-    }
-
-    if (gameCapacity === gameRoom.players.length) {
-        gameRoom.changeGameStatus(GameStatus.Playing);
-    }
-
-    gameRooms.push(gameRoom);
-
-    io.emit("game_room_created", gameRoom);
-
-    console.log("Game room created");
-}, 3000);
-
-// Remove random room every 10 seconds
-setInterval(() => {
-    const index = Math.floor(Math.random() * gameRooms.length);
-    const removedRoom = gameRooms.splice(index, 1)[0];
-
-    io.emit("game_room_destroyed", removedRoom);
-
-    console.log("Game room removed");
-}, 3000);

@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModel
 import com.groupfive.sketchmatch.MESSAGE_EVENT
+import com.groupfive.sketchmatch.communication.MessageClient
 
 /**
  * Composable serving as a proof of concept for the use of socket io,
