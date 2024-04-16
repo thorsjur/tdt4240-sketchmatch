@@ -98,6 +98,8 @@ class GameRoomsViewModel : ViewModel() {
             if (response.status == "success") {
                 Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom?.gameCode}")
 
+                // TODO: Save the game room data to the GameData singleton object
+
                 joinGameByCodeStatus.postValue(true)
                 navigateToGameLobby.postValue(NavigationEvent(Unit))  // Trigger the navigation event
 
