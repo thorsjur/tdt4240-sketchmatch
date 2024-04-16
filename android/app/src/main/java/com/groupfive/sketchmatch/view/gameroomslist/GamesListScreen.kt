@@ -55,9 +55,8 @@ fun GamesListScreen(
     var openCreateGamePopup by remember { mutableStateOf(false) }
     var openJoinGameRoomByCodePopup by remember { mutableStateOf(false) }
 
-    val navigateEvent by viewModel.navigateToGameLobby.observeAsState()
-    val joinGameByCodeStatus by viewModel.joinGameByCodeStatus.observeAsState(false)
-    val joinGameByCodeMessage by viewModel.joinGameByCodeMessage.observeAsState("")
+    val successEvent by viewModel.successEvent.observeAsState()
+    val errorEvent by viewModel.errorEvent.observeAsState()
 
     // Handle back button press
     BackHandler {
@@ -66,11 +65,16 @@ fun GamesListScreen(
         navController.popBackStack()
     }
 
-    navigateEvent?.getContentIfNotHandled()?.let {
+    successEvent?.getContentIfNotHandled()?.let {
         viewModel.removeAllCallbacks()
 
         // TODO: Navigate to the game lobby screen in stead of Draw screen
+        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
         navController.navigate(Screen.Draw.route)
+    }
+
+    errorEvent?.getContentIfNotHandled()?.let {
+        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
     }
 
     Surface(
@@ -178,13 +182,6 @@ fun GamesListScreen(
                 navController.navigate(Screen.Draw.route)
             }
         )
-    }
-
-    // When join button is clicked and server responds with error status
-    if (!joinGameByCodeStatus && joinGameByCodeMessage.isNotEmpty()) {
-        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
-        viewModel.joinGameByCodeStatus.postValue(false)
-        viewModel.joinGameByCodeMessage.postValue("")
     }
 }
 

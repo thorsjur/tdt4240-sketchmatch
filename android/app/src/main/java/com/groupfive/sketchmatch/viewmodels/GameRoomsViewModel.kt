@@ -19,7 +19,8 @@ class GameRoomsViewModel : ViewModel() {
     val joinGameByCodeStatus: MutableLiveData<Boolean> = MutableLiveData()
     val joinGameByCodeMessage: MutableLiveData<String> = MutableLiveData()
 
-    val navigateToGameLobby = MutableLiveData<SingleLiveEvent<Unit>>()
+    val successEvent = MutableLiveData<SingleLiveEvent<Unit>>()
+    val errorEvent = MutableLiveData<SingleLiveEvent<Unit>>()
 
     init {
         // Initialize the list of game rooms with fake data
@@ -101,11 +102,12 @@ class GameRoomsViewModel : ViewModel() {
                 // TODO: Save the game room data to the GameData singleton object
 
                 joinGameByCodeStatus.postValue(true)
-                navigateToGameLobby.postValue(SingleLiveEvent(Unit))  // Trigger the navigation event
+                successEvent.postValue(SingleLiveEvent(Unit))  // Trigger the navigation event
 
                 // TODO: Navigate to the game room screen
             } else {
                 // Display an error message
+                errorEvent.postValue(SingleLiveEvent(Unit))
             }
         }
 
