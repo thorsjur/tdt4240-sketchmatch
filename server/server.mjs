@@ -1,4 +1,3 @@
-import { log } from "console";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -10,10 +9,9 @@ import { GameRoomsRepository } from './Repository/GameRoomsRepository.mjs';
 // DTOs
 import { SetNicknameRequestDTO } from './Dto/Request/SetNicknameRequestDTO.mjs';
 import { SetNicknameResponsetDTO } from './Dto/Response/SetNicknameResponseDTO.mjs';
+import { CreateGameRequestDTO } from './Dto/Request/CreateGameRequestDTO.mjs';
+import { CreateGameResponseDTO } from './Dto/Response/CreateGameResponseDTO.mjs';
 
-import { Player } from "./Models/Player.mjs";
-import { GameRoom } from "./Models/GameRoom.mjs";
-import { GameStatus } from "./Models/GameRoom.mjs";
 
 const app = express();
 const port = 40401;
@@ -38,7 +36,6 @@ const io = new Server(httpServer, {
 const playersRepository = new PlayersRepository();
 const gameRoomsRepository = new GameRoomsRepository();
 
-var gameRooms = [];
 
 
 io.on("connection", (socket) => {
@@ -98,43 +95,33 @@ io.on("connection", (socket) => {
     // On create_room event
     socket.on("create_room", (data) => {
         let jsonData = JSON.parse(data);
-        const gameRoomName = jsonData.gameRoomName;
-        const roomCapacity = jsonData.roomCapacity;
+        var response = new CreateGameResponseDTO();
 
-        console.log(
-            `Creating room: ${gameRoomName} with capacity ${roomCapacity}`
-        );
+        try {
+            let dto = new CreateGameRequestDTO();
+            dto.setProperties(jsonData);
 
-        const player = playersRepository.getPlayerByHWID(hwid);
+            const player = playersRepository.getPlayerByHWID(hwid);
 
-        const gameRoom = gameRoomsRepository.createGameRoom(
-            gameRoomName,
-            player,
-            roomCapacity
-        );
+            const gameRoom = gameRoomsRepository.createGameRoom(
+                dto.gameRoomName,
+                player,
+                dto.roomCapacity
+            );
 
-        // TODO: Add room to database
-        // TODO: Implement logic for handling status from database
+            console.log(
+                `Creating room: ${gameRoom.gameName} with capacity ${gameRoom.gameCapacity}`
+            );
 
-        // Dummy values for now
-        const status = "success";
-        let message = "";
-
-        if (status === "error") {
-            message = "Game room created successfully";
-        } else if (status === "success") {
-            message = "Error creating game room";
+        } catch (error) {
+            response.status = "error";
+            response.message = "Error creating game room";
         }
 
-        const response = {
-            status: status,
-            gameRooms: gameRoom,
-            message: message,
-        };
         socket.emit("game_room_created_response", response);
 
-        if (status == "success") {
-            io.emit("game_room_created", gameRoom);
+        if (response.status == "success") {
+            io.emit("game_room_created", response.gameRoom);
         }
     });
 });
