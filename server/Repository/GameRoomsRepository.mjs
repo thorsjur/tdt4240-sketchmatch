@@ -25,6 +25,7 @@ export class GameRoomsRepository {
         var gameCode = Math.random().toString(16).substr(2, 6);
 
         let gameRoom = new GameRoom(id, gameCode, name, capacity);
+        gameRoom.addPlayer(player);
 
         this.gameRooms.push(gameRoom);
 

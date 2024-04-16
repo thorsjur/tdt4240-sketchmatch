@@ -1,14 +1,9 @@
-package com.groupfive.sketchmatch.view.demo
+package com.groupfive.sketchmatch.communication
 
 import android.util.Log
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.BuildConfig
 import com.groupfive.sketchmatch.MESSAGE_EVENT
-import com.groupfive.sketchmatch.ROOMS_LIST_EVENT
-import com.groupfive.sketchmatch.ROOM_CREATED_EVENT
-import com.groupfive.sketchmatch.ROOM_CREATED_EVENT_APPROVAL
-import com.groupfive.sketchmatch.ROOM_DESTROYED_EVENT
-import com.groupfive.sketchmatch.ROOM_UPDATED_EVENT
 import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import dev.icerock.moko.socket.Socket
 import dev.icerock.moko.socket.SocketEvent
@@ -21,16 +16,18 @@ import java.net.URISyntaxException
  * Currently using the singleton pattern to ensure only one message client exists
  * per mobile client.
  */
-class MessageClient private constructor() {
+class MessageClient private constructor(
+    private val hwid: String? = null
+) {
 
     companion object {
 
         @Volatile
         private var instance: MessageClient? = null
 
-        fun getInstance() =
+        fun getInstance(hwid: String? = null) =
             instance ?: synchronized(this) {
-                instance ?: MessageClient().also { instance = it }
+                instance ?: MessageClient(hwid).also { instance = it }
             }
     }
 
@@ -45,10 +42,16 @@ class MessageClient private constructor() {
     private fun setSocket() {
         try {
             Log.i("Socket", "Setting up socket with address: ${BuildConfig.SOCKET_IO_ADDRESS}")
+
+            val queryParams = mutableMapOf<String, String>()
+
+            // Add the hardware ID to the query parameters
+            hwid?.let { queryParams["hwid"] = it }
+
             socket = Socket(
                 endpoint = BuildConfig.SOCKET_IO_ADDRESS,
                 config = SocketOptions(
-                    queryParams = null,
+                    queryParams = queryParams,
                     transport = SocketOptions.Transport.WEBSOCKET,
                 )
             ) {
@@ -98,29 +101,34 @@ class MessageClient private constructor() {
                     invokeCallbacks(MESSAGE_EVENT, msg)
                 }
 
+                // On SET_NICKNAME_RESPONSE_EVENT
+                on(ResponseEvent.SET_NICKNAME_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.SET_NICKNAME_RESPONSE.value, msg)
+                }
+
                 // On ROOMS_LIST_EVENT
-                on(ROOMS_LIST_EVENT) { msg ->
-                    invokeCallbacks(ROOMS_LIST_EVENT, msg)
+                on(ResponseEvent.ROOMS_LIST.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROOMS_LIST.value, msg)
                 }
 
                 // On ROOM_CREATED_EVENT
-                on(ROOM_CREATED_EVENT) { msg ->
-                    invokeCallbacks(ROOM_CREATED_EVENT, msg)
+                on(ResponseEvent.SET_NICKNAME_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.SET_NICKNAME_RESPONSE.value, msg)
                 }
 
                 // On ROOM_CREATED_EVENT_APPROVAL
-                on(ROOM_CREATED_EVENT_APPROVAL) { msg ->
-                    invokeCallbacks(ROOM_CREATED_EVENT_APPROVAL, msg)
+                on(ResponseEvent.ROOM_CREATED_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROOM_CREATED_RESPONSE.value, msg)
                 }
 
                 // On ROOM_UPDATED_EVENT
-                on(ROOM_UPDATED_EVENT) { msg ->
-                    invokeCallbacks(ROOM_UPDATED_EVENT, msg)
+                on(ResponseEvent.ROOM_UPDATED.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROOM_UPDATED.value, msg)
                 }
 
                 // On ROOM_DESTROYED_EVENT
-                on(ROOM_DESTROYED_EVENT) { msg ->
-                    invokeCallbacks(ROOM_DESTROYED_EVENT, msg)
+                on(ResponseEvent.ROOM_DESTROYED.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROOM_DESTROYED.value, msg)
                 }
             }
         } catch (e: URISyntaxException) {
@@ -145,13 +153,16 @@ class MessageClient private constructor() {
     }
 
     @Synchronized
-    fun createGameRoom(msg: String = "", gameRoomName: String, roomCapacity: Int) {
+    fun createGameRoom(gameRoomName: String, roomCapacity: Int) {
         val requestData = CreateGameRequestDTO(gameRoomName, roomCapacity)
         val gson = Gson()
         val data = gson.toJson(requestData)
 
         if (!isConnected()) return
-        socket.emit(msg, data)
+        socket.emit(
+            RequestEvent.CREATE_ROOM.value,
+            data
+        )
     }
 
     fun addCallback(event: String, callback: (String) -> Unit) {

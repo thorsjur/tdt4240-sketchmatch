@@ -38,6 +38,8 @@ const io = new Server(httpServer, {
 const playersRepository = new PlayersRepository();
 const gameRoomsRepository = new GameRoomsRepository();
 
+var gameRooms = [];
+
 
 io.on("connection", (socket) => {
     var hwid = socket.handshake.query.hwid;
@@ -102,10 +104,12 @@ io.on("connection", (socket) => {
         console.log(
             `Creating room: ${gameRoomName} with capacity ${roomCapacity}`
         );
-        const gameRoom = new GameRoom(
-            gameRooms.length,
-            `game_${gameRooms.length}`,
+
+        const player = playersRepository.getPlayerByHWID(hwid);
+
+        const gameRoom = gameRoomsRepository.createGameRoom(
             gameRoomName,
+            player,
             roomCapacity
         );
 
@@ -127,7 +131,7 @@ io.on("connection", (socket) => {
             gameRooms: gameRoom,
             message: message,
         };
-        socket.emit("game_room_created_approval", response);
+        socket.emit("game_room_created_response", response);
 
         if (status == "success") {
             io.emit("game_room_created", gameRoom);
