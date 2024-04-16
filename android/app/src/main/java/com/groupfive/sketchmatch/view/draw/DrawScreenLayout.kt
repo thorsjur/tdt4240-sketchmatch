@@ -62,6 +62,9 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    Button(onClick = { drawViewModel.toggleIsDrawing() }) {
+                        Text(text = if (drawViewModel.isDrawing.value) "Guess word" else "Draw word")
+                    }
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
                         drawViewModel.goBackToMainMenu(
@@ -122,7 +125,7 @@ fun WordChoiceDialog(
         },
         confirmButton = {
             Button(onClick = { drawViewModel.generateWords() }) {
-                stringResource(R.string.new_words)
+                Text(text = stringResource(R.string.new_words))
             }
         }
     )
@@ -152,7 +155,7 @@ fun LeaveGameButton(onLeaveGameClicked: () -> Unit) {
             .width(125.dp),
         onClick = onLeaveGameClicked
     ) {
-        stringResource(R.string.leave_game)
+        Text(text = stringResource(R.string.leave_game))
     }
 }
 

@@ -82,6 +82,9 @@ fun DrawScreen(
         onSizeClick = {
             drawViewModel.toggleSizePickerVisibility()
         },
+        onUndoClick = { drawViewModel.publishFullDrawBoxPayload(controller) },
+        onRedoClick = { drawViewModel.publishFullDrawBoxPayload(controller) },
+        onClearClick = { drawViewModel.publishFullDrawBoxPayload(controller) }
     )
     RangVikalp(isVisible = drawViewModel.isColorBarVisible.value, showShades = true) {
         drawViewModel.changeColor(it)

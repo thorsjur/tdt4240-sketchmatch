@@ -87,6 +87,10 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
+    fun toggleIsDrawing() {
+        _isDrawing.value = !_isDrawing.value
+    }
+
     fun toggleColorBarVisibility() {
         if (_isSizePickerVisible.value) {
             _isSizePickerVisible.value = false
