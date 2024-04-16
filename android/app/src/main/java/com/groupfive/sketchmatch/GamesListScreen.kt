@@ -59,11 +59,13 @@ fun GamesListScreen(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(modifier = modifier
-            .fillMaxSize()
-            .padding(5.dp),
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(5.dp),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally) {
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -76,7 +78,7 @@ fun GamesListScreen(
                 Button(
                     onClick = {
                         openCreateGamePopup = true
-                            // Handle create game button click here
+                        // Handle create game button click here
                         Log.i("GamesListScreen", "Create game button clicked")
                     }
                 ) {
@@ -97,7 +99,9 @@ fun GamesListScreen(
                 }
             }
 
-            CreateGamePopUp(openCreateGamePopup = openCreateGamePopup, onOpenCreateGamePopup = { openCreateGamePopup = it })
+            CreateGamePopUp(
+                openCreateGamePopup = openCreateGamePopup,
+                onOpenCreateGamePopup = { openCreateGamePopup = it })
 
             Column(Modifier.height(20.dp)) {
                 Text(
@@ -116,13 +120,12 @@ fun GamesListScreen(
                 horizontalAlignment = Alignment.Start
             ) {
                 items(items = gameRooms ?: emptyList()) { gameRoom ->
-                    GameRoomItem(gameRoom = gameRoom) {
+                    GameRoomItem(gameRoom = gameRoom) { roomId ->
                         // Handle join button click here
                         Log.i("GamesListScreen", "Joining room ${gameRoom.id}")
                         viewModel.removeAllCallbacks()
 
-                        // TODO: Implement join game room functionality
-                        navController.navigate(Screen.Draw.route)
+                        navController.navigate("${Screen.Draw.route}/$roomId")
                     }
                 }
 
@@ -143,13 +146,25 @@ fun GameRoomItem(gameRoom: GameRoom, onJoinClicked: (Int) -> Unit) {
     ) {
         Column {
             // Var name get text from var strings and pass the room name as parameter
-            Text(text = String.format(stringResource(id = R.string.room_list_row_name),
-                gameRoom.gameName))
-            Text(text = String.format(stringResource(id = R.string.room_list_row_players),
-                gameRoom.players.size,
-                gameRoom.gameCapacity))
-            Text(text = String.format(stringResource(id = R.string.room_list_row_status),
-                gameRoom.gameStatus.name))
+            Text(
+                text = String.format(
+                    stringResource(id = R.string.room_list_row_name),
+                    gameRoom.gameName
+                )
+            )
+            Text(
+                text = String.format(
+                    stringResource(id = R.string.room_list_row_players),
+                    gameRoom.players.size,
+                    gameRoom.gameCapacity
+                )
+            )
+            Text(
+                text = String.format(
+                    stringResource(id = R.string.room_list_row_status),
+                    gameRoom.gameStatus.name
+                )
+            )
         }
         JoinButton(onJoinClicked = { onJoinClicked(gameRoom.id) })
     }

@@ -1,17 +1,16 @@
-import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.navigator.Screen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class DrawViewModel : ViewModel() {
     private val _showWordDialog = mutableStateOf(true)
@@ -43,6 +42,9 @@ class DrawViewModel : ViewModel() {
 
     private val _hardWord = mutableStateOf("")
     val hardWord: State<String> = _hardWord
+
+    private val _isDrawing = mutableStateOf(false)
+    val isDrawing: State<Boolean> = _isDrawing
 
 
     private suspend fun handleTimer() {
@@ -108,12 +110,12 @@ class DrawViewModel : ViewModel() {
         }
     }
 
-    fun goBackToMainMenu(navController: NavController){
+    fun goBackToMainMenu(navController: NavController) {
         dismissWordDialog()
         navController.navigate(Screen.MainMenu.route)
     }
 
-    fun formatTime(timeCount: Int): String{
+    fun formatTime(timeCount: Int): String {
         // Calculate minutes and seconds from timeCount
         val minutes = timeCount / 60
         val seconds = timeCount % 60
