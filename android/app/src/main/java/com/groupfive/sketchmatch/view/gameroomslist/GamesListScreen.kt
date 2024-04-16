@@ -156,13 +156,12 @@ fun GamesListScreen(
                 Log.i("GamesListScreen", "Joining room with code $gameCode")
 
                 viewModel.joinGameByCode(gameCode)
-
-                //viewModel.removeAllCallbacks()
             },
             onDismiss = { openJoinGameRoomByCodePopup = false },
             onSuccess = {
                 Log.i("GamesListScreen", "Joined game room successfully")
                 openJoinGameRoomByCodePopup = false
+                viewModel.removeAllCallbacks()
 
                 // TODO: Navigate to the game lobby screen
                 navController.navigate(Screen.Draw.route)

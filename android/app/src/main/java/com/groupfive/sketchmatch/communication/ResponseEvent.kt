@@ -22,6 +22,6 @@ enum class ResponseEvent(val value: String) {
     ROOM_CREATED_RESPONSE("game_room_created_response"),
 
     // Event for when server sends response of game room join by code request
-    JOIN_ROOM_BY_CODE_RESPONSE("join_room_by_code_response"),
+    JOIN_ROOM_RESPONSE("join_room_response"),
 
 }

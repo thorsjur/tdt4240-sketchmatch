@@ -134,8 +134,8 @@ class MessageClient private constructor(
                 }
 
                 // On JOIN_ROOM_BY_CODE_RESPONSE
-                on(ResponseEvent.JOIN_ROOM_BY_CODE_RESPONSE.value) { msg ->
-                    invokeCallbacks(ResponseEvent.JOIN_ROOM_BY_CODE_RESPONSE.value, msg)
+                on(ResponseEvent.JOIN_ROOM_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.JOIN_ROOM_RESPONSE.value, msg)
                 }
             }
         } catch (e: URISyntaxException) {

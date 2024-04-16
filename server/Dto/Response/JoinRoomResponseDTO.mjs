@@ -1,6 +1,6 @@
 import { BaseDTO } from '../BaseDTO.mjs';
 
-export class JoinRoomByCodeResponseDTO extends BaseDTO {
+export class JoinRoomResponseDTO extends BaseDTO {
 
     // Properties declaration. If true, the property is required
     status = "success";

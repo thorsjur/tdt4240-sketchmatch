@@ -9,7 +9,7 @@ import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.JoinGameByCodeRequestDTO
-import com.groupfive.sketchmatch.communication.dto.response.JoinRoomByCodeResponseDTO
+import com.groupfive.sketchmatch.communication.dto.response.JoinRoomResponseDTO
 
 class GameRoomsViewModel : ViewModel() {
     val gameRooms: MutableLiveData<List<GameRoom>> = MutableLiveData()
@@ -81,14 +81,14 @@ class GameRoomsViewModel : ViewModel() {
         }
 
         // Add a callback to handle incoming join_room_by_code_response messages
-        client.addCallback(ResponseEvent.JOIN_ROOM_BY_CODE_RESPONSE.value) { message ->
-            Log.i("GameRoomsViewModel", "JOIN_ROOM_BY_CODE_RESPONSE_EVENT: $message")
+        client.addCallback(ResponseEvent.JOIN_ROOM_RESPONSE.value) { message ->
+            Log.i("GameRoomsViewModel", "JOIN_ROOM_RESPONSE: $message")
 
             // Parse the game room from the json message string
             val gson = Gson()
 
             // Convert the json string to a GameRoom object
-            val response = gson.fromJson(message, JoinRoomByCodeResponseDTO::class.java)
+            val response = gson.fromJson(message, JoinRoomResponseDTO::class.java)
 
             if (response.status == "success") {
                 Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom?.gameCode}")

@@ -136,6 +136,7 @@ fun JoinGameRoomByCodePopupContent(
 
             var errorMessage = when(joinGameByCodeMessage) {
                 "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
+                "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
                 else -> stringResource(id = R.string.something_went_wrong)
             }
 

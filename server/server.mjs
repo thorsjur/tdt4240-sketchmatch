@@ -12,7 +12,7 @@ import { SetNicknameResponsetDTO } from './Dto/Response/SetNicknameResponseDTO.m
 import { CreateGameRequestDTO } from './Dto/Request/CreateGameRequestDTO.mjs';
 import { CreateGameResponseDTO } from './Dto/Response/CreateGameResponseDTO.mjs';
 import { JoinGameByCodeRequest } from './Dto/Request/JoinGameByCodeRequestDTO.mjs';
-import { JoinRoomByCodeResponseDTO } from './Dto/Response/JoinRoomByCodeResponseDTO.mjs';
+import { JoinRoomResponseDTO } from './Dto/Response/JoinRoomResponseDTO.mjs';
 
 
 const app = express();
@@ -133,7 +133,7 @@ io.on("connection", (socket) => {
     socket.on("join_room_by_code", (data) => {
         let jsonData = JSON.parse(data);
         
-        var response = new JoinRoomByCodeResponseDTO();
+        var response = new JoinRoomResponseDTO();
 
         try {
             let dto = new JoinGameByCodeRequest();
@@ -144,7 +144,7 @@ io.on("connection", (socket) => {
 
             if (!gameRoom) {
                 response.status = "error";
-                response.message = "Game room not found";
+                response.message = "game_room_not_found";
             } else if (gameRoom.players.length >= gameRoom.gameCapacity) {
                 response.status = "error";
                 response.message = "game_room_already_full";
@@ -162,7 +162,7 @@ io.on("connection", (socket) => {
         }
 
         // Emit join_room_by_code_response only to the sender
-        socket.emit("join_room_by_code_response", response);
+        socket.emit("join_room_response", response);
     });
 });
 
