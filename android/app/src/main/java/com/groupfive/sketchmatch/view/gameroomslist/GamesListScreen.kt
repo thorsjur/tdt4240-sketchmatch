@@ -67,7 +67,9 @@ fun GamesListScreen(
     }
 
     navigateEvent?.getContentIfNotHandled()?.let {
-        // Navigate to the game lobby screen
+        viewModel.removeAllCallbacks()
+
+        // TODO: Navigate to the game lobby screen in stead of Draw screen
         navController.navigate(Screen.Draw.route)
     }
 
