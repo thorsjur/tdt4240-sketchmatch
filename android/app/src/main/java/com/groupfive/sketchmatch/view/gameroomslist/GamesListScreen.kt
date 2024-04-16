@@ -1,7 +1,9 @@
 package com.groupfive.sketchmatch.view.gameroomslist
 
+import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,16 +49,26 @@ fun GamesListScreen(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
+    val context = LocalContext.current
     val viewModel: GameRoomsViewModel = viewModel()
     val gameRooms by viewModel.gameRooms.observeAsState()
     var openCreateGamePopup by remember { mutableStateOf(false) }
     var openJoinGameRoomByCodePopup by remember { mutableStateOf(false) }
+
+    val navigateEvent by viewModel.navigateToGameLobby.observeAsState()
+    val joinGameByCodeStatus by viewModel.joinGameByCodeStatus.observeAsState(false)
+    val joinGameByCodeMessage by viewModel.joinGameByCodeMessage.observeAsState("")
 
     // Handle back button press
     BackHandler {
         // Remove all callbacks for events from the server as we are leaving the screen and don't need them anymore to update the UI
         viewModel.removeAllCallbacks()
         navController.popBackStack()
+    }
+
+    navigateEvent?.getContentIfNotHandled()?.let {
+        // Navigate to the game lobby screen
+        navController.navigate(Screen.Draw.route)
     }
 
     Surface(
@@ -136,20 +149,16 @@ fun GamesListScreen(
             ) {
                 items(items = gameRooms ?: emptyList()) { gameRoom ->
                     GameRoomItem(gameRoom = gameRoom) {
-                        // Handle join button click here
-                        Log.i("GamesListScreen", "Joining room ${gameRoom.id}")
-                        viewModel.removeAllCallbacks()
-
-                        // TODO: Implement join game room functionality
-                        navController.navigate(Screen.Draw.route)
+                        // Handle join button click on a game room
+                        // Send a request to the server to join the game room
+                        viewModel.joinGameByCode(gameRoom.gameCode)
                     }
                 }
-
             }
         }
     }
 
-    if(openJoinGameRoomByCodePopup){
+    if(openJoinGameRoomByCodePopup) {
         JoinGameRoomByCodePopup(
             onSubmit = { gameCode ->
                 // Handle join game by code button click here
@@ -167,6 +176,13 @@ fun GamesListScreen(
                 navController.navigate(Screen.Draw.route)
             }
         )
+    }
+
+    // When join button is clicked and server responds with error status
+    if (!joinGameByCodeStatus && joinGameByCodeMessage.isNotEmpty()) {
+        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
+        viewModel.joinGameByCodeStatus.postValue(false)
+        viewModel.joinGameByCodeMessage.postValue("")
     }
 }
 
@@ -214,6 +230,25 @@ fun Divider(height: Int = 1) {
             .height(height.dp),
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
     ) {}
+}
+
+// Toast Maker
+@Composable
+fun GamesListToastMaker(
+    context: Context = LocalContext.current,
+    messageId: String
+) {
+    var message = when(messageId){
+        "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
+        "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
+        else -> stringResource(id = R.string.something_went_wrong)
+    }
+
+    Toast.makeText(
+        context,
+        message,
+        Toast.LENGTH_SHORT
+    ).show()
 }
 
 @Preview(showBackground = true, widthDp = 360, uiMode = Configuration.UI_MODE_NIGHT_YES)

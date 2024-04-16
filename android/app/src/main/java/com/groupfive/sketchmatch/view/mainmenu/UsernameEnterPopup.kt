@@ -2,7 +2,6 @@ package com.groupfive.sketchmatch.view.mainmenu
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.provider.Settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,7 +50,6 @@ fun UsernameEnterDialog(
 ){
     val viewModel: SetNicknameViewModel = viewModel()
     val context = LocalContext.current
-    val hwid = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
     val setNicknameIsSuccess by viewModel.nicknameSetStatus.observeAsState(false)
     val setNicknameMessage by viewModel.nicknameSetMessage.observeAsState("")
@@ -72,7 +70,7 @@ fun UsernameEnterDialog(
             ) {
                 UsernameEnterDialogContent(
                     onSubmit = { username ->
-                        viewModel.setNickname(username, hwid)
+                        viewModel.setNickname(username)
                     }
                 )
             }

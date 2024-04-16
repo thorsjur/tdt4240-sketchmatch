@@ -1,6 +1,6 @@
 import { BaseDTO } from '../BaseDTO.mjs';
 
-export class JoinRoomResponseDTO extends BaseDTO {
+export class JoinGameResponseDTO extends BaseDTO {
 
     // Properties declaration. If true, the property is required
     status = "success";

@@ -12,7 +12,7 @@ import { SetNicknameResponsetDTO } from './Dto/Response/SetNicknameResponseDTO.m
 import { CreateGameRequestDTO } from './Dto/Request/CreateGameRequestDTO.mjs';
 import { CreateGameResponseDTO } from './Dto/Response/CreateGameResponseDTO.mjs';
 import { JoinGameByCodeRequest } from './Dto/Request/JoinGameByCodeRequestDTO.mjs';
-import { JoinRoomResponseDTO } from './Dto/Response/JoinRoomResponseDTO.mjs';
+import { JoinGameResponseDTO } from './Dto/Response/JoinGameResponseDTO.mjs';
 
 
 const app = express();
@@ -69,7 +69,6 @@ io.on("connection", (socket) => {
 
         // Create response object which will be sent to the client
         var response = new SetNicknameResponsetDTO()
-        var hwid = socket.handshake.query.hwid;
 
         try {
             // Create DTO object from the json data sent by the client
@@ -132,8 +131,10 @@ io.on("connection", (socket) => {
     // On join_room_by_code event
     socket.on("join_room_by_code", (data) => {
         let jsonData = JSON.parse(data);
+
+        console.log(`Joining room by code: ${jsonData.gameCode}`);
         
-        var response = new JoinRoomResponseDTO();
+        var response = new JoinGameResponseDTO();
 
         try {
             let dto = new JoinGameByCodeRequest();

@@ -1,5 +1,6 @@
 package com.groupfive.sketchmatch.view.gameroomslist
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -52,40 +53,29 @@ fun JoinGameRoomByCodePopup(
     val joinGameByCodeStatus by viewModel.joinGameByCodeStatus.observeAsState(false)
     val joinGameByCodeMessage by viewModel.joinGameByCodeMessage.observeAsState("")
 
-    //if (!setNicknameIsSuccess && nickname.isEmpty()) {
-        Dialog(onDismissRequest = {
-            onDismiss()
-            viewModel.joinGameByCodeStatus.postValue(false)
-            viewModel.joinGameByCodeMessage.postValue("")
-        }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .wrapContentHeight()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-            ) {
-                JoinGameRoomByCodePopupContent(
-                    joinGameByCodeStatus = joinGameByCodeStatus,
-                    joinGameByCodeMessage = joinGameByCodeMessage,
-                    onSubmit = { gameCode ->
-                        onSubmit(gameCode)
-                        viewModel.joinGameByCodeStatus.postValue(false)
-                        viewModel.joinGameByCodeMessage.postValue("")
-                    }
-                )
-            }
-        }
-    //}
 
-    if(joinGameByCodeStatus) {
-        onSuccess()
-        viewModel.joinGameByCodeStatus.postValue(false)
-        viewModel.joinGameByCodeMessage.postValue("")
+    Dialog(onDismissRequest = {
+        onDismiss()
+    }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .wrapContentHeight()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            JoinGameRoomByCodePopupContent(
+                joinGameByCodeStatus = joinGameByCodeStatus,
+                joinGameByCodeMessage = joinGameByCodeMessage,
+                onSubmit = { gameCode ->
+                    onSubmit(gameCode)
+                }
+            )
+        }
     }
 }
 
@@ -132,21 +122,9 @@ fun JoinGameRoomByCodePopupContent(
 
         // Error message text
         if (!joinGameByCodeStatus && joinGameByCodeMessage != "") {
-            // Switch case for error message based on joinGameByCodeMessage
-
-            var errorMessage = when(joinGameByCodeMessage) {
-                "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
-                "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
-                else -> stringResource(id = R.string.something_went_wrong)
-            }
-
-            Text(
-                text = errorMessage,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.error
-                ),
-                modifier = Modifier.padding(bottom = 10.dp, start = 20.dp, end = 20.dp),
-                textAlign = TextAlign.Center
+            JoinGameRoomByCodeErrorMessage(
+                context = LocalContext.current,
+                messageId = joinGameByCodeMessage
             )
         }
 
@@ -165,6 +143,20 @@ fun JoinGameRoomByCodePopupContent(
             Text(stringResource(id = R.string.submit))
         }
     }
+}
+
+@Composable
+fun JoinGameRoomByCodeErrorMessage(
+    context: Context = LocalContext.current,
+    messageId: String
+) {
+    var message = when(messageId){
+        "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
+        "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
+        else -> stringResource(id = R.string.something_went_wrong)
+    }
+
+    GamesListToastMaker(context = context, messageId = message)
 }
 
 @Preview(showBackground = true, widthDp = 360, uiMode = Configuration.UI_MODE_NIGHT_YES)

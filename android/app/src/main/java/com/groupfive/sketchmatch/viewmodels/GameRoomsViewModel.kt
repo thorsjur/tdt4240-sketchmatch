@@ -9,7 +9,8 @@ import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.JoinGameByCodeRequestDTO
-import com.groupfive.sketchmatch.communication.dto.response.JoinRoomResponseDTO
+import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
+import com.groupfive.sketchmatch.navigator.NavigationEvent
 
 class GameRoomsViewModel : ViewModel() {
     val gameRooms: MutableLiveData<List<GameRoom>> = MutableLiveData()
@@ -17,6 +18,8 @@ class GameRoomsViewModel : ViewModel() {
 
     val joinGameByCodeStatus: MutableLiveData<Boolean> = MutableLiveData()
     val joinGameByCodeMessage: MutableLiveData<String> = MutableLiveData()
+
+    val navigateToGameLobby = MutableLiveData<NavigationEvent<Unit>>()
 
     init {
         // Initialize the list of game rooms with fake data
@@ -88,19 +91,20 @@ class GameRoomsViewModel : ViewModel() {
             val gson = Gson()
 
             // Convert the json string to a GameRoom object
-            val response = gson.fromJson(message, JoinRoomResponseDTO::class.java)
+            val response = gson.fromJson(message, JoinGameResponseDTO::class.java)
+
+            joinGameByCodeMessage.postValue(response.message)
 
             if (response.status == "success") {
                 Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom?.gameCode}")
 
                 joinGameByCodeStatus.postValue(true)
+                navigateToGameLobby.postValue(NavigationEvent(Unit))  // Trigger the navigation event
 
                 // TODO: Navigate to the game room screen
             } else {
                 // Display an error message
             }
-
-            joinGameByCodeMessage.postValue(response.message)
         }
 
         // Request the list of game rooms from the server
