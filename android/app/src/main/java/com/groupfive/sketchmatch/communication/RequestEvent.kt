@@ -15,4 +15,10 @@ enum class RequestEvent(val value: String) {
     // Event for publishing a path to a room
     PUBLISH_PATH("publish_path"),
 
+    // Event for subscribing to a specific room
+    SUBSCRIBE_TO_ROOM("subscribe_to_room"),
+    
+    // Event for unsubscribing from a specific room
+    UNSUBSCRIBE_FROM_ROOM("unsubscribe_from_room"),
+
 }

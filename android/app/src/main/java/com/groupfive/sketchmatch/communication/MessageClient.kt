@@ -6,6 +6,8 @@ import com.groupfive.sketchmatch.BuildConfig
 import com.groupfive.sketchmatch.MESSAGE_EVENT
 import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.PublishPathRequestDTO
+import com.groupfive.sketchmatch.communication.dto.request.RoomEventRequestDTO
+import com.groupfive.sketchmatch.communication.dto.response.PayloadResponseDTO
 import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
 import com.groupfive.sketchmatch.serialization.PathWrapperSerializer
 import dev.icerock.moko.socket.Socket
@@ -39,6 +41,7 @@ class MessageClient private constructor(
 
     private lateinit var socket: Socket
     private val eventCallbacks: MutableMap<String, MutableList<(String) -> Unit>> = mutableMapOf()
+    private val gson = Gson()
 
     init {
         setSocket()
@@ -136,6 +139,11 @@ class MessageClient private constructor(
                 on(ResponseEvent.ROOM_DESTROYED.value) { msg ->
                     invokeCallbacks(ResponseEvent.ROOM_DESTROYED.value, msg)
                 }
+
+                // On MESSAGE_PUBLISHED_IN_SUBSCRIBED_ROOM
+                on(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) { msg ->
+                    invokeCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value, msg)
+                }
             }
         } catch (e: URISyntaxException) {
 
@@ -159,37 +167,57 @@ class MessageClient private constructor(
     }
 
     @Synchronized
+    fun subscribeToRoom(roomId: Int, callback: (DrawBoxPayLoad) -> Unit) {
+        sendMessage(
+            eventName = RequestEvent.SUBSCRIBE_TO_ROOM.value,
+            msg = gson.toJson(
+                RoomEventRequestDTO(
+                    roomId = roomId
+                )
+            )
+        )
+        addCallback(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) {
+            val response = gson.fromJson(it, PayloadResponseDTO::class.java)
+            val drawBoxPayLoad =
+                Json.decodeFromString(DrawBoxPayLoadSerializer, response.pathPayload)
+            callback(drawBoxPayLoad)
+        }
+    }
+
+    @Synchronized
+    fun unsubscribeFromRoom(roomId: Int) {
+        sendMessage(
+            eventName = RequestEvent.UNSUBSCRIBE_FROM_ROOM.value,
+            msg = gson.toJson(
+                RoomEventRequestDTO(
+                    roomId = roomId
+                )
+            )
+        )
+        removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
+    }
+
+    @Synchronized
     fun publishPathToRoom(roomId: Int, path: PathWrapper) {
         val stringifiedPath = Json.encodeToString(PathWrapperSerializer, path)
         val request = PublishPathRequestDTO(roomId, stringifiedPath)
-        val gson = Gson()
         val data = gson.toJson(request)
 
-        if (!isConnected()) return
-        socket.emit(
-            RequestEvent.PUBLISH_PATH.value,
-            data
-        )
+        sendMessage(RequestEvent.PUBLISH_PATH.value, data)
     }
 
     @Synchronized
     fun publishFullDrawBoxPayload(roomId: Int, payLoad: DrawBoxPayLoad) {
         val stringifiedPayload = Json.encodeToString(DrawBoxPayLoadSerializer, payLoad)
         val request = PublishPathRequestDTO(roomId, stringifiedPayload)
-        val gson = Gson()
         val data = gson.toJson(request)
 
-        if (!isConnected()) return
-        socket.emit(
-            RequestEvent.PUBLISH_PATH.value,
-            data
-        )
+        sendMessage(RequestEvent.PUBLISH_PATH.value, data)
     }
 
     @Synchronized
     fun createGameRoom(gameRoomName: String, roomCapacity: Int) {
         val requestData = CreateGameRequestDTO(gameRoomName, roomCapacity)
-        val gson = Gson()
         val data = gson.toJson(requestData)
 
         if (!isConnected()) return

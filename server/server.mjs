@@ -9,6 +9,7 @@ import { PlayersRepository } from "./Repository/PlayersRepository.mjs";
 // DTOs
 import { CreateGameRequestDTO } from "./Dto/Request/CreateGameRequestDTO.mjs";
 import { PublishPathRequestDTO } from "./Dto/Request/PublishPathRequestDTO.mjs";
+import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
 import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
 import { CreateGameResponseDTO } from "./Dto/Response/CreateGameResponseDTO.mjs";
 import { SetNicknameResponsetDTO } from "./Dto/Response/SetNicknameResponseDTO.mjs";
@@ -126,6 +127,24 @@ io.on("connection", (socket) => {
     const json = JSON.parse(data);
     const dto = new PublishPathRequestDTO();
     dto.setProperties(json);
+
+    io.to(dto.roomId).emit("draw_payload_published", JSON.stringify(dto));
+  });
+
+  socket.on("subscribe_to_room", (data) => {
+    const json = JSON.parse(data);
+    const dto = new RoomEventRequestDTO();
+    dto.setProperties(json);
+
+    socket.join(dto.roomId);
+  });
+
+  socket.on("unsubscribe_from_room", (data) => {
+    const json = JSON.parse(data);
+    const dto = new RoomEventRequestDTO();
+    dto.setProperties(json);
+
+    socket.leave(dto.roomId);
   });
 });
 

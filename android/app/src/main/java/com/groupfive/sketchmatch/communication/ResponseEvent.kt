@@ -19,6 +19,9 @@ enum class ResponseEvent(val value: String) {
     ROOMS_LIST("game_room_list"),
 
     // Event for when server sends response of game room creation request
-    ROOM_CREATED_RESPONSE("game_room_created_response")
+    ROOM_CREATED_RESPONSE("game_room_created_response"),
+
+    // Event for when server publishes to a room the client is subscribed to
+    DRAW_PAYLOAD_PUBLISHED("draw_payload_published"),
 
 }

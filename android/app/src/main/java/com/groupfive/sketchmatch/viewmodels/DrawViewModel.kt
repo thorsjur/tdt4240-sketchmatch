@@ -53,10 +53,11 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val client = MessageClient.getInstance()
 
-    fun publishLatestPath(controller: DrawController) {
-        val payload = controller.exportPath()
-        client.publishPathToRoom(roomId.toInt(), payload.path.last())
-    }
+    fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
+        roomId = roomId.toInt()
+    ) { controller.importPath(it) }
+
+    fun unsubscribeFromRoom() = client.unsubscribeFromRoom(roomId.toInt())
 
     fun publishFullDrawBoxPayload(controller: DrawController) {
         val payload = controller.exportPath()

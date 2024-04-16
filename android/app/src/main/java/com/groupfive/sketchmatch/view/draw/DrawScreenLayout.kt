@@ -78,7 +78,7 @@ fun DrawScreenLayout(
                         drawViewModel = drawViewModel
                     )
                 } else {
-                    GuessScreen(modifier = Modifier.weight(1f))
+                    GuessScreen(modifier = Modifier.weight(1f), drawViewModel = drawViewModel)
                 }
 
                 Row(
