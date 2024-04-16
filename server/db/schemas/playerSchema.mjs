@@ -1,13 +1,13 @@
 export const playerSchema = {
     title: 'playerSchema',
-    version: 1,
+    version: 0,
     description: 'Holds the players',
     primaryKey: 'id',
     type: 'object',
     properties: {
         id: {
-            type: 'number',
-            maxLength: 15
+            type: 'string',
+            maxLength: 100,
         },
         hwid: {
             type: 'string'
@@ -17,13 +17,15 @@ export const playerSchema = {
         },
         score: {
             type: 'number',
-            minimum: 0
+            minimum: 0,
+            maximum: 2500,
+            multipleOf: 1
         }
     },
     required: [
-        id,
-        hwid,
-        nickname,
-        score
+        'id',
+        'hwid',
+        'nickname',
+        'score'
     ]
 }

@@ -10,19 +10,22 @@ export const guessesSchema = {
     type: 'object',
     properties: {
         id: {
-            type: 'number',
-            maxLength: 100 // <- the primary key must have set maxLength
+            type: 'string',
+            maxLength: 100,
         },
         guess: {
             type: 'string',
         },
         points: {
-            type: 'number'
+            type: 'number',
+            minimum: 0,
+            maximum: 100,
+            mulitpleOf: 1
         }
     },
     required: [
-        id,
-        guess,
-        points
+        'id',
+        'guess',
+        'points'
     ]
-}
+};

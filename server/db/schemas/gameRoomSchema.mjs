@@ -1,13 +1,13 @@
 export const gameRoomSchema = {
     title: 'gameRoomSchema',
-    version: 1,
+    version: 0,
     description: 'Holds the game rooms',
     primaryKey: 'id',
     type: 'object',
     properties: {
         id: {
-            type: 'number',
-            maxLength: 15
+            type: 'string',
+            maxLength: 100,
         },
         gameCode: {
             type: 'string'
@@ -16,7 +16,10 @@ export const gameRoomSchema = {
             type: 'string'
         },
         gameCapacity: {
-            type: 'number'
+            type: 'number',
+            minimum: 0,
+            maximum: 5,
+            multipleOf: 1
         },
         players: {
             type: 'array',
@@ -31,11 +34,11 @@ export const gameRoomSchema = {
         }
     },
     required: [
-        id,
-        gameCode,
-        gameName,
-        gameCapacity,
-        players,
-        gameStatus
+        'id',
+        'gameCode',
+        'gameName',
+        'gameCapacity',
+        'players',
+        'gameStatus'
     ]
 }
