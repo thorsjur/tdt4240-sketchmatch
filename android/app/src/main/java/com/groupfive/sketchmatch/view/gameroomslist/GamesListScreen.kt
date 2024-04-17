@@ -1,7 +1,9 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.gameroomslist
 
+import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.CreateGamePopUp
+import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
@@ -44,9 +49,14 @@ fun GamesListScreen(
     modifier: Modifier = Modifier,
     navController: NavController
 ) {
+    val context = LocalContext.current
     val viewModel: GameRoomsViewModel = viewModel()
     val gameRooms by viewModel.gameRooms.observeAsState()
     var openCreateGamePopup by remember { mutableStateOf(false) }
+    var openJoinGameRoomByCodePopup by remember { mutableStateOf(false) }
+
+    val successEvent by viewModel.successEvent.observeAsState()
+    val errorEvent by viewModel.errorEvent.observeAsState()
 
     // Handle back button press
     BackHandler {
@@ -55,19 +65,35 @@ fun GamesListScreen(
         navController.popBackStack()
     }
 
+    successEvent?.getContentIfNotHandled()?.let {
+        viewModel.removeAllCallbacks()
+
+        // TODO: Navigate to the game lobby screen in stead of Draw screen
+        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
+        // TODO: Replace mockId with actual roomId
+        val mockId = 1234
+        navController.navigate(Screen.Draw.route + "/$mockId")
+    }
+
+    errorEvent?.getContentIfNotHandled()?.let {
+        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(modifier = modifier
-            .fillMaxSize()
-            .padding(5.dp),
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(5.dp, top = 20.dp, bottom = 0.dp),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally) {
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp, bottom = 0.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -76,7 +102,7 @@ fun GamesListScreen(
                 Button(
                     onClick = {
                         openCreateGamePopup = true
-                            // Handle create game button click here
+                        // Handle create game button click here
                         Log.i("GamesListScreen", "Create game button clicked")
                     }
                 ) {
@@ -91,13 +117,31 @@ fun GamesListScreen(
                     onClick = {
                         // Handle join by code button click here
                         Log.i("GamesListScreen", "Join by code button clicked")
+
+                        openJoinGameRoomByCodePopup = true
                     }
                 ) {
                     Text(text = stringResource(R.string.join_by_code_button))
                 }
+
+                // Spacer
+                Spacer(modifier = Modifier.width(15.dp))
             }
 
-            CreateGamePopUp(openCreateGamePopup = openCreateGamePopup, onOpenCreateGamePopup = { openCreateGamePopup = it })
+            Button(
+                modifier = Modifier
+                    .padding(16.dp),
+                onClick = {
+                    // Handle refresh button click here
+                    viewModel.refreshGameRooms()
+                }
+            ) {
+                Text(text = stringResource(R.string.refresh))
+            }
+
+            CreateGamePopUp(
+                openCreateGamePopup = openCreateGamePopup,
+                onOpenCreateGamePopup = { openCreateGamePopup = it })
 
             Column(Modifier.height(20.dp)) {
                 Text(
@@ -117,17 +161,35 @@ fun GamesListScreen(
             ) {
                 items(items = gameRooms ?: emptyList()) { gameRoom ->
                     GameRoomItem(gameRoom = gameRoom) {
-                        // Handle join button click here
-                        Log.i("GamesListScreen", "Joining room ${gameRoom.id}")
-                        viewModel.removeAllCallbacks()
-
-                        // TODO: Implement join game room functionality
-                        navController.navigate(Screen.MainMenu.route)
+                        // Handle join button click on a game room
+                        // Send a request to the server to join the game room
+                        viewModel.joinGameByCode(gameRoom.gameCode)
                     }
                 }
-
             }
         }
+    }
+
+    if (openJoinGameRoomByCodePopup) {
+        JoinGameRoomByCodePopup(
+            onSubmit = { gameCode ->
+                // Handle join game by code button click here
+                Log.i("GamesListScreen", "Joining room with code $gameCode")
+
+                viewModel.joinGameByCode(gameCode)
+            },
+            onDismiss = { openJoinGameRoomByCodePopup = false },
+            onSuccess = {
+                Log.i("GamesListScreen", "Joined game room successfully")
+                openJoinGameRoomByCodePopup = false
+                viewModel.removeAllCallbacks()
+
+                // TODO: Navigate to the game lobby screen
+                // TODO: Replace mockId with actual roomId
+                val mockId = 1234
+                navController.navigate(Screen.Draw.route + "/$mockId")
+            }
+        )
     }
 }
 
@@ -143,13 +205,25 @@ fun GameRoomItem(gameRoom: GameRoom, onJoinClicked: (Int) -> Unit) {
     ) {
         Column {
             // Var name get text from var strings and pass the room name as parameter
-            Text(text = String.format(stringResource(id = R.string.room_list_row_name),
-                gameRoom.gameName))
-            Text(text = String.format(stringResource(id = R.string.room_list_row_players),
-                gameRoom.players.size,
-                gameRoom.gameCapacity))
-            Text(text = String.format(stringResource(id = R.string.room_list_row_status),
-                gameRoom.gameStatus.name))
+            Text(
+                text = String.format(
+                    stringResource(id = R.string.room_list_row_name),
+                    gameRoom.gameName
+                )
+            )
+            Text(
+                text = String.format(
+                    stringResource(id = R.string.room_list_row_players),
+                    gameRoom.players.size,
+                    gameRoom.gameCapacity
+                )
+            )
+            Text(
+                text = String.format(
+                    stringResource(id = R.string.room_list_row_status),
+                    gameRoom.gameStatus.name
+                )
+            )
         }
         JoinButton(onJoinClicked = { onJoinClicked(gameRoom.id) })
     }
@@ -175,6 +249,25 @@ fun Divider(height: Int = 1) {
             .height(height.dp),
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
     ) {}
+}
+
+// Toast Maker
+@Composable
+fun GamesListToastMaker(
+    context: Context = LocalContext.current,
+    messageId: String
+) {
+    var message = when (messageId) {
+        "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
+        "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
+        else -> stringResource(id = R.string.something_went_wrong)
+    }
+
+    Toast.makeText(
+        context,
+        message,
+        Toast.LENGTH_SHORT
+    ).show()
 }
 
 @Preview(showBackground = true, widthDp = 360, uiMode = Configuration.UI_MODE_NIGHT_YES)

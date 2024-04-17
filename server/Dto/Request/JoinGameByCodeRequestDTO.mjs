@@ -1,9 +1,9 @@
 import { BaseDTO } from '../BaseDTO.mjs';
 
-export class SetNicknameRequestDTO extends BaseDTO {
+export class JoinGameByCodeRequest extends BaseDTO {
 
     // Properties declaration. If true, the property is required
-    nickname = true;
+    gameCode = true;
 
     // Override the setProperties method
     setProperties(dataJson) {

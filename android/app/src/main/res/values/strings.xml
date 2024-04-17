@@ -50,5 +50,19 @@
     <string name="set_nickname_success_msg">Nickname set successfully</string>
     <string name="set_nickname_error_msg">Something went wrong. Please try again or restart the game.</string>
     <string name="greetings_message">Hey, %1$s!</string>
+    <string name="choose_word">Choose a word to draw</string>
+    <string name="easy_word">Easy</string>
+    <string name="medium_word">Medium</string>
+    <string name="hard_word">Hard</string>
+    <string name="new_words">New words</string>
+    <string name="leave_game">Leave game</string>
+    <string name="draw">Draw</string>
+    <string name="guess">Guess</string>
+    <string name="join_game_by_code">Join game by a code</string>
+    <string name="game_code">Game code</string>
+    <string name="refresh">Refresh</string>
+    <string name="game_room_already_full">The game room is already full</string>
+    <string name="game_room_not_found">Game room not found</string>
+    <string name="something_went_wrong">Something went wrong. Please try again or restart the app.</string>
 
 </resources>
