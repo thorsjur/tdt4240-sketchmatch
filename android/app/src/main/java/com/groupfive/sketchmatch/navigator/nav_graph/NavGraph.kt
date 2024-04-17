@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.groupfive.sketchmatch.DrawScreen
-import com.groupfive.sketchmatch.GamesListScreen
+import com.groupfive.sketchmatch.view.gameroomslist.GamesListScreen
 import com.groupfive.sketchmatch.HelpScreen
 import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
 import com.groupfive.sketchmatch.navigator.Screen

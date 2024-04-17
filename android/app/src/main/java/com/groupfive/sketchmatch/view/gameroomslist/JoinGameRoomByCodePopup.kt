@@ -1,6 +1,6 @@
-package com.groupfive.sketchmatch.view.mainmenu
+package com.groupfive.sketchmatch.view.gameroomslist
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -39,60 +39,58 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
-import com.groupfive.sketchmatch.viewmodels.SetNicknameViewModel
+import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
 
-@SuppressLint("HardwareIds")
 @Composable
-fun UsernameEnterDialog(
+fun JoinGameRoomByCodePopup(
     modifier: Modifier = Modifier,
     onSubmit: (String) -> Unit,
-    onSuccess: (String, String) -> Unit
+    onDismiss: () -> Unit,
+    onSuccess: () -> Unit
 ){
-    val viewModel: SetNicknameViewModel = viewModel()
     val context = LocalContext.current
+    var viewModel: GameRoomsViewModel = viewModel()
+    val joinGameByCodeStatus by viewModel.joinGameByCodeStatus.observeAsState(false)
+    val joinGameByCodeMessage by viewModel.joinGameByCodeMessage.observeAsState("")
 
-    val setNicknameIsSuccess by viewModel.nicknameSetStatus.observeAsState(false)
-    val setNicknameMessage by viewModel.nicknameSetMessage.observeAsState("")
-    val nickname by viewModel.nickname.observeAsState("")
 
-    if (!setNicknameIsSuccess && nickname.isEmpty()) {
-        Dialog(onDismissRequest = { }) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .wrapContentHeight()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-            ) {
-                UsernameEnterDialogContent(
-                    onSubmit = { username ->
-                        viewModel.setNickname(username)
-                    }
-                )
-            }
+    Dialog(onDismissRequest = {
+        onDismiss()
+    }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .wrapContentHeight()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            JoinGameRoomByCodePopupContent(
+                joinGameByCodeStatus = joinGameByCodeStatus,
+                joinGameByCodeMessage = joinGameByCodeMessage,
+                onSubmit = { gameCode ->
+                    onSubmit(gameCode)
+                }
+            )
         }
-    }
-
-    if (setNicknameIsSuccess) {
-        onSuccess(nickname, setNicknameMessage)
-        viewModel.nicknameSetStatus.postValue(false)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UsernameEnterDialogContent(
+fun JoinGameRoomByCodePopupContent(
+    joinGameByCodeStatus: Boolean,
+    joinGameByCodeMessage: String = "",
     onSubmit: (String) -> Unit
 ) {
     var gameNameString by remember { mutableStateOf("") }
 
     Column (horizontalAlignment = Alignment.CenterHorizontally){
         Text(
-            text = stringResource(id = R.string.set_nickname_modal_title),
+            text = stringResource(id = R.string.join_game_by_code),
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
@@ -106,7 +104,7 @@ fun UsernameEnterDialogContent(
         TextField(
             value = gameNameString,
             onValueChange = { gameNameString = it },
-            label = { Text(stringResource(id = R.string.nickname)) },
+            label = { Text(stringResource(id = R.string.game_code)) },
             modifier = Modifier
                 .padding(20.dp)
                 .width(300.dp),
@@ -121,6 +119,15 @@ fun UsernameEnterDialogContent(
             ),
             shape = RoundedCornerShape(8.dp)
         )
+
+        // Error message text
+        if (!joinGameByCodeStatus && joinGameByCodeMessage != "") {
+            JoinGameRoomByCodeErrorMessage(
+                context = LocalContext.current,
+                messageId = joinGameByCodeMessage
+            )
+        }
+
 
         Button(
             modifier = Modifier
@@ -138,15 +145,29 @@ fun UsernameEnterDialogContent(
     }
 }
 
+@Composable
+fun JoinGameRoomByCodeErrorMessage(
+    context: Context = LocalContext.current,
+    messageId: String
+) {
+    var message = when(messageId){
+        "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
+        "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
+        else -> stringResource(id = R.string.something_went_wrong)
+    }
+
+    GamesListToastMaker(context = context, messageId = message)
+}
+
 @Preview(showBackground = true, widthDp = 360, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(showBackground = true, widthDp = 360)
 @Composable
-fun UsernameEnterDialogPreview() {
+fun JoinGameRoomByCodePopupPreview() {
     SketchmatchTheme {
-        UsernameEnterDialog(
+        JoinGameRoomByCodePopup(
             onSubmit = {},
-            onSuccess = { username, message ->
-            }
+            onDismiss = {},
+            onSuccess = {}
         )
     }
 }

@@ -11,6 +11,8 @@ import { SetNicknameRequestDTO } from './Dto/Request/SetNicknameRequestDTO.mjs';
 import { SetNicknameResponsetDTO } from './Dto/Response/SetNicknameResponseDTO.mjs';
 import { CreateGameRequestDTO } from './Dto/Request/CreateGameRequestDTO.mjs';
 import { CreateGameResponseDTO } from './Dto/Response/CreateGameResponseDTO.mjs';
+import { JoinGameByCodeRequest } from './Dto/Request/JoinGameByCodeRequestDTO.mjs';
+import { JoinGameResponseDTO } from './Dto/Response/JoinGameResponseDTO.mjs';
 
 
 const app = express();
@@ -67,7 +69,6 @@ io.on("connection", (socket) => {
 
         // Create response object which will be sent to the client
         var response = new SetNicknameResponsetDTO()
-        var hwid = socket.handshake.query.hwid;
 
         try {
             // Create DTO object from the json data sent by the client
@@ -112,7 +113,7 @@ io.on("connection", (socket) => {
             response.gameRoom = gameRoom;
 
             console.log(
-                `Creating room: ${gameRoom.gameName} with capacity ${gameRoom.gameCapacity}`
+                `Creating room: ${gameRoom.gameCode} with capacity ${gameRoom.gameCapacity}`
             );
 
         } catch (error) {
@@ -125,6 +126,44 @@ io.on("connection", (socket) => {
         if (response.status == "success") {
             io.emit("game_room_created", response.gameRoom);
         }
+    });
+
+    // On join_room_by_code event
+    socket.on("join_room_by_code", (data) => {
+        let jsonData = JSON.parse(data);
+
+        console.log(`Joining room by code: ${jsonData.gameCode}`);
+        
+        var response = new JoinGameResponseDTO();
+
+        try {
+            let dto = new JoinGameByCodeRequest();
+            dto.setProperties(jsonData);
+
+            const player = playersRepository.getPlayerByHWID(hwid);
+            const gameRoom = gameRoomsRepository.getGameRoomByCode(dto.gameCode);
+
+            if (!gameRoom) {
+                response.status = "error";
+                response.message = "game_room_not_found";
+            } else if (gameRoom.players.length >= gameRoom.gameCapacity) {
+                response.status = "error";
+                response.message = "game_room_already_full";
+            } else {
+                gameRoom.addPlayer(player);
+                response.gameRoom = gameRoom;
+
+                // Emit game_room_updated event to all clients
+                console.log(`Emitting game_room_updated event to all clients`);
+                io.emit("game_room_updated", gameRoom);
+            }
+        } catch (error) {
+            response.status = "error";
+            response.message = "something_went_wrong";
+        }
+
+        // Emit join_room_by_code_response only to the sender
+        socket.emit("join_room_response", response);
     });
 });
 
