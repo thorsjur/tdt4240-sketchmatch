@@ -8,11 +8,14 @@ import { PlayersRepository } from "./Repository/PlayersRepository.mjs";
 
 // DTOs
 import { CreateGameRequestDTO } from "./Dto/Request/CreateGameRequestDTO.mjs";
+import { JoinGameByCodeRequest } from './Dto/Request/JoinGameByCodeRequestDTO.mjs';
 import { PublishPathRequestDTO } from "./Dto/Request/PublishPathRequestDTO.mjs";
 import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
 import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
 import { CreateGameResponseDTO } from "./Dto/Response/CreateGameResponseDTO.mjs";
+import { JoinGameResponseDTO } from './Dto/Response/JoinGameResponseDTO.mjs';
 import { SetNicknameResponsetDTO } from "./Dto/Response/SetNicknameResponseDTO.mjs";
+
 
 const app = express();
 const port = 40401;
@@ -146,6 +149,44 @@ io.on("connection", (socket) => {
 
     socket.leave(dto.roomId);
   });
+
+    // On join_room_by_code event
+    socket.on("join_room_by_code", (data) => {
+        let jsonData = JSON.parse(data);
+
+        console.log(`Joining room by code: ${jsonData.gameCode}`);
+        
+        var response = new JoinGameResponseDTO();
+
+        try {
+            let dto = new JoinGameByCodeRequest();
+            dto.setProperties(jsonData);
+
+            const player = playersRepository.getPlayerByHWID(hwid);
+            const gameRoom = gameRoomsRepository.getGameRoomByCode(dto.gameCode);
+
+            if (!gameRoom) {
+                response.status = "error";
+                response.message = "game_room_not_found";
+            } else if (gameRoom.players.length >= gameRoom.gameCapacity) {
+                response.status = "error";
+                response.message = "game_room_already_full";
+            } else {
+                gameRoom.addPlayer(player);
+                response.gameRoom = gameRoom;
+
+                // Emit game_room_updated event to all clients
+                console.log(`Emitting game_room_updated event to all clients`);
+                io.emit("game_room_updated", gameRoom);
+            }
+        } catch (error) {
+            response.status = "error";
+            response.message = "something_went_wrong";
+        }
+
+        // Emit join_room_by_code_response only to the sender
+        socket.emit("join_room_response", response);
+    });
 });
 
 httpServer.listen(port, () => {

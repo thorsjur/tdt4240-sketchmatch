@@ -26,6 +26,9 @@ class SetNicknameViewModel: ViewModel() {
             val response = Gson().fromJson(message, SetNicknameResponseDTO::class.java)
 
             if (response.status == "success") {
+
+                // TODO: Set the player object to the GameData singleton class/object
+
                 // Set the nickname
                 nickname.postValue(response.player?.nickname ?: "")
 
@@ -41,9 +44,9 @@ class SetNicknameViewModel: ViewModel() {
     }
 
     // Send a request to set the user's nickname
-    fun setNickname(nickname: String, hwid: String) {
+    fun setNickname(nickname: String) {
         // Creating DTO object to send to the server
-        val nicknameDTO = SetNicknameRequestDTO(nickname, hwid)
+        val nicknameDTO = SetNicknameRequestDTO(nickname)
 
         // Convert the DTO object to a JSON string
         val jsonData = Gson().toJson(nicknameDTO)

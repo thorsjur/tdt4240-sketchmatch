@@ -127,11 +127,13 @@ class MessageClient private constructor(
 
                 // On ROOM_CREATED_EVENT_APPROVAL
                 on(ResponseEvent.ROOM_CREATED_RESPONSE.value) { msg ->
+                    Log.i("Socket", "Room created: $msg")
                     invokeCallbacks(ResponseEvent.ROOM_CREATED_RESPONSE.value, msg)
                 }
 
                 // On ROOM_UPDATED_EVENT
                 on(ResponseEvent.ROOM_UPDATED.value) { msg ->
+                    Log.i("Socket", "Room updated: $msg")
                     invokeCallbacks(ResponseEvent.ROOM_UPDATED.value, msg)
                 }
 
@@ -143,6 +145,11 @@ class MessageClient private constructor(
                 // On MESSAGE_PUBLISHED_IN_SUBSCRIBED_ROOM
                 on(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) { msg ->
                     invokeCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value, msg)
+                }
+
+                // On JOIN_ROOM_BY_CODE_RESPONSE
+                on(ResponseEvent.JOIN_ROOM_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.JOIN_ROOM_RESPONSE.value, msg)
                 }
             }
         } catch (e: URISyntaxException) {

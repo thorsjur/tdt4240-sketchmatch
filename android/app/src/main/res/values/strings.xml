@@ -58,5 +58,11 @@
     <string name="leave_game">Leave game</string>
     <string name="draw">Draw</string>
     <string name="guess">Guess</string>
+    <string name="join_game_by_code">Join game by a code</string>
+    <string name="game_code">Game code</string>
+    <string name="refresh">Refresh</string>
+    <string name="game_room_already_full">The game room is already full</string>
+    <string name="game_room_not_found">Game room not found</string>
+    <string name="something_went_wrong">Something went wrong. Please try again or restart the app.</string>
 
 </resources>
