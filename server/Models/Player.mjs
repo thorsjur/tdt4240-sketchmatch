@@ -1,10 +1,13 @@
 export class Player {
-  constructor(id, hwid, name) {
-    this.id = id;
-    this.hwid = hwid;
-    this.name = name;
-    this.score = 0;
-  }
+    constructor(id, hwid, name) {
+        this.id = id;
+        this.hwid = hwid;
+        this.nickname = name;
+        this.score = 0;
+    }
 
-  // Add methods as needed
+    // Set nickname
+    setNickname(nickname) {
+        this.nickname = nickname;
+    }
 }

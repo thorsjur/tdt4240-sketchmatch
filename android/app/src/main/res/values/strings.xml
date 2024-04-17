@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">sketchmatch</string>
+    <string name="main_menu_create_game_button">Create game</string>
+    <string name="main_menu_join_game_button">Join game</string>
+    <string name="main_menu_how_to_play_button">How to play</string>
     <string name="show_less">Show less</string>
     <string name="show_more">Show more</string>
     <string name="creating_a_game_title">Creating a game</string>
@@ -31,4 +34,35 @@
     <string name="room_list_row_name">Room name: %1$s</string>
     <string name="room_list_row_players">Players: %1$s / %2$s</string>
     <string name="room_list_row_status">Status: %1$s</string>
+    <string name="confirm">Confirm</string>
+    <string name="num_of_players">Number of players</string>
+    <string name="create_game_room_popup_title">Create game room</string>
+    <string name="create_game_room_popup_example_name">Game name (ex: Cool Cats)</string>
+    <string name="create_game_error">An error occurred while creating the game. Please try again or restart the app if the issue persists.</string>
+    <string name="error">Error</string>
+    <string name="error_outlined">Error outlined</string>
+    <string name="ok">OK</string>
+    <string name="stepper_increase_value">Increase value</string>
+    <string name="stepper_decrease_value">Decrease value</string>
+    <string name="set_nickname_modal_title">Please enter your nickname</string>
+    <string name="nickname">Nickname</string>
+    <string name="submit">Submit</string>
+    <string name="set_nickname_success_msg">Nickname set successfully</string>
+    <string name="set_nickname_error_msg">Something went wrong. Please try again or restart the game.</string>
+    <string name="greetings_message">Hey, %1$s!</string>
+    <string name="choose_word">Choose a word to draw</string>
+    <string name="easy_word">Easy</string>
+    <string name="medium_word">Medium</string>
+    <string name="hard_word">Hard</string>
+    <string name="new_words">New words</string>
+    <string name="leave_game">Leave game</string>
+    <string name="draw">Draw</string>
+    <string name="guess">Guess</string>
+    <string name="join_game_by_code">Join game by a code</string>
+    <string name="game_code">Game code</string>
+    <string name="refresh">Refresh</string>
+    <string name="game_room_already_full">The game room is already full</string>
+    <string name="game_room_not_found">Game room not found</string>
+    <string name="something_went_wrong">Something went wrong. Please try again or restart the app.</string>
+
 </resources>
