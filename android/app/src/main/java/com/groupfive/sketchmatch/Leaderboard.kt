@@ -26,11 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import com.groupfive.sketchmatch.models.Player
 
 // TODO: Remove the dummy values and standard player list and round number
-val p1 = Player("1", "Ola", 15)
-val p2 = Player("2", "Kari", 18)
-val p3 = Player("3", "Arne", 27)
-val p4 = Player("4", "Gunn", 24)
-val p5 = Player("5", "Åse", 19)
+val p1 = Player("1","hwid1", "Ola", 15)
+val p2 = Player("2", "hwid1","Kari", 18)
+val p3 = Player("3", "hwid1","Arne", 27)
+val p4 = Player("4", "hwid1","Gunn", 24)
+val p5 = Player("5", "hwid1","Åse", 19)
 
 @Composable
 fun Leaderboard(
@@ -71,7 +71,7 @@ fun Players(
     LazyColumn(modifier = modifier) {
         items(items = playersList) { player ->
             val rank = playersList.indexOf(player) + 1
-            PlayerCard(modifier, player.name, player.score, getPlayerRankString(rank))
+            PlayerCard(modifier, player.nickname, player.score, getPlayerRankString(rank))
         }
     }
 }
