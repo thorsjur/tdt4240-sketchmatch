@@ -39,120 +39,176 @@ const collections = await database.addCollections({
 });
 
 export const addPlayerToDB = (player) => {
-    collections.players.insert({
-        id: player.id,
-        hwid: player.hwid,
-        nickname: player.nickname,
-        score: player.score
-    });
+    try {    
+        collections.players.insert({
+            id: player.id,
+            hwid: player.hwid,
+            nickname: player.nickname,
+            score: player.score
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const getPlayerById = async (playerId) => {
-    const player = await collections.players.findOne(playerId).exec();
-    return player;
+    try {  
+        const player = await collections.players.findOne(playerId).exec();
+        return player;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 
 export const getPlayerByHWID = async (hwid) => {
-    const player = await collections.players.findOne({
-        selector: {
-            hwid: hwid
-        }
-    }).exec();
-    return player;
+    try {  
+        const player = await collections.players.findOne({
+            selector: {
+                hwid: hwid
+            }
+        }).exec();
+        return player._data;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const removePlayer = async (player) => {
-    const doc = await collections.players.findOne(player.id).exec();
-    doc.remove();
+    try { 
+        const doc = await collections.players.findOne(player.id).exec();
+        doc.remove();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-export const removePlayerByHWID = async (hwid) => {
-    const query = collections.players.findOne({
-        selector: {
-            hwid: hwid
-        }
-    }).exec();
-    await query.remove();
+export const removePlayerByHWID = async (hwid) => {
+    try {  
+        const query = collections.players.findOne({
+            selector: {
+                hwid: hwid
+            }
+        }).exec();
+        await query.remove();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const incrementScore = async (player, pointsEarned) => {
-    const doc = await collections.players.findOne(player.id).exec();
-    await doc.incrementalUpdate({
-        $inc: {
-            score: pointsEarned
-        }
-    });
+    try {
+        const doc = await collections.players.findOne(player.id).exec();
+        await doc.incrementalUpdate({
+            $inc: {
+                score: pointsEarned
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const addGameRoom = (gameRoom) => {
-    const gameRooms = collections.gamerooms;
-
-    gameRooms.insert({
-        id: gameRoom.id,
-        gameCode: gameRoom.gameCode,
-        gameName: gameRoom.gameName,
-        gameCapacity: gameRoom.gameCapacity,
-        players: gameRoom.players,
-        GameStatus: gameRoom.gameStatus
-    });
+    try {
+        const gameRooms = collections.gamerooms;
+    
+        gameRooms.insert({
+            id: gameRoom.id,
+            gameCode: gameRoom.gameCode,
+            gameName: gameRoom.gameName,
+            gameCapacity: gameRoom.gameCapacity,
+            players: gameRoom.players,
+            GameStatus: gameRoom.gameStatus
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const getAllGameRooms = async () => {
-    const query = collections.gamerooms.find();
-    const results = await query.exec();
-    return results;
+    try { 
+        const query = collections.gamerooms.find();
+        const gameRooms = await query.exec();
+        return gameRooms;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const getGameRoomById = async (gameRoomId) => {
-    const gameRoom = await collections.gamerooms.findOne(gameRoomId).exec();
-    return gameRoom;
+    try {
+        const gameRoom = await collections.gamerooms.findOne(gameRoomId).exec();
+        return gameRoom;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-export const getGameRoomByCode = async (gameRoomCode) => {
-    const gameRoom = await collections.gamerooms.findOne({
-        selector: {
-            gameCode: gameRoomCode
-        }
-    }).exec();
-    return gameRoom;
+export const getGameRoomByCode = async (gameRoomCode) => {
+    try {
+        const gameRoom = await collections.gamerooms.findOne({
+            selector: {
+                gameCode: gameRoomCode
+            }
+        }).exec();
+        return gameRoom;
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const removeGameRoom = async (id) => {
-    const doc = await collections.gamerooms.findOne(id).exec();
-    doc.remove();
+    try {
+        const doc = await collections.gamerooms.findOne(id).exec();
+        doc.remove();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const addPlayerToGameRoom = async (gameRoom, player) => {
-    const doc = await collections.gamerooms.findOne(gameRoom.id).exec();
-    const players = doc.get('players');
-    const newPlayers = players.push(player)
-
-    await doc.update({
-        $set: {
-            players: newPlayers
-        }
-    });
+    try {
+        const doc = await collections.gamerooms.findOne(gameRoom.id).exec();
+        const players = doc.get('players');
+        const newPlayers = players.push(player)
+    
+        await doc.update({
+            $set: {
+                players: newPlayers
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const removePlayerFromGameRoom = async (gameRoom, player) => {
-    const doc = await collections.gamerooms.findOne(gameRoom.id).exec();
-    const players = doc.get('players');
-    const newPlayers = players.filter((p) => p.id !== player.id);
-
-    await doc.update({
-        $set: {
-            players: newPlayers
-        }
-    });
+    try {        
+        const doc = await collections.gamerooms.findOne(gameRoom.id).exec();
+        const players = doc.get('players');
+        const newPlayers = players.filter((p) => p.id !== player.id);
+    
+        await doc.update({
+            $set: {
+                players: newPlayers
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export const updateGameRoomStatus = async (gameRoom, newStatus) => {
-    const doc = await collections.gamerooms.findOne(gameRoom.id).exec();
-
-    await doc.update({
-        $set: {
-            gameStatus: newStatus
-        }
-    });
+    try {
+        const doc = await collections.gamerooms.findOne(gameRoom.id).exec();
+    
+        await doc.update({
+            $set: {
+                gameStatus: newStatus
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }

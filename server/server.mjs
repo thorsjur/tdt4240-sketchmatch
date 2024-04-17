@@ -51,16 +51,16 @@ io.on("connection", (socket) => {
     });
 
     // On get_rooms event
-    socket.on("get_game_rooms", () => {
+    socket.on("get_game_rooms", async () => {
         // Getting the game rooms from the repository
-        var dataToSend = gameRoomsRepository.getGameRooms();
+        var dataToSend = await gameRoomsRepository.getGameRooms();
 
         // Sending the game rooms to the client
         socket.emit("game_room_list", dataToSend);
     });
 
     // On set_nickname event
-    socket.on("set_nickname", (data) => {
+    socket.on("set_nickname", async (data) => {
         // Convert string json data to DTO object
         let jsonData = JSON.parse(data);
 
@@ -78,7 +78,7 @@ io.on("connection", (socket) => {
 
             // Add player to the repository
             playersRepository.addPlayer(hwid, dto.nickname);
-            var player = playersRepository.getPlayerByHWID(hwid);
+            var player = await playersRepository.getPlayerByHWID(hwid);
             response.player = player;
 
         } catch (error) {
@@ -92,7 +92,7 @@ io.on("connection", (socket) => {
     });
 
     // On create_room event
-    socket.on("create_room", (data) => {
+    socket.on("create_room", async (data) => {
         let jsonData = JSON.parse(data);
         var response = new CreateGameResponseDTO();
 
@@ -100,7 +100,7 @@ io.on("connection", (socket) => {
             let dto = new CreateGameRequestDTO();
             dto.setProperties(jsonData);
 
-            const player = playersRepository.getPlayerByHWID(hwid);
+            const player = await playersRepository.getPlayerByHWID(hwid);
 
             const gameRoom = gameRoomsRepository.createGameRoom(
                 dto.gameRoomName,
