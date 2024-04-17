@@ -24,6 +24,9 @@ fun ControlBar(
     controller: DrawController,
     onColorClick: () -> Unit,
     onSizeClick: () -> Unit,
+    onUndoClick: () -> Unit,
+    onRedoClick: () -> Unit,
+    onClearClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -35,18 +38,21 @@ fun ControlBar(
             "undo",
         ) {
             controller.unDo()
+            onUndoClick()
         }
         MenuItem(
             Icons.Filled.Redo,
             "redo",
         ) {
             controller.reDo()
+            onRedoClick()
         }
         MenuItem(
             Icons.Filled.Clear,
             "reset",
         ) {
             controller.reset()
+            onClearClick()
         }
         MenuItem(
             Icons.Filled.ColorLens,

@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import com.groupfive.sketchmatch.communication.dto.response.CreateGameResponseDTO
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
+import com.groupfive.sketchmatch.communication.dto.response.CreateGameResponseDTO
 
-class CreateGameViewModel:ViewModel() {
+class CreateGameViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
     val isError: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -24,11 +24,9 @@ class CreateGameViewModel:ViewModel() {
             // Convert the json string to a GameRoom object
             val response = gson.fromJson(message, CreateGameResponseDTO::class.java)
 
-            if (response.status == "success"){
+            if (response.status == "success") {
                 // TODO: Subscribe player when moved to lobby
-            }
-
-            else{
+            } else {
                 isError.postValue(true)
             }
         }

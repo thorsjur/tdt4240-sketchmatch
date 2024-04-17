@@ -1,24 +1,41 @@
-import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
-import androidx.compose.runtime.mutableStateOf
+package com.groupfive.sketchmatch.viewmodels
+
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.WordRepository
+import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.navigator.Screen
+import io.ak1.drawbox.DrawController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class DrawViewModel : ViewModel() {
+class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+
+    companion object {
+        const val MAX_ROUNDS = 5
+    }
+
+    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
+
     private val _showWordDialog = mutableStateOf(true)
     val showWordDialog: State<Boolean> = _showWordDialog
 
     private val _currentWord = mutableStateOf("")
     val currentWord: State<String> = _currentWord
+
+    private val _currentGuess = mutableStateOf("")
+    val currentGuess: State<String> = _currentGuess
+
+    private val _currentRound = mutableIntStateOf(3)
+    val currentRound: State<Int> = _currentRound
 
     private val _timeCount = mutableIntStateOf(59)
     val timeCount: State<Int> = _timeCount
@@ -44,6 +61,31 @@ class DrawViewModel : ViewModel() {
     private val _hardWord = mutableStateOf("")
     val hardWord: State<String> = _hardWord
 
+    private val _isDrawing = mutableStateOf(true)
+    val isDrawing: State<Boolean> = _isDrawing
+
+    private val client = MessageClient.getInstance()
+
+    // Load initial words
+    init {
+        generateWords()
+    }
+
+    fun submitGuess() {
+        val guess = currentGuess.value
+        // TODO: Add the required functionality to the server for handling guesses.
+    }
+
+    fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
+        roomId = roomId.toInt()
+    ) { controller.importPath(it) }
+
+    fun unsubscribeFromRoom() = client.unsubscribeFromRoom(roomId.toInt())
+
+    fun publishFullDrawBoxPayload(controller: DrawController) {
+        val payload = controller.exportPath()
+        client.publishFullDrawBoxPayload(roomId.toInt(), payload)
+    }
 
     private suspend fun handleTimer() {
         while (_timeCount.intValue > 0 && _isTimerRunning.value) {
@@ -66,6 +108,10 @@ class DrawViewModel : ViewModel() {
             _isTimerRunning.value = !_isTimerRunning.value
             handleTimer()
         }
+    }
+
+    fun toggleIsDrawing() {
+        _isDrawing.value = !_isDrawing.value
     }
 
     fun toggleColorBarVisibility() {
@@ -95,9 +141,8 @@ class DrawViewModel : ViewModel() {
         _showWordDialog.value = false
     }
 
-    // Load initial words
-    init {
-        generateWords()
+    fun setCurrentGuess(guess: String) {
+        _currentGuess.value = guess
     }
 
     fun generateWords() {
@@ -108,12 +153,12 @@ class DrawViewModel : ViewModel() {
         }
     }
 
-    fun goBackToMainMenu(navController: NavController){
+    fun goBackToMainMenu(navController: NavController) {
         dismissWordDialog()
         navController.navigate(Screen.MainMenu.route)
     }
 
-    fun formatTime(timeCount: Int): String{
+    fun formatTime(timeCount: Int): String {
         // Calculate minutes and seconds from timeCount
         val minutes = timeCount / 60
         val seconds = timeCount % 60

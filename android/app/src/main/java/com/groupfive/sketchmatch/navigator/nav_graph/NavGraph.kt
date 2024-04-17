@@ -7,8 +7,9 @@ import androidx.navigation.compose.composable
 import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.view.gameroomslist.GamesListScreen
 import com.groupfive.sketchmatch.HelpScreen
-import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.view.draw.DrawScreenLayout
+import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -59,9 +60,9 @@ fun SetupNavGraph(navController: NavHostController) {
 
         // Draw Screen Destination
         composable(
-            route = Screen.Draw.route
+            route = Screen.Draw.route + "/{roomId}"
         ) {
-            DrawScreen(navController = navController)
+            DrawScreenLayout(navController = navController)
         }
     }
 }
