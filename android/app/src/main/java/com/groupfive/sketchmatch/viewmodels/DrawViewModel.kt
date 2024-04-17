@@ -1,3 +1,5 @@
+package com.groupfive.sketchmatch.viewmodels
+
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +18,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+
+    companion object {
+        const val MAX_ROUNDS = 5
+    }
+
     private val roomId: String = checkNotNull(savedStateHandle["roomId"])
 
     private val _showWordDialog = mutableStateOf(true)
@@ -23,6 +30,12 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val _currentWord = mutableStateOf("")
     val currentWord: State<String> = _currentWord
+
+    private val _currentGuess = mutableStateOf("")
+    val currentGuess: State<String> = _currentGuess
+
+    private val _currentRound = mutableIntStateOf(3)
+    val currentRound: State<Int> = _currentRound
 
     private val _timeCount = mutableIntStateOf(59)
     val timeCount: State<Int> = _timeCount
@@ -52,6 +65,16 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     val isDrawing: State<Boolean> = _isDrawing
 
     private val client = MessageClient.getInstance()
+
+    // Load initial words
+    init {
+        generateWords()
+    }
+
+    fun submitGuess() {
+        val guess = currentGuess.value
+        // TODO: Add the required functionality to the server for handling guesses.
+    }
 
     fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
         roomId = roomId.toInt()
@@ -118,9 +141,8 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         _showWordDialog.value = false
     }
 
-    // Load initial words
-    init {
-        generateWords()
+    fun setCurrentGuess(guess: String) {
+        _currentGuess.value = guess
     }
 
     fun generateWords() {

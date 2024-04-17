@@ -1,6 +1,5 @@
 package com.groupfive.sketchmatch
 
-import DrawViewModel
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -33,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.view.draw.ControlBar
+import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import io.ak1.drawbox.DrawBox
 import io.ak1.drawbox.rememberDrawController
 import io.ak1.rangvikalp.RangVikalp

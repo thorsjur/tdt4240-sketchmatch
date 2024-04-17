@@ -1,6 +1,5 @@
 package com.groupfive.sketchmatch.view.draw
 
-import DrawViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -35,6 +37,8 @@ import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.viewmodels.DrawViewModel
+import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
 
 
 @Composable
@@ -62,6 +66,8 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    // The following button is for testing the publishing/subscribing of the drawing.
+                    // It can be removed when the proper functionality is implemented.
                     Button(onClick = { drawViewModel.toggleIsDrawing() }) {
                         Text(text = if (drawViewModel.isDrawing.value) "Guess word" else "Draw word")
                     }
@@ -180,17 +186,39 @@ fun TopWordBar(
                 .padding(20.dp)
         ) {
             Column(modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
-                stringResource(R.string.draw)
+                Text(text = stringResource(if (drawViewModel.isDrawing.value) R.string.draw else R.string.guess) + ":")
             }
             Column(modifier.padding(5.dp, 0.dp)) {
-                Text(text = currentWord)
+                Text(
+                    fontWeight = FontWeight.Bold,
+                    text = if (drawViewModel.isDrawing.value) currentWord else "_ ".repeat(
+                        currentWord.length
+                    )
+                )
             }
             Spacer(modifier.weight(1f))
-            Column(
+            Row(
                 modifier.padding(0.dp, 0.dp, 10.dp, 0.dp),
-                horizontalAlignment = Alignment.End
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(text = formattedTime)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Alarm, contentDescription = "Alarm icon",
+                        tint = MaterialTheme.colorScheme.inverseSurface
+                    )
+                    Text(text = "$formattedTime")
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Numbers, contentDescription = "Number of rounds",
+                        tint = MaterialTheme.colorScheme.inverseSurface
+                    )
+                    Text(text = "${drawViewModel.currentRound.value}/${MAX_ROUNDS}")
+                }
             }
         }
     }

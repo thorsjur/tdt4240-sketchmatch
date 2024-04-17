@@ -56,6 +56,7 @@
     <string name="hard_word">Hard</string>
     <string name="new_words">New words</string>
     <string name="leave_game">Leave game</string>
-    <string name="draw">Draw:</string>
+    <string name="draw">Draw</string>
+    <string name="guess">Guess</string>
 
 </resources>
