@@ -93,6 +93,7 @@ fun DrawScreen(
     SizePicker(isVisible = drawViewModel.isSizePickerVisible.value) {
         controller.changeStrokeWidth(it)
     }
+
 }
 
 val sizes = listOf(4f, 8f, 16f, 32f, 48f)
@@ -137,7 +138,6 @@ fun SizePickerSizing(size: Float, onClick: () -> Unit) {
         )
     }
 }
-
 
 @Preview(
     showBackground = true,

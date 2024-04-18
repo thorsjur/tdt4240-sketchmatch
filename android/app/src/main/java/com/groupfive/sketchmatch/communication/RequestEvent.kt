@@ -12,6 +12,15 @@ enum class RequestEvent(val value: String) {
     // Event for when a user gets a list of rooms
     GET_ROOMS("get_game_rooms"),
 
+    // Event for when a user makes a guess
+    CHECK_GUESS("check_guess"),
+
+    // Event for when a user selects a word to draw
+    SET_DRAW_WORD("set_draw_word"),
+
+    // Event for when a timer for a round is started
+    ROUND_TIMER_UPDATE("round_timer_update"),
+
     // Event for when a user wants to join a room by code
     JOIN_ROOM_BY_CODE("join_room_by_code"),
 

@@ -34,9 +34,9 @@ val p5 = Player("5", "hwid1","Åse", 19)
 
 @Composable
 fun Leaderboard(
-        modifier: Modifier = Modifier,
-        players: List<Player> = listOf(p1, p2, p3, p4, p5),
-        roundNumber: Int = 2
+    modifier: Modifier = Modifier,
+    players: List<Player> = listOf(p1, p2, p3, p4, p5),
+    roundNumber: Int = 2
 ) {
     Surface(modifier) {
         Column(
@@ -136,6 +136,6 @@ private fun PlayerCard(
 @Composable
 fun LeaderboardPreview() {
     SketchmatchTheme {
-        Leaderboard()
+//        Leaderboard()
     }
 }
