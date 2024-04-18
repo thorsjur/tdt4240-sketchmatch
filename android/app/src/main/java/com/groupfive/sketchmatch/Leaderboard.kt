@@ -54,9 +54,10 @@ fun Leaderboard(
         roundTimerUpdateViewModel.roundStartedEvent.postValue(null)
     }
 
-    if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {
-        navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
-    }
+    // the following code block is to navigate only the drawing player to the "choose word view"
+//    if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {
+ //       navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+  //  }
 
     Surface(modifier = Modifier) {
         Column(
@@ -73,9 +74,9 @@ fun Leaderboard(
                 Text(
                     modifier = Modifier.padding(10.dp),
                     text = if (leaderboardViewModel.secondsLeft != 0) {
-                        getRoundString(gameRoom?.currentRound ?: 1, gameRoom?.players?.size ?: 1)
+                        getRoundString(gameRoom?.getCurrentRoundNumber() ?: 1, gameRoom?.players?.size ?: 1)
                     } else {
-                        "${gameRoom?.getCurrentRound()?.drawingPlayer?.nickname} is choosing a word"
+                        "${gameRoom?.getDrawingPlayerName()} is choosing a word"
                     },
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.ExtraBold

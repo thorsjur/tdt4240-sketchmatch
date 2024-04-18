@@ -157,8 +157,24 @@ class MessageClient private constructor(
                 }
 
                 // On ROUND_TIMER_UPDATE_RESPONSE_EVENT
-                on(ResponseEvent.ROUND_TIMER_UPDATE_RESPONSE.value) { msg ->
-                    invokeCallbacks(ResponseEvent.ROUND_TIMER_UPDATE_RESPONSE.value, msg)
+                on(ResponseEvent.ROUND_TIMER_TICK_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROUND_TIMER_TICK_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.LEADERBOARD_TIMER_TICK_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.LEADERBOARD_TIMER_TICK_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.ANSWER_TO_GUESS_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ANSWER_TO_GUESS_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.ROUND_STARTED_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.OPEN_LEADERBOARD_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.OPEN_LEADERBOARD_RESPONSE.value, msg)
                 }
 
                 // On ROUND_FINISHED_RESPONSE_EVENT
@@ -260,7 +276,7 @@ class MessageClient private constructor(
 
     @Synchronized
     fun checkGuess(inputGuess: String, gameRoomId: Int, timestamp: Int) {
-        val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId, timestamp)
+        val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId)
         val gson = Gson()
         val data = gson.toJson(requestData)
 

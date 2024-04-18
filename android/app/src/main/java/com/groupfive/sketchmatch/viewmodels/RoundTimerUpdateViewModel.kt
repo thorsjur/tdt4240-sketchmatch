@@ -21,7 +21,7 @@ class RoundTimerUpdateViewModel: ViewModel() {
     init {
 
         // Add a callback to handle incoming round_timer_update message
-        client.addCallback(ResponseEvent.ROUND_TIMER_UPDATE_RESPONSE.value) { message ->
+        client.addCallback(ResponseEvent.ROUND_TIMER_TICK_RESPONSE.value) { message ->
             Log.i("RoundTimerUpdateViewModel", "ROUND_TIMER_UPDATE_RESPONSE_EVENT: $message")
 
             // Parse the guess from the json message string

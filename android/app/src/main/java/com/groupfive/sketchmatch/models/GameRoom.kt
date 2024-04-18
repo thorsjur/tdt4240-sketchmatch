@@ -20,7 +20,11 @@ class GameRoom {
     }
 
     fun getDrawingPlayerId(): String {
-        return players.get(drawingPLayer).id
+        return players[drawingPLayer].id
+    }
+
+    fun getDrawingPlayerName(): String {
+        return players[drawingPLayer].nickname
     }
 }
 

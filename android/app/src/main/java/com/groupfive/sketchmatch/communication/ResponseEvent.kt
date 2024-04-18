@@ -13,10 +13,15 @@ enum class ResponseEvent(val value: String) {
     ROOM_UPDATED("game_room_updated"),
 
     // Event for when server notifies of a game room being destroyed
+    // Currently, we don't have anything for this on the server
     ROOM_DESTROYED("game_room_destroyed"),
 
     // Event for when server sends a list of game rooms
     ROOMS_LIST("game_room_list"),
+
+    ROUND_STARTED_RESPONSE("round_started_response"),
+
+    OPEN_LEADERBOARD_RESPONSE("open_leaderboard_response"),
 
     // Event for when server sends response of game room creation request
     ROOM_CREATED_RESPONSE("game_room_created_response"),
@@ -31,7 +36,11 @@ enum class ResponseEvent(val value: String) {
     SET_DRAW_WORD_RESPONSE("set_draw_word_response"),
 
     // Event for when server notifies of the timer for a round starting
-    ROUND_TIMER_UPDATE_RESPONSE("round_timer_update_response"),
+    ROUND_TIMER_TICK_RESPONSE("round_timer_tick_response"),
+
+    LEADERBOARD_TIMER_TICK_RESPONSE("leaderboard_timer_tick_response"),
+
+    ANSWER_TO_GUESS_RESPONSE("answer_to_guess_response"),
 
     // Event for when server notifies of a round finishing
     ROUND_FINISHED_RESPONSE("round_finished_response"),
