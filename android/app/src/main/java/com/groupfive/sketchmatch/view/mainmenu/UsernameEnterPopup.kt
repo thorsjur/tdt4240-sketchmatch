@@ -46,13 +46,12 @@ import com.groupfive.sketchmatch.viewmodels.SetNicknameViewModel
 fun UsernameEnterDialog(
     modifier: Modifier = Modifier,
     onSubmit: (String) -> Unit,
-    onSuccess: (String, String) -> Unit
+    onSuccess: (String) -> Unit
 ){
     val viewModel: SetNicknameViewModel = viewModel()
     val context = LocalContext.current
 
     val setNicknameIsSuccess by viewModel.nicknameSetStatus.observeAsState(false)
-    val setNicknameMessage by viewModel.nicknameSetMessage.observeAsState("")
     val nickname by viewModel.nickname.observeAsState("")
 
     if (!setNicknameIsSuccess && nickname.isEmpty()) {
@@ -78,7 +77,7 @@ fun UsernameEnterDialog(
     }
 
     if (setNicknameIsSuccess) {
-        onSuccess(nickname, setNicknameMessage)
+        onSuccess(nickname)
         viewModel.nicknameSetStatus.postValue(false)
     }
 }
@@ -145,7 +144,7 @@ fun UsernameEnterDialogPreview() {
     SketchmatchTheme {
         UsernameEnterDialog(
             onSubmit = {},
-            onSuccess = { username, message ->
+            onSuccess = { _ ->
             }
         )
     }

@@ -9,6 +9,7 @@ import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.SetNicknameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.SetNicknameResponseDTO
+import com.groupfive.sketchmatch.store.GameData
 
 class SetNicknameViewModel: ViewModel() {
     private val client = MessageClient.getInstance()
@@ -26,10 +27,10 @@ class SetNicknameViewModel: ViewModel() {
             val response = Gson().fromJson(message, SetNicknameResponseDTO::class.java)
 
             if (response.status == "success") {
+                // Set the current player in the GameData store
+                GameData.currentPlayer.postValue(response.player)
 
-                // TODO: Set the player object to the GameData singleton class/object
-
-                // Set the nickname
+                // Set the nickname in the view model
                 nickname.postValue(response.player?.nickname ?: "")
 
                 // Set the nickname set status to true

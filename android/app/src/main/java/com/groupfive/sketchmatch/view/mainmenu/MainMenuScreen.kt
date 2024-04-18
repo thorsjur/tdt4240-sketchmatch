@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import com.groupfive.sketchmatch.CreateGamePopUp
 import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 
 @Composable
@@ -41,8 +43,8 @@ fun MainMenuScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    var username by remember { mutableStateOf("") }
     var openCreateGamePopup by remember { mutableStateOf(false) }
+    val player by GameData.currentPlayer.observeAsState()
 
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
         Column(
@@ -60,8 +62,8 @@ fun MainMenuScreen(
                 contentDescription = null,
                 modifier = Modifier.size(250.dp)
             )
-            if (username.isNotEmpty()) {
-                CreateGreetingsText(username = username)
+            if (player?.nickname != null && player?.nickname!!.isNotEmpty()) {
+                CreateGreetingsText(username = player?.nickname!!)
             }
             CreateGameButton(onCreateGameClicked = { openCreateGamePopup = true})
             JoinGameButton(onJoinGameClicked = { navController.navigate(Screen.GameRoomsList.route) })
@@ -75,10 +77,8 @@ fun MainMenuScreen(
         modifier = Modifier,
         onSubmit = { username ->
         },
-        onSuccess = { newNickname, message ->
-            // Get string from values based on the message
-            username = newNickname
-
+        onSuccess = { message ->
+            // Show a toast message to the user
             Toast.makeText(
                 context,
                 context.getString(R.string.set_nickname_success_msg),

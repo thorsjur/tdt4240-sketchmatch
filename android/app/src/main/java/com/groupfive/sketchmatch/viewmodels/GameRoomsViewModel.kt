@@ -10,6 +10,7 @@ import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.JoinGameByCodeRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
+import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.SingleLiveEvent
 
 class GameRoomsViewModel : ViewModel() {
@@ -99,7 +100,8 @@ class GameRoomsViewModel : ViewModel() {
             if (response.status == "success") {
                 Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom?.gameCode}")
 
-                // TODO: Save the game room data to the GameData singleton object
+                // Update the current game room
+                GameData.currentGameRoom.postValue(response.gameRoom)
 
                 joinGameByCodeStatus.postValue(true)
                 successEvent.postValue(SingleLiveEvent(Unit))  // Trigger the navigation event
