@@ -268,13 +268,13 @@ io.on("connection", (socket) => {
       
             socket.join(gameRoom.id);
           
-            response.gameRoom = gameRoom;
+            response.gameRoom = gameRoom.serialize();
 
             // Emit game_room_updated event to all clients in the room
-            io.to(gameRoom.id).emit("player_joined_room", gameRoom);
+            io.to(gameRoom.id).emit("player_joined_room", response);
     
             // Emit game_room_updated event to all clients
-            io.emit("game_room_updated", gameRoom);
+            io.emit("game_room_updated", gameRoom.serialize());
         }
       } catch (error) {
           response.status = "error";
