@@ -1,4 +1,4 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.mainmenu
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -45,6 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.groupfive.sketchmatch.view.misc.AlertPopup
+import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.viewmodels.CreateGameViewModel
 

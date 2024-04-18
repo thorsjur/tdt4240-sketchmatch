@@ -5,5 +5,6 @@ data class Player(
     var hwid: String = "",
     var nickname: String = "",
     var score: Int = 0,
+    var isDrawing: Boolean = false,
     var hasGuessedCorrectly: Boolean = false
 )

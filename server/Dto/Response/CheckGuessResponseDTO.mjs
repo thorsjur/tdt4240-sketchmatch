@@ -1,10 +1,8 @@
 import { BaseDTO } from "../BaseDTO.mjs";
 
-export class SetNicknameResponseDTO extends BaseDTO {
+export class CheckGuessResponseDTO extends BaseDTO {
     // Properties declaration. If true, the property is required
-    status = "success";
-    message = "set_nickname_success_msg";
-    player;
+    guess = true;
 
     // Override the setProperties method
     setProperties(dataJson) {

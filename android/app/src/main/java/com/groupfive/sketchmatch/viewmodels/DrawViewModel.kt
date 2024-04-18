@@ -70,10 +70,10 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         generateWords()
     }
 
-    fun submitGuess() {
-        val guess = currentGuess.value
-        // TODO: Add the required functionality to the server for handling guesses.
-    }
+//    fun submitGuess() {
+//        val guess = currentGuess.value
+//        // TODO: Add the required functionality to the server for handling guesses.
+//    }
 
     fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
         roomId = roomId.toInt()
