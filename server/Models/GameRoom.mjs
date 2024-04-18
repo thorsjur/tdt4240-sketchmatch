@@ -61,9 +61,13 @@ export class GameRoom{
     initializeRounds() {
         this.players.forEach((player, index) => {
             const round = new Round(index + 1, this.id, player);
-            player.setIsDrawing(true);
+            round.setDrawingPlayer(player);
             this.addRound(round);
         });
+    }
+
+    getGameCode() {
+        return this.gameCode;
     }
 }
 
@@ -73,3 +77,4 @@ export const GameStatus = {
     Playing: "Playing",
     Finished: "Finished",
 };
+

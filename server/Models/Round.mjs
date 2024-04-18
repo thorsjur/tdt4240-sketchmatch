@@ -86,4 +86,12 @@ export class Round extends EventEmitter{
         }
         return difficultyPoints;
     }
+
+    setDrawingPlayer(player) {
+        this.drawingPlayer = player;
+    }
+
+    getGameRoomId() {
+        return this.gameRoomId;
+    }
 }
