@@ -37,6 +37,7 @@ import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
 
@@ -55,7 +56,10 @@ fun DrawScreenLayout(
             drawViewModel = drawViewModel,
             onDismissRequest = drawViewModel::dismissWordDialog
         )
-    } else {
+    } else if (timeCount == 0) {
+        navController.navigate(Screen.Leaderboard.route)
+    }
+    else {
         Surface(modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(
                 modifier.padding(10.dp),

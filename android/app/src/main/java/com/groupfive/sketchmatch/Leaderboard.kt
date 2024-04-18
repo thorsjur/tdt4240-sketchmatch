@@ -15,46 +15,83 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.groupfive.sketchmatch.models.Player
-
-// TODO: Remove the dummy values and standard player list and round number
-val p1 = Player("1","hwid1", "Ola", 15)
-val p2 = Player("2", "hwid1","Kari", 18)
-val p3 = Player("3", "hwid1","Arne", 27)
-val p4 = Player("4", "hwid1","Gunn", 24)
-val p5 = Player("5", "hwid1","Åse", 19)
+import com.groupfive.sketchmatch.viewmodels.LeaderboardViewModel
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.navigation.NavController
+import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.utils.getPlayerRankString
+import com.groupfive.sketchmatch.utils.getRoundString
 
 @Composable
 fun Leaderboard(
-        modifier: Modifier = Modifier,
-        players: List<Player> = listOf(p1, p2, p3, p4, p5),
-        roundNumber: Int = 2
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    leaderboardViewModel: LeaderboardViewModel = viewModel()
 ) {
-    Surface(modifier) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logog),
-                contentDescription = null,
-                modifier = Modifier.size(250.dp)
-            )
-            Text(
-                modifier = Modifier.padding(10.dp),
-                text = getRoundString(roundNumber, players.size),
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.ExtraBold
+    // if drawingplayer.id == currentplayer.id && secondsleft === 0 -> Then navigate to choose word
+    // else if
+    val gameRoom by GameData.currentGameRoom.observeAsState()
+
+    if () {
+        Surface(modifier = Modifier) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logog),
+                    contentDescription = null,
+                    modifier = Modifier.size(250.dp)
                 )
-            )
-            Players(modifier = modifier, players = players)
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.padding(10.dp),
+                        text = if (leaderboardViewModel.secondsLeft != 0) {
+                            getRoundString(gameRoom?.currentRound ?: 1, gameRoom?.players?.size ?: 1)
+                        } else {
+                            "${gameRoom?.getCurrentRound()?.drawingPlayer} is choosing a word"
+                        },
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    )
+                    if (leaderboardViewModel.secondsLeft != 0) {
+                        Icon(
+                            modifier = Modifier.padding(5.dp),
+                            imageVector = Icons.Filled.Alarm,
+                            contentDescription = "Alarm Icon"
+                        )
+                        Text(
+                            text = "${leaderboardViewModel.secondsLeft}",
+                            style = MaterialTheme.typography.headlineLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                    LaunchedEffect(key1 = Unit) {
+                        leaderboardViewModel.startCountDown()
+                    }
+                }
+                Players(
+                    modifier = Modifier,
+                    players = gameRoom?.players ?: emptyList()
+                )
+            }
         }
     }
 }
@@ -136,6 +173,6 @@ private fun PlayerCard(
 @Composable
 fun LeaderboardPreview() {
     SketchmatchTheme {
-        Leaderboard()
+        //Leaderboard(navController = NavController())
     }
 }
