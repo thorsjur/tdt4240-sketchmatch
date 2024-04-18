@@ -6,10 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
-import com.groupfive.sketchmatch.communication.dto.response.RoundFinishedResponseDTO
-import com.groupfive.sketchmatch.communication.dto.response.RoundTimerUpdateResponseDTO
+import com.groupfive.sketchmatch.communication.dto.response.TimerTickResponseDTO
 import com.groupfive.sketchmatch.models.GameRoom
-import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.SingleLiveEvent
 
 class RoundTimerUpdateViewModel: ViewModel() {
@@ -30,12 +28,12 @@ class RoundTimerUpdateViewModel: ViewModel() {
             val gson = Gson()
 
             // Convert the json string to a GameRoom object with an updated timer
-            val updatedTimer = gson.fromJson(message, RoundTimerUpdateResponseDTO::class.java)
+            val updatedTimer = gson.fromJson(message, TimerTickResponseDTO::class.java)
 
-            updatedTimerTick.postValue(updatedTimer.roundTimerTick)
+            updatedTimerTick.postValue(updatedTimer.timerTick)
 
             // if updatedTimer.roundTimerTick == 60, then send Single LiveEvent rounds started to Leaderboard, then navigate to DrawScreenLayout
-            if (updatedTimer.roundTimerTick == 59) {
+            if (updatedTimer.timerTick == 59) {
                 roundStartedEvent.postValue(SingleLiveEvent(Unit))
             }
         }
@@ -48,14 +46,17 @@ class RoundTimerUpdateViewModel: ViewModel() {
             val gson = Gson()
 
             // Convert the json string to a GameRoom object with an updated timer
-            val gameRoom = gson.fromJson(message, RoundFinishedResponseDTO::class.java)
 
-            updatedRoundGameRoom.postValue(gameRoom.gameRoom)
+            // The RoundFinishedResponseDTO class was deleted due to rework of backend.
+            // The commented logic under has to be rewritten.
+            //val gameRoom = gson.fromJson(message, RoundFinishedResponseDTO::class.java)
 
-            GameData.currentGameRoom.postValue(gameRoom.gameRoom)
+            //updatedRoundGameRoom.postValue(gameRoom.gameRoom)
+
+            //GameData.currentGameRoom.postValue(gameRoom.gameRoom)
 
             // send SingleLiveEvent round is over to DrawScreenLayout, then navigate to Leaderboard
-            roundEndedEvent.postValue(SingleLiveEvent(Unit))
+            //roundEndedEvent.postValue(SingleLiveEvent(Unit))
         }
     }
 
