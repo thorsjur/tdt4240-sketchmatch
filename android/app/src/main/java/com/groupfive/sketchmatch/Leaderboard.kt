@@ -51,6 +51,7 @@ fun Leaderboard(
 
     roundStartedEvent?.getContentIfNotHandled()?.let {
         navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+        roundTimerUpdateViewModel.roundStartedEvent.postValue(null)
     }
 
     if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {
@@ -74,7 +75,7 @@ fun Leaderboard(
                     text = if (leaderboardViewModel.secondsLeft != 0) {
                         getRoundString(gameRoom?.currentRound ?: 1, gameRoom?.players?.size ?: 1)
                     } else {
-                        "${gameRoom?.getCurrentRound()?.drawingPlayer} is choosing a word"
+                        "${gameRoom?.getCurrentRound()?.drawingPlayer?.nickname} is choosing a word"
                     },
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.ExtraBold

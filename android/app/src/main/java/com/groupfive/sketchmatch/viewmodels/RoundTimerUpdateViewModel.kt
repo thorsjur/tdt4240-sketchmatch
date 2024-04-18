@@ -35,7 +35,7 @@ class RoundTimerUpdateViewModel: ViewModel() {
             updatedTimerTick.postValue(updatedTimer.roundTimerTick)
 
             // if updatedTimer.roundTimerTick == 60, then send Single LiveEvent rounds started to Leaderboard, then navigate to DrawScreenLayout
-            if (updatedTimer.roundTimerTick == 60) {
+            if (updatedTimer.roundTimerTick == 59) {
                 roundStartedEvent.postValue(SingleLiveEvent(Unit))
             }
         }
