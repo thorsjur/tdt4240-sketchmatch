@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.Player
@@ -40,21 +42,27 @@ import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
+import com.groupfive.sketchmatch.viewmodels.GuessViewModel
+import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
+import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 
 
 @Composable
 fun DrawScreenLayout(
     modifier: Modifier = Modifier,
     navController: NavController,
-    drawViewModel: DrawViewModel = viewModel()
+    drawViewModel: DrawViewModel = viewModel(),
+    guessViewModel: GuessViewModel = viewModel()
 ) {
-    val currentWord = drawViewModel.currentWord.value
-    val timeCount = drawViewModel.timeCount.value
+    val currentWord = drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
+    val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
+    val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
 
     if (drawViewModel.showWordDialog.value) {
         WordChoiceDialog(
             drawViewModel = drawViewModel,
-            onDismissRequest = drawViewModel::dismissWordDialog
+            onDismissRequest = drawViewModel::dismissWordDialog,
+            roundTimerUpdateViewModel = roundTimerUpdateViewModel,
         )
     } else if (timeCount == 0) {
         navController.navigate(Screen.Leaderboard.route)
@@ -91,7 +99,12 @@ fun DrawScreenLayout(
                         drawViewModel = drawViewModel
                     )
                 } else {
-                    GuessScreen(modifier = Modifier.weight(1f), drawViewModel = drawViewModel)
+                    GuessScreen(
+                        modifier = Modifier.weight(1f),
+                        drawViewModel = drawViewModel,
+                        guessViewModel = guessViewModel,
+                        timeCount = timeCount,
+                    )
                 }
 
                 Row(
@@ -108,11 +121,14 @@ fun DrawScreenLayout(
 @Composable
 fun WordChoiceDialog(
     drawViewModel: DrawViewModel,
-    onDismissRequest: () -> Unit
-) {
+    onDismissRequest: () -> Unit,
+    roundTimerUpdateViewModel: RoundTimerUpdateViewModel,
+    ) {
     val easyWord by drawViewModel.easyWord
     val mediumWord by drawViewModel.mediumWord
     val hardWord by drawViewModel.hardWord
+
+    val setDrawWordViewModel: SetDrawWordViewModel = viewModel()
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -122,15 +138,23 @@ fun WordChoiceDialog(
                 WordButton(
                     stringResource(R.string.easy_word),
                     easyWord
-                ) { drawViewModel.onWordChosen(easyWord) }
+                ) {
+                    drawViewModel.onWordChosen(easyWord);
+                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY, 1);
+                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                }
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
-                ) { drawViewModel.onWordChosen(mediumWord) }
+                ) { drawViewModel.onWordChosen(mediumWord);
+                    setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM, 1)
+                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
-                ) { drawViewModel.onWordChosen(hardWord) }
+                ) { drawViewModel.onWordChosen(hardWord);
+                    setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD, 1)
+                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
             }
         },
         confirmButton = {

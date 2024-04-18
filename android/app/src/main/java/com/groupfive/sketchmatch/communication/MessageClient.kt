@@ -3,8 +3,12 @@ package com.groupfive.sketchmatch.communication
 import android.util.Log
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.BuildConfig
+import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.MESSAGE_EVENT
 import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
+import com.groupfive.sketchmatch.communication.dto.request.CheckGuessRequestDTO
+import com.groupfive.sketchmatch.communication.dto.request.SetDrawWordRequestDTO
+import com.groupfive.sketchmatch.communication.dto.request.RoundTimerUpdateRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.PublishPathRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.RoomEventRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.PayloadResponseDTO
@@ -142,6 +146,26 @@ class MessageClient private constructor(
                     invokeCallbacks(ResponseEvent.ROOM_DESTROYED.value, msg)
                 }
 
+                // On CHECK_GUESS_RESPONSE_EVENT
+                on(ResponseEvent.CHECK_GUESS_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.CHECK_GUESS_RESPONSE.value, msg)
+                }
+
+                // On SET_DRAW_WORD_RESPONSE_EVENT
+                on(ResponseEvent.SET_DRAW_WORD_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.SET_DRAW_WORD_RESPONSE.value, msg)
+                }
+
+                // On ROUND_TIMER_UPDATE_RESPONSE_EVENT
+                on(ResponseEvent.ROUND_TIMER_UPDATE_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROUND_TIMER_UPDATE_RESPONSE.value, msg)
+                }
+
+                // On ROUND_FINISHED_RESPONSE_EVENT
+                on(ResponseEvent.ROUND_FINISHED_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROUND_FINISHED_RESPONSE.value, msg)
+                }
+
                 // On MESSAGE_PUBLISHED_IN_SUBSCRIBED_ROOM
                 on(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) { msg ->
                     invokeCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value, msg)
@@ -230,6 +254,45 @@ class MessageClient private constructor(
         if (!isConnected()) return
         socket.emit(
             RequestEvent.CREATE_ROOM.value,
+            data
+        )
+    }
+
+    @Synchronized
+    fun checkGuess(inputGuess: String, gameRoomId: Int, timestamp: Int) {
+        val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId, timestamp)
+        val gson = Gson()
+        val data = gson.toJson(requestData)
+
+        if (!isConnected()) return
+        socket.emit(
+            RequestEvent.CHECK_GUESS.value,
+            data
+        )
+    }
+
+    @Synchronized
+    fun setDrawWord(drawWord: String, difficulty: Difficulty, gameRoomId: Int) {
+        val requestData = SetDrawWordRequestDTO(drawWord, difficulty, gameRoomId)
+        val gson = Gson()
+        val data = gson.toJson(requestData)
+
+        if (!isConnected()) return
+        socket.emit(
+            RequestEvent.SET_DRAW_WORD.value,
+            data
+        )
+    }
+
+    @Synchronized
+    fun roundTimerUpdate(gameRoomId: Int) {
+        val requestData = RoundTimerUpdateRequestDTO(gameRoomId)
+        val gson = Gson()
+        val data = gson.toJson(requestData)
+
+        if (!isConnected()) return
+        socket.emit(
+            RequestEvent.ROUND_TIMER_UPDATE.value,
             data
         )
     }

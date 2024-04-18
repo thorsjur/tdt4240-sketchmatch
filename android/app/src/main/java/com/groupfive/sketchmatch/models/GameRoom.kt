@@ -10,6 +10,13 @@ class GameRoom {
     var gameCapacity: Int = 2
     var players: List<Player> = emptyList()
     var gameStatus: GameRoomStatus = GameRoomStatus.Waiting
+    var drawWord: String = ""
+    var rounds: MutableList<Round> = mutableListOf() // A round consists of a number of turns
+    var currentRound: Int = 1 // The current round being played
+
+    fun getCurrentRound(): Round {
+        return rounds[currentRound - 1]
+    }
 }
 
 // Enum class for game room status
