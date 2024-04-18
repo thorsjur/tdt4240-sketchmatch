@@ -38,6 +38,10 @@ export class GameRoomsRepository extends EventEmitter{
         gameRoom.addPlayer(player);
         this.gameRooms.push(gameRoom);
 
+        gameRoom.on('round_has_been_created', gameRoom => {
+            this.emit('round_has_been_created', gameRoom);
+        });
+
         gameRoom.on('round_has_started', gameRoom => {
             this.emit('round_has_started', gameRoom);
         });
@@ -46,8 +50,8 @@ export class GameRoomsRepository extends EventEmitter{
             this.emit('open_leaderboard', gameRoom);
         });
 
-        gameRoom.on('round_timer_tick', (roundTimer, gameRoom) => {
-            this.emit('round_timer_tick', roundTimer, gameRoom);
+        gameRoom.on('round_timer_tick', (gameRoom) => {
+            this.emit('round_timer_tick', gameRoom);
         });
 
         gameRoom.on('leaderboard_timer_tick', (leaderboardTimer, gameRoom) => {

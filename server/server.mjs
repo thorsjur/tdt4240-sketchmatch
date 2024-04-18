@@ -15,7 +15,7 @@ import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
 import { RoundTimerUpdateRequestDTO } from "./Dto/Request/RoundTimerUpdateRequestDTO.mjs";
 import { SetDrawWordRequestDTO } from "./Dto/Request/SetDrawWordRequestDTO.mjs";
 import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
-import { AnswerToGuessResponseDTO, CheckGuessResponseDTO } from "./Dto/Response/AnswerToGuessResponseDTO.mjs";
+import { AnswerToGuessResponseDTO } from "./Dto/Response/AnswerToGuessResponseDTO.mjs";
 import { CreateGameResponseDTO } from "./Dto/Response/CreateGameResponseDTO.mjs";
 import { GameRoomUpdateStatusResponseDTO } from "./Dto/Response/GameRoomUpdateStatusResponseDTO.mjs";
 import { JoinGameResponseDTO } from "./Dto/Response/JoinGameResponseDTO.mjs";
@@ -241,24 +241,6 @@ io.on("connection", (socket) => {
       io.emit("set_draw_word_response", response.gameRoom);
   });
 
-  // On Round Timer Update event
-  socket.on("round_timer_update", (data) => {
-      let jsonData = JSON.parse(data);
-
-      try {
-
-          let dto = new RoundTimerUpdateRequestDTO();
-          dto.setProperties(jsonData);
-
-          gameRoomsRepository.startRound(dto.gameRoomId);
-          console.log("Round started")
-
-      } catch (error) {
-          response.status = "error";
-          response.message = "Error updating timer";
-          console.log(response.message);
-      }
-  });
   // On join_room_by_code event
   socket.on("join_room_by_code", (data) => {
       let jsonData = JSON.parse(data);
@@ -306,35 +288,49 @@ io.on("connection", (socket) => {
   });
 });
 
+gameRoomsRepository.on('round_has_been_created', gameRoom => {
+  console.log(`Round has been created in game room: ${gameRoom.gameName}`);
+  let dto = new GameRoomUpdateStatusResponseDTO();
+  dto.gameRoom = gameRoom;
+
+  io.to(gameRoom.id).emit('round_has_been_created_response', dto);
+});
+
 gameRoomsRepository.on('round_has_started', gameRoom => {
+  console.log(`Round has started in game room: ${gameRoom.gameName}`);
   let dto = new GameRoomUpdateStatusResponseDTO();
   dto.gameRoom = gameRoom;
 
   io.to(gameRoom.id).emit('round_started_response', dto);
-})
+});
 
 gameRoomsRepository.on('open_leaderboard', gameRoom => {
+  console.log(`Opening leaderboard in game room: ${gameRoom.gameName}`);
   let dto = new GameRoomUpdateStatusResponseDTO();
   dto.gameRoom = gameRoom;
 
   io.to(gameRoom.id).emit('open_leaderboard_response', dto);  
-})
+});
 
-gameRoomsRepository.on('round_timer_tick', (roundTimer, gameRoom) => {
+gameRoomsRepository.on('round_timer_tick', (gameRoom) => {
+  console.log(`Round timer tick in game room: ${gameRoom.gameName}: ${gameRoom.roundTimestamp}`);
   let dto = new TimerTickResponseDTO();
-  dto.timerTick = roundTimer;
+  dto.timerTick = gameRoom.roundTimestamp;
 
-  io.to(gameRoom.id).emit('round_timer_tick_response', dtp);
-})
+  io.to(gameRoom.id).emit('round_timer_tick_response', dto);
+});
 
 gameRoomsRepository.on("leaderboard_timer_tick", (leaderboardTimer, gameRoom) => {
+  console.log(`Leaderboard timer tick in game room: ${gameRoom.gameName}: ${leaderboardTimer}`);
   let dto = new TimerTickResponseDTO();
   dto.timerTick = leaderboardTimer;
 
-  io.to(gameRoom.id).emit('leaderboard_timer_tick_response', dtp);
+  io.to(gameRoom.id).emit('leaderboard_timer_tick_response', dto);
 });
 
 gameRoomsRepository.on("round_finished", (gameRoom) => {
+  console.log(`Round finished in game room: ${gameRoom.gameName}. Game status: ${gameRoom.gameStatus}`);
+  //console.log(gameRoom.serialize());
   let dto = new GameRoomUpdateStatusResponseDTO();
   dto.gameRoom = gameRoom;
 
@@ -342,6 +338,7 @@ gameRoomsRepository.on("round_finished", (gameRoom) => {
 });
 
 gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
+  console.log(`Answer to guess in game room: ${gameRoom.gameName}: ${isCorrect}`);
   let dto = new AnswerToGuessResponseDTO();
   dto.isCorrect = isCorrect;
   dto.playerId = playerId;
