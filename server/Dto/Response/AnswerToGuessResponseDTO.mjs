@@ -1,8 +1,9 @@
 import { BaseDTO } from "../BaseDTO.mjs";
 
-export class RoundFinishedResponseDTO extends BaseDTO {
+export class AnswerToGuessResponseDTO extends BaseDTO {
     // Properties declaration. If true, the property is required
-    gameRoom = true;
+    isCorrect = true;
+    playerId = true;
 
     // Override the setProperties method
     setProperties(dataJson) {

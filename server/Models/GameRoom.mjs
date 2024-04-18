@@ -12,10 +12,6 @@ export class GameRoom extends EventEmitter {
         this.word = null;
         this.wordDifficultyPoints = null;
         this.guessedCorrectly = [];
-
-
-        //this.rounds = []; // Number of rounds match number of players
-        //this.currentRound = 1; // Current round being played (eg. 1 would be the first round in the game)
     }
 
     addPlayer(player) {
@@ -132,15 +128,15 @@ export class GameRoom extends EventEmitter {
 
 // Enum for game status
 export const GameStatus = {
-    Waiting: "Waiting",
-    Playing: "Playing",
-    Finished: "Finished",
-    Choosing: "Choosing",
-    Leaderboard: "Leaderboard"
+    WAITING: "WAITING",
+    PLAYING: "PLAYING",
+    FINISHED: "FINISHED",
+    CHOOSING: "CHOOSING",
+    LEADERBOARD: "LEADERBOARD"
 };
 
 export const WordDifficultyPoints = {
-    Easy: 5,
-    Medium: 15,
-    Hard: 25
+    EASY: 5,
+    MEDIUM: 15,
+    HARD: 25
 }
