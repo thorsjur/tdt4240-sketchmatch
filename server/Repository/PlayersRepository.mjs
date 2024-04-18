@@ -1,9 +1,10 @@
+import crypto from "crypto";
 import { Player } from '../Models/Player.mjs';
+import { addPlayerToDB, getPlayerByHWID, removePlayerByHWID } from '../db/rxdbSetup.mjs';
 
 export class PlayersRepository {
     constructor() {
         if (!PlayersRepository.instance) {
-            this.players = [];
             PlayersRepository.instance = this;
         }
 
@@ -12,21 +13,21 @@ export class PlayersRepository {
 
     addPlayer(hwid, nickname) {
         // Generate a random ID for the player
-        var id = Math.floor(Math.random() * 1000000);
+        var id = crypto.randomUUID();
 
         var player = new Player(id, hwid, nickname);
 
-        this.players.push(player);
+        addPlayerToDB(player)
         return player;
     }
 
     // Get player by HWID
     getPlayerByHWID(hwid) {
-        return this.players.find(player => player.hwid === hwid);
+        return getPlayerByHWID(hwid);
     }
 
     // Remove player by HWID
     removePlayerByHWID(hwid) {
-        this.players = this.players.filter(player => player.hwid !== hwid);
+        removePlayerByHWID(hwid);
     }
 }

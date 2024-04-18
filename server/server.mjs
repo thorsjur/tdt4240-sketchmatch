@@ -52,19 +52,19 @@ io.on("connection", (socket) => {
     // TODO: Decide what will happend with the game if the game is started
   });
 
-  // On get_rooms event
-  socket.on("get_game_rooms", () => {
-    // Getting the game rooms from the repository
-    var dataToSend = gameRoomsRepository.getGameRooms();
+    // On get_rooms event
+    socket.on("get_game_rooms", async () => {
+        // Getting the game rooms from the repository
+        var dataToSend = await gameRoomsRepository.getGameRooms();
 
     // Sending the game rooms to the client
     socket.emit("game_room_list", dataToSend);
   });
 
-  // On set_nickname event
-  socket.on("set_nickname", (data) => {
-    // Convert string json data to DTO object
-    let jsonData = JSON.parse(data);
+    // On set_nickname event
+    socket.on("set_nickname", async (data) => {
+        // Convert string json data to DTO object
+        let jsonData = JSON.parse(data);
 
     // Create response object which will be sent to the client
     var response = new SetNicknameResponsetDTO();
@@ -78,30 +78,31 @@ io.on("connection", (socket) => {
       dto.setProperties(jsonData);
       console.log(`Set nickname: ${dto.nickname}`);
 
-      // Add player to the repository
-      playersRepository.addPlayer(hwid, dto.nickname);
-      var player = playersRepository.getPlayerByHWID(hwid);
-      response.player = player;
-    } catch (error) {
-      console.error(error.message);
-      response.status = "error";
-      response.message = "set_nickname_error_msg";
-    }
+            // Add player to the repository
+            playersRepository.addPlayer(hwid, dto.nickname);
+            var player = await playersRepository.getPlayerByHWID(hwid);
+            response.player = player;
+
+        } catch (error) {
+            console.error(error.message);
+            response.status = "error";
+            response.message = "set_nickname_error_msg";
+        }
 
     // Emit set_nickname_response only to the sender
     socket.emit("set_nickname_response", response);
   });
 
-  // On create_room event
-  socket.on("create_room", (data) => {
-    let jsonData = JSON.parse(data);
-    var response = new CreateGameResponseDTO();
+    // On create_room event
+    socket.on("create_room", async (data) => {
+        let jsonData = JSON.parse(data);
+        var response = new CreateGameResponseDTO();
 
     try {
       let dto = new CreateGameRequestDTO();
       dto.setProperties(jsonData);
 
-      const player = playersRepository.getPlayerByHWID(hwid);
+            const player = await playersRepository.getPlayerByHWID(hwid);
 
       const gameRoom = gameRoomsRepository.createGameRoom(
         dto.gameRoomName,
@@ -151,7 +152,7 @@ io.on("connection", (socket) => {
   });
 
     // On join_room_by_code event
-    socket.on("join_room_by_code", (data) => {
+    socket.on("join_room_by_code", async (data) => {
         let jsonData = JSON.parse(data);
 
         console.log(`Joining room by code: ${jsonData.gameCode}`);
@@ -162,8 +163,8 @@ io.on("connection", (socket) => {
             let dto = new JoinGameByCodeRequest();
             dto.setProperties(jsonData);
 
-            const player = playersRepository.getPlayerByHWID(hwid);
-            const gameRoom = gameRoomsRepository.getGameRoomByCode(dto.gameCode);
+            const player = await playersRepository.getPlayerByHWID(hwid);
+            const gameRoom = await gameRoomsRepository.getGameRoomByCode(dto.gameCode);
 
             if (!gameRoom) {
                 response.status = "error";
@@ -172,12 +173,13 @@ io.on("connection", (socket) => {
                 response.status = "error";
                 response.message = "game_room_already_full";
             } else {
-                gameRoom.addPlayer(player);
-                response.gameRoom = gameRoom;
+                gameRoomsRepository.joinGameRoom(dto.gameCode, player);
+                const updatedGameRoom = await gameRoomsRepository.getGameRoomByCode(dto.gameCode);
+                response.gameRoom = updatedGameRoom;
 
                 // Emit game_room_updated event to all clients
                 console.log(`Emitting game_room_updated event to all clients`);
-                io.emit("game_room_updated", gameRoom);
+                io.emit("game_room_updated", updatedGameRoom);
             }
         } catch (error) {
             response.status = "error";

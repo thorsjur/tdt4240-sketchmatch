@@ -1,10 +1,10 @@
-import { Player } from '../Models/Player.mjs';
+import crypto from "crypto";
 import { GameRoom } from '../Models/GameRoom.mjs';
+import { addGameRoom, addPlayerToGameRoom, getAllGameRooms, getGameRoomByCode, getGameRoomById, removeGameRoom } from '../db/rxdbSetup.mjs';
 
 export class GameRoomsRepository {
     constructor() {
         if (!GameRoomsRepository.instance) {
-            this.gameRooms = [];
             GameRoomsRepository.instance = this;
         }
 
@@ -13,13 +13,13 @@ export class GameRoomsRepository {
 
     // Get all game rooms
     getGameRooms() {
-        return this.gameRooms;
+        return getAllGameRooms();
     }
 
     // Create a new game room
     createGameRoom(name, player, capacity) {
         // Generate a random ID for the game room
-        var id = Math.floor(Math.random() * 1000000);
+        var id = crypto.randomUUID();
 
         // Generate a HEX code for the game room to be used as a "enter by code" feature
         var gameCode = Math.random().toString(16).substr(2, 6);
@@ -27,24 +27,29 @@ export class GameRoomsRepository {
         let gameRoom = new GameRoom(id, gameCode, name, capacity);
         gameRoom.addPlayer(player);
 
-        this.gameRooms.push(gameRoom);
+        addGameRoom(gameRoom);
 
         return gameRoom;
     }
 
     // Get game room by ID
-    getGameRoomById(id) {
-        return this.gameRooms.find(gameRoom => gameRoom.id === id);
+    getGameRoomById(gameRoomId) {
+        return getGameRoomById(gameRoomId);
     }
 
     // Get game room by code
-    getGameRoomByCode(code) {
-        return this.gameRooms.find(gameRoom => gameRoom.gameCode === code);
+    getGameRoomByCode(gameCode) {
+        return getGameRoomByCode(gameCode);
     }
 
     // Remove game room by ID
-    removeGameRoomById(id) {
-        this.gameRooms = this.gameRooms.filter(gameRoom => gameRoom.id !== id);
+    removeGameRoomById(gameRoomId) {
+        removeGameRoom(gameRoomId);
+    }
+
+    // Adds a player to a game room
+    joinGameRoom(gameRoomId, player) {
+        addPlayerToGameRoom(gameRoomId, player);
     }
 
 }
