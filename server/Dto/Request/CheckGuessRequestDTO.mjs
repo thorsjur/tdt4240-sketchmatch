@@ -5,6 +5,7 @@ export class CheckGuessRequestDTO extends BaseDTO {
     inputGuess = true;
     gameRoomId = true;
     timestamp = true;
+    hwid = false;
 
     // Override the setProperties method
     setProperties(dataJson) {

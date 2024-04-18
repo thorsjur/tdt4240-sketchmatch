@@ -28,10 +28,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
@@ -42,8 +44,8 @@ import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
-import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
+import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
 
 
 @Composable
@@ -51,11 +53,14 @@ fun DrawScreenLayout(
     modifier: Modifier = Modifier,
     navController: NavController,
     drawViewModel: DrawViewModel = viewModel(),
-    guessViewModel: GuessViewModel = viewModel()
+    guessViewModel: GuessViewModel = viewModel(),
+    lifecycle: LifecycleOwner = LocalLifecycleOwner.current
 ) {
-    val currentWord = drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
+    val currentWord =
+        drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
     val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
     val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
+    val gameRoom by drawViewModel.gameRoom.observeAsState()
 
     if (drawViewModel.showWordDialog.value) {
         WordChoiceDialog(
@@ -107,7 +112,7 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val players = drawViewModel.gameRoom.value?.players
+                    val players = gameRoom?.players
                     if (!players.isNullOrEmpty()) {
                         PlayersIconsBar(
                             modifier,
@@ -125,7 +130,7 @@ fun WordChoiceDialog(
     drawViewModel: DrawViewModel,
     onDismissRequest: () -> Unit,
     roundTimerUpdateViewModel: RoundTimerUpdateViewModel,
-    ) {
+) {
     val easyWord by drawViewModel.easyWord
     val mediumWord by drawViewModel.mediumWord
     val hardWord by drawViewModel.hardWord
@@ -148,15 +153,19 @@ fun WordChoiceDialog(
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
-                ) { drawViewModel.onWordChosen(mediumWord);
+                ) {
+                    drawViewModel.onWordChosen(mediumWord);
                     setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
+                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
-                ) { drawViewModel.onWordChosen(hardWord);
+                ) {
+                    drawViewModel.onWordChosen(hardWord);
                     setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
+                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                }
             }
         },
         confirmButton = {

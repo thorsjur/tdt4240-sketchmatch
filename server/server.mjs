@@ -3,25 +3,25 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 
 // Repositories
-import { PlayersRepository } from "./Repository/PlayersRepository.mjs";
 import { GameRoomsRepository } from "./Repository/GameRoomsRepository.mjs";
+import { PlayersRepository } from "./Repository/PlayersRepository.mjs";
 
 // DTOs
-import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
-import { SetNicknameResponseDTO } from "./Dto/Response/SetNicknameResponseDTO.mjs";
-import { CreateGameRequestDTO } from "./Dto/Request/CreateGameRequestDTO.mjs";
-import { CreateGameResponseDTO } from "./Dto/Response/CreateGameResponseDTO.mjs";
 import { CheckGuessRequestDTO } from "./Dto/Request/CheckGuessRequestDTO.mjs";
-import { CheckGuessResponseDTO } from "./Dto/Response/CheckGuessResponseDTO.mjs";
-import { SetDrawWordRequestDTO } from "./Dto/Request/SetDrawWordRequestDTO.mjs";
-import { SetDrawWordResponseDTO } from "./Dto/Response/SetDrawWordResponseDTO.mjs";
-import { RoundTimerUpdateRequestDTO } from "./Dto/Request/RoundTimerUpdateRequestDTO.mjs";
-import { RoundTimerUpdateResponseDTO } from "./Dto/Response/RoundTimerUpdateResponseDTO.mjs";
+import { CreateGameRequestDTO } from "./Dto/Request/CreateGameRequestDTO.mjs";
 import { JoinGameByCodeRequest } from "./Dto/Request/JoinGameByCodeRequestDTO.mjs";
-import { JoinGameResponseDTO } from "./Dto/Response/JoinGameResponseDTO.mjs";
 import { PublishPathRequestDTO } from "./Dto/Request/PublishPathRequestDTO.mjs";
 import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
+import { RoundTimerUpdateRequestDTO } from "./Dto/Request/RoundTimerUpdateRequestDTO.mjs";
+import { SetDrawWordRequestDTO } from "./Dto/Request/SetDrawWordRequestDTO.mjs";
+import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
+import { CheckGuessResponseDTO } from "./Dto/Response/CheckGuessResponseDTO.mjs";
+import { CreateGameResponseDTO } from "./Dto/Response/CreateGameResponseDTO.mjs";
+import { JoinGameResponseDTO } from "./Dto/Response/JoinGameResponseDTO.mjs";
 import { RoundFinishedResponseDTO } from "./Dto/Response/RoundFinishedResponseDTO.mjs";
+import { RoundTimerUpdateResponseDTO } from "./Dto/Response/RoundTimerUpdateResponseDTO.mjs";
+import { SetDrawWordResponseDTO } from "./Dto/Response/SetDrawWordResponseDTO.mjs";
+import { SetNicknameResponseDTO } from "./Dto/Response/SetNicknameResponseDTO.mjs";
 
 
 const app = express();
@@ -188,6 +188,11 @@ io.on("connection", (socket) => {
             console.log(
                 `Checking guess: ${checkedGuess.inputGuess} - ${checkedGuess.isCorrect}`
             );
+
+            if (checkedGuess.isCorrect && dto.hwid) {
+              console.log("Player guessed correctly, emitting player_guessed_correctly event to room.");
+              io.to(dto.gameRoomId).emit("player_guessed_correctly", dto.hwid);
+            }
         } catch (error) {
             response.status = "error";
             response.message = "Error checking guess";

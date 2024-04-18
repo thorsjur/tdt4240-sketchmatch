@@ -8,9 +8,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
+import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
@@ -22,8 +24,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     companion object {
         const val MAX_ROUNDS = 5
     }
-
-    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
 
     private val _showWordDialog = mutableStateOf(true)
     val showWordDialog: State<Boolean> = _showWordDialog
@@ -62,28 +62,44 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     val isDrawing: State<Boolean> = _isDrawing
 
     private val client = MessageClient.getInstance()
-    
+
     val gameRoom = GameData.currentGameRoom
 
     // Load initial words
     init {
         generateWords()
+
+        // Updates the list of players in the global state to reflect who has guessed correctly,
+        // it is based on their hwid.
+        client.addCallback(ResponseEvent.PLAYER_GUESSED_CORRECTLY.value) { msg ->
+            val gameRoom = GameData.currentGameRoom
+            val currentValue = gameRoom.value
+            if (currentValue != null) {
+                val gson = Gson()
+                val hwid = gson.fromJson(msg, String::class.java)
+
+                gameRoom.postValue(currentValue.apply {
+                    players = players.filterNotNull().map { player ->
+                        if (player.hwid == hwid) player.apply {
+                            hasGuessedCorrectly = true
+                        } else {
+                            return@map player
+                        }
+                    }
+                })
+
+            }
+        }
+
     }
 
-//    fun submitGuess() {
-//        val guess = currentGuess.value
-//        // TODO: Add the required functionality to the server for handling guesses.
-//    }
-
-    fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
-        roomId = roomId.toInt()
-    ) { controller.importPath(it) }
-
-    fun unsubscribeFromRoom() = client.unsubscribeFromRoom(roomId.toInt())
-
     fun publishFullDrawBoxPayload(controller: DrawController) {
-        val payload = controller.exportPath()
-        client.publishFullDrawBoxPayload(roomId.toInt(), payload)
+        val currentGameRoom = gameRoom.value
+        if (currentGameRoom != null) {
+            val roomId = currentGameRoom.id
+            val payload = controller.exportPath()
+            client.publishFullDrawBoxPayload(roomId, payload)
+        }
     }
 
     private suspend fun handleTimer() {

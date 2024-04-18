@@ -7,8 +7,12 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.CheckGuessResponseDTO
+import com.groupfive.sketchmatch.communication.dto.response.PayloadResponseDTO
+import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
+import io.ak1.drawbox.DrawController
+import kotlinx.serialization.json.Json
 
-class GuessViewModel: ViewModel(){
+class GuessViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
     val isCorrect: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -32,4 +36,15 @@ class GuessViewModel: ViewModel(){
     fun checkGuess(inputGuess: String, gameRoomId: Int, timestamp: Int) {
         client.checkGuess(inputGuess, gameRoomId, timestamp)
     }
+
+    fun handleRender(controller: DrawController) =
+        client.addCallback(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) {
+            val gson = Gson()
+            val response = gson.fromJson(it, PayloadResponseDTO::class.java)
+            val drawBoxPayLoad =
+                Json.decodeFromString(DrawBoxPayLoadSerializer, response.pathPayload)
+            controller.importPath(drawBoxPayLoad)
+        }
+
+    fun handleDestroy() = client.removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
 }
