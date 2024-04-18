@@ -35,8 +35,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GuessScreen
-import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
 
@@ -94,7 +94,13 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    PlayersIconsBar(modifier, currentPlayers = drawViewModel.players.value)
+                    val players = drawViewModel.gameRoom.value?.players
+                    if (!players.isNullOrEmpty()) {
+                        PlayersIconsBar(
+                            modifier,
+                            currentPlayers = players
+                        )
+                    }
                 }
             }
         }
@@ -227,7 +233,6 @@ fun TopWordBar(
 
 @Composable
 fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
-
     Row(modifier.padding(8.dp)) {
         currentPlayers.forEach { player ->
             Box(contentAlignment = Alignment.Center) {
@@ -238,7 +243,7 @@ fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
                 )
 
                 // If the player's action is complete, overlay a green-tinted checkmark
-                if (player.isComplete) {
+                if (player.hasGuessedCorrectly) {
                     Box(
                         modifier = Modifier.size(45.dp),
                         contentAlignment = Alignment.Center

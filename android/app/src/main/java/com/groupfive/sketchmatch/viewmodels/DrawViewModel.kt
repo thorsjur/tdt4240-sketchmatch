@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -49,9 +49,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val _currentColor = mutableStateOf(Color.Black)
 
-    private val _players = mutableStateOf(List(5) { Player(it, false) })
-    val players: State<List<Player>> = _players
-
     private val _easyWord = mutableStateOf("")
     val easyWord: State<String> = _easyWord
 
@@ -65,6 +62,8 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     val isDrawing: State<Boolean> = _isDrawing
 
     private val client = MessageClient.getInstance()
+    
+    val gameRoom = GameData.currentGameRoom
 
     // Load initial words
     init {
@@ -92,7 +91,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
             delay(1000)
             _timeCount.value--
         }
-        _players.value = _players.value.map { it.copy(isComplete = true) }
     }
 
     fun onWordChosen(word: String) {
