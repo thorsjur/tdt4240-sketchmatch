@@ -17,6 +17,10 @@ export class Player {
         this.score = score;
     }
 
+    incrementScore(points) {
+        this.score += points;
+    }
+
     // Update score
     getScore() {
         return this.score;
