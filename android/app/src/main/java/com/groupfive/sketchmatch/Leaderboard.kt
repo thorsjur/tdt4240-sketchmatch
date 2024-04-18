@@ -32,66 +32,75 @@ import com.groupfive.sketchmatch.viewmodels.LeaderboardViewModel
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
+import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.getPlayerRankString
 import com.groupfive.sketchmatch.utils.getRoundString
+import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 
 @Composable
 fun Leaderboard(
     modifier: Modifier = Modifier,
     navController: NavController,
-    leaderboardViewModel: LeaderboardViewModel = viewModel()
+    leaderboardViewModel: LeaderboardViewModel = viewModel(),
+    roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
 ) {
     // if drawingplayer.id == currentplayer.id && secondsleft === 0 -> Then navigate to choose word
-    // else if
     val gameRoom by GameData.currentGameRoom.observeAsState()
+    val roundStartedEvent by roundTimerUpdateViewModel.roundStartedEvent.observeAsState()
 
-    if () {
-        Surface(modifier = Modifier) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+    roundStartedEvent?.getContentIfNotHandled()?.let {
+        navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+    }
+
+    if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {
+        navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+    }
+
+    Surface(modifier = Modifier) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logog),
+                contentDescription = null,
+                modifier = Modifier.size(250.dp)
+            )
+            Row (
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logog),
-                    contentDescription = null,
-                    modifier = Modifier.size(250.dp)
+                Text(
+                    modifier = Modifier.padding(10.dp),
+                    text = if (leaderboardViewModel.secondsLeft != 0) {
+                        getRoundString(gameRoom?.currentRound ?: 1, gameRoom?.players?.size ?: 1)
+                    } else {
+                        "${gameRoom?.getCurrentRound()?.drawingPlayer} is choosing a word"
+                    },
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    )
                 )
-                Row (
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                if (leaderboardViewModel.secondsLeft != 0) {
+                    Icon(
+                        modifier = Modifier.padding(5.dp),
+                        imageVector = Icons.Filled.Alarm,
+                        contentDescription = "Alarm Icon"
+                    )
                     Text(
-                        modifier = Modifier.padding(10.dp),
-                        text = if (leaderboardViewModel.secondsLeft != 0) {
-                            getRoundString(gameRoom?.currentRound ?: 1, gameRoom?.players?.size ?: 1)
-                        } else {
-                            "${gameRoom?.getCurrentRound()?.drawingPlayer} is choosing a word"
-                        },
+                        text = "${leaderboardViewModel.secondsLeft}",
                         style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.ExtraBold
+                            fontWeight = FontWeight.Bold
                         )
                     )
-                    if (leaderboardViewModel.secondsLeft != 0) {
-                        Icon(
-                            modifier = Modifier.padding(5.dp),
-                            imageVector = Icons.Filled.Alarm,
-                            contentDescription = "Alarm Icon"
-                        )
-                        Text(
-                            text = "${leaderboardViewModel.secondsLeft}",
-                            style = MaterialTheme.typography.headlineLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
-                    }
-                    LaunchedEffect(key1 = Unit) {
-                        leaderboardViewModel.startCountDown()
-                    }
                 }
-                Players(
-                    modifier = Modifier,
-                    players = gameRoom?.players ?: emptyList()
-                )
+                LaunchedEffect(key1 = Unit) {
+                    leaderboardViewModel.startCountDown()
+                }
             }
+            Players(
+                modifier = Modifier,
+                players = gameRoom?.players ?: emptyList()
+            )
         }
     }
 }

@@ -57,6 +57,11 @@ fun DrawScreenLayout(
     val currentWord = drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
     val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
     val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
+    val roundEndedEvent by roundTimerUpdateViewModel.roundEndedEvent.observeAsState()
+
+    roundEndedEvent?.getContentIfNotHandled()?.let {
+        navController.navigate(Screen.Leaderboard.route)
+    }
 
     if (drawViewModel.showWordDialog.value) {
         WordChoiceDialog(
@@ -64,10 +69,7 @@ fun DrawScreenLayout(
             onDismissRequest = drawViewModel::dismissWordDialog,
             roundTimerUpdateViewModel = roundTimerUpdateViewModel,
         )
-    } else if (timeCount == 0) {
-        navController.navigate(Screen.Leaderboard.route)
-    }
-    else {
+    } else {
         Surface(modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Column(
                 modifier.padding(10.dp),

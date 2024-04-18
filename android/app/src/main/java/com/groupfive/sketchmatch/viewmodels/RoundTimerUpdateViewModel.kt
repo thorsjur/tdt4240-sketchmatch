@@ -10,11 +10,15 @@ import com.groupfive.sketchmatch.communication.dto.response.RoundFinishedRespons
 import com.groupfive.sketchmatch.communication.dto.response.RoundTimerUpdateResponseDTO
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.utils.SingleLiveEvent
 
 class RoundTimerUpdateViewModel: ViewModel() {
     private val client = MessageClient.getInstance()
     val updatedTimerTick: MutableLiveData<Int> = MutableLiveData()
     val updatedRoundGameRoom: MutableLiveData<GameRoom> = MutableLiveData()
+
+    val roundStartedEvent = MutableLiveData<SingleLiveEvent<Unit>>()
+    val roundEndedEvent = MutableLiveData<SingleLiveEvent<Unit>>()
 
     init {
 
@@ -31,6 +35,9 @@ class RoundTimerUpdateViewModel: ViewModel() {
             updatedTimerTick.postValue(updatedTimer.roundTimerTick)
 
             // if updatedTimer.roundTimerTick == 60, then send Single LiveEvent rounds started to Leaderboard, then navigate to DrawScreenLayout
+            if (updatedTimer.roundTimerTick == 60) {
+                roundStartedEvent.postValue(SingleLiveEvent(Unit))
+            }
         }
 
         // Add a callback to handle incoming  message
@@ -48,6 +55,7 @@ class RoundTimerUpdateViewModel: ViewModel() {
             GameData.currentGameRoom.postValue(gameRoom.gameRoom)
 
             // send SingleLiveEvent round is over to DrawScreenLayout, then navigate to Leaderboard
+            roundEndedEvent.postValue(SingleLiveEvent(Unit))
         }
     }
 

@@ -70,7 +70,7 @@ fun SetupNavGraph(navController: NavHostController) {
 
         // Leaderboard Destination
         composable(
-            route = Screen.Leaderboard.route + "/{roomId}"
+            route = Screen.Leaderboard.route
         ) {
             Leaderboard(navController = navController)
         }
