@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.CreateGameResponseDTO
+import com.groupfive.sketchmatch.store.GameData
 
 class CreateGameViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
@@ -25,6 +26,9 @@ class CreateGameViewModel : ViewModel() {
             val response = gson.fromJson(message, CreateGameResponseDTO::class.java)
 
             if (response.status == "success") {
+                // Update the current game room
+                GameData.currentGameRoom.postValue(response.gameRoom)
+
                 // TODO: Subscribe player when moved to lobby
             } else {
                 isError.postValue(true)
