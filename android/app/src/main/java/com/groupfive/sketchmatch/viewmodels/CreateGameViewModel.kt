@@ -3,15 +3,32 @@ package com.groupfive.sketchmatch.viewmodels
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.CreateGameResponseDTO
 import com.groupfive.sketchmatch.store.GameData
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 class CreateGameViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
     val isError: MutableLiveData<Boolean> = MutableLiveData()
+
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    val eventsFlow = eventChannel.receiveAsFlow()
+
+    fun sendEvent(event: Event) {
+        viewModelScope.launch {
+            eventChannel.send(event)
+        }
+    }
+
+    sealed class Event {
+        data class NavigateTo(val destination: Int): Event()
+    }
 
     init {
 
@@ -28,6 +45,11 @@ class CreateGameViewModel : ViewModel() {
             if (response.status == "success") {
                 // Update the current game room
                 GameData.currentGameRoom.postValue(response.gameRoom)
+
+                Log.i("CreateGameViewModel", "Game room created: ${response.gameRoom}")
+
+                // Navigate to the draw screen
+                sendEvent(Event.NavigateTo(1))
 
                 // TODO: Subscribe player when moved to lobby
             } else {

@@ -46,9 +46,9 @@ import com.groupfive.sketchmatch.viewmodels.SetNicknameViewModel
 fun UsernameEnterDialog(
     modifier: Modifier = Modifier,
     onSubmit: (String) -> Unit,
-    onSuccess: (String) -> Unit
+    onSuccess: (String) -> Unit,
+    viewModel: SetNicknameViewModel = viewModel()
 ){
-    val viewModel: SetNicknameViewModel = viewModel()
     val context = LocalContext.current
 
     val setNicknameIsSuccess by viewModel.nicknameSetStatus.observeAsState(false)

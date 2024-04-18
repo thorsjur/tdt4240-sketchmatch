@@ -42,6 +42,7 @@ fun MainMenuScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+
     var openCreateGamePopup by remember { mutableStateOf(false) }
     val player by GameData.currentPlayer.observeAsState()
 
@@ -68,7 +69,11 @@ fun MainMenuScreen(
             JoinGameButton(onJoinGameClicked = { navController.navigate(Screen.GameRoomsList.route) })
             HelpButton(onHelpClicked = { navController.navigate(Screen.Help.route) })
 
-            CreateGamePopUp(openCreateGamePopup = openCreateGamePopup, onOpenCreateGamePopup = { openCreateGamePopup = it })
+            CreateGamePopUp(
+                navController = navController,
+                openCreateGamePopup = openCreateGamePopup,
+                onOpenCreateGamePopup = { openCreateGamePopup = it }
+            )
         }
     }
 

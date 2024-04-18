@@ -256,10 +256,6 @@ io.on("connection", (socket) => {
           const gameRoom = gameRoomsRepository.getGameRoomByCode(
               dto.gameCode
           );
-          
-          const gameRoomId = gameRoomsRepository.getRoomIdFromGameCode(
-            dto.gameCode
-        );
       
         if (!gameRoom) {
             response.status = "error";
@@ -270,12 +266,14 @@ io.on("connection", (socket) => {
         } else {
             gameRoom.addPlayer(player);
       
-            socket.join(gameRoomId);
+            socket.join(gameRoom.id);
           
             response.gameRoom = gameRoom;
+
+            // Emit game_room_updated event to all clients in the room
+            io.to(gameRoom.id).emit("player_joined_room", gameRoom);
     
             // Emit game_room_updated event to all clients
-            console.log(`Emitting game_room_updated event to all clients`);
             io.emit("game_room_updated", gameRoom);
         }
       } catch (error) {
@@ -350,3 +348,33 @@ gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
 httpServer.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
+
+/*
+
+// Create new player
+const player1 = playersRepository.addPlayer("hwid1", "Player 1");
+const player2 = playersRepository.addPlayer("hwid2", "Player 2");
+
+// Create new game room
+const gameRoom = gameRoomsRepository.createGameRoom("Game Room 1", player1, 2);
+
+// Add player to the game room
+gameRoom.addPlayer(player2);
+
+import { WordDifficultyPoints } from "./Models/GameRoom.mjs";
+
+// Start round
+gameRoomsRepository.startRound(gameRoom.id, "ivan", WordDifficultyPoints.EASY);
+
+setTimeout(() => {
+  gameRoomsRepository.handleGuess(gameRoom.id, player2.id, "ivan");
+}, 1500);
+
+// wait for 10csec
+setTimeout(() => {
+  // Start round
+  gameRoomsRepository.startRound(gameRoom.id, "tsvetelin", WordDifficultyPoints.HARD);
+  gameRoomsRepository.handleGuess(gameRoom.id, player2.id, "ivan");
+}, 10000);
+
+*/

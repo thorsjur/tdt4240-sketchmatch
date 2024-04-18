@@ -30,7 +30,10 @@ export class GameRoom extends EventEmitter {
 
         if(this.players.length === this.gameCapacity) {
             this.setGameStatus(GameStatus.CHOOSING);
-            this.emit('round_has_been_created', this);
+            // Emit after 300 ms
+            setTimeout(() => {
+                this.emit('round_has_been_created', this);
+            }, 300);
         }
     }
 

@@ -13,6 +13,7 @@ import com.groupfive.sketchmatch.view.draw.DrawScreenLayout
 import com.groupfive.sketchmatch.view.gameroomslist.GamesListScreen
 import com.groupfive.sketchmatch.view.mainmenu.HelpScreen
 import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
+import com.groupfive.sketchmatch.view.waitinglobby.WaitingLobby
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -59,6 +60,13 @@ fun SetupNavGraph(navController: NavHostController) {
             route = Screen.GameRoomsList.route
         ) {
             GamesListScreen(navController = navController)
+        }
+
+        // WaitingLobby Screen Destination
+        composable(
+            route = Screen.WaitingLobby.route
+        ) {
+            WaitingLobby(navController = navController)
         }
 
         // Draw Screen Destination

@@ -21,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +44,7 @@ import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
+import com.groupfive.sketchmatch.viewmodels.CreateGameViewModel
 import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
 
 @Composable
@@ -68,14 +71,18 @@ fun GamesListScreen(
     successEvent?.getContentIfNotHandled()?.let {
         viewModel.removeAllCallbacks()
 
-        // TODO: Navigate to the game lobby screen in stead of Draw screen
-        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
-        // TODO: Replace mockId with actual roomId
-        val mockId = 1234
-        navController.navigate(Screen.Draw.route + "/$mockId")
+        Log.i("GamesListScreen", "Game room joined successfully")
+
+        viewModel.joinGameByCodeMessage.value?.let {
+            GamesListToastMaker(context, it)
+            Log.i("GamesListScreen", it)
+        }
+
+        navController.navigate(Screen.WaitingLobby.route)
     }
 
     errorEvent?.getContentIfNotHandled()?.let {
+        Log.i("GamesListScreen", "Error joining game room")
         viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
     }
 
@@ -141,6 +148,7 @@ fun GamesListScreen(
             }
 
             CreateGamePopUp(
+                navController = navController,
                 openCreateGamePopup = openCreateGamePopup,
                 onOpenCreateGamePopup = { openCreateGamePopup = it })
 
@@ -259,6 +267,7 @@ fun GamesListToastMaker(
     messageId: String
 ) {
     var message = when (messageId) {
+        "game_room_enter_success" -> stringResource(id = R.string.game_room_enter_success)
         "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
         "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
         else -> stringResource(id = R.string.something_went_wrong)
