@@ -1,4 +1,4 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.mainmenu
 
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 
 
@@ -55,9 +56,19 @@ fun HelpScreen(
         navController.popBackStack()
     }
 
-    val desc1 = arrayOf(stringResource(R.string.desc1_1), stringResource(R.string.desc1_2), stringResource(R.string.desc1_3), stringResource(R.string.desc1_4), stringResource(R.string.desc1_5))
-    val desc2 = arrayOf(stringResource(R.string.desc2_1), stringResource(R.string.desc2_2), stringResource(R.string.desc2_3))
-    val desc3 = arrayOf(stringResource(R.string.desc3_1), stringResource(R.string.desc3_2), stringResource(R.string.desc3_3), stringResource(R.string.desc3_4), stringResource(R.string.desc3_5), stringResource(R.string.desc3_6), stringResource(R.string.desc3_7), stringResource(R.string.desc3_8), stringResource(R.string.desc3_9), stringResource(R.string.desc3_10), stringResource(R.string.desc3_11))
+    val desc1 = arrayOf(stringResource(R.string.desc1_1), stringResource(R.string.desc1_2), stringResource(
+        R.string.desc1_3
+    ), stringResource(R.string.desc1_4), stringResource(R.string.desc1_5))
+    val desc2 = arrayOf(stringResource(R.string.desc2_1), stringResource(R.string.desc2_2), stringResource(
+        R.string.desc2_3
+    ))
+    val desc3 = arrayOf(stringResource(R.string.desc3_1), stringResource(R.string.desc3_2), stringResource(
+        R.string.desc3_3
+    ), stringResource(R.string.desc3_4), stringResource(R.string.desc3_5), stringResource(R.string.desc3_6), stringResource(
+        R.string.desc3_7
+    ), stringResource(R.string.desc3_8), stringResource(R.string.desc3_9), stringResource(R.string.desc3_10), stringResource(
+        R.string.desc3_11
+    ))
 
     val card1 = arrayOf(stringResource(R.string.creating_a_game_title), desc1)
     val card2 = arrayOf(stringResource(R.string.joining_a_game_title), desc2)

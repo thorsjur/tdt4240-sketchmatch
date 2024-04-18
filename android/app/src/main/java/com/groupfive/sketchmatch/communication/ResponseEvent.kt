@@ -21,8 +21,20 @@ enum class ResponseEvent(val value: String) {
     // Event for when server sends response of game room creation request
     ROOM_CREATED_RESPONSE("game_room_created_response"),
 
+    // Event for when server notifies of a guess being checked
+    CHECK_GUESS_RESPONSE("check_guess_response"),
+
     // Event for when server sends response of game room join by code request
     JOIN_ROOM_RESPONSE("join_room_response"),
+
+    // Event for when server notifies that a draw word has been selected
+    SET_DRAW_WORD_RESPONSE("set_draw_word_response"),
+
+    // Event for when server notifies of the timer for a round starting
+    ROUND_TIMER_UPDATE_RESPONSE("round_timer_update_response"),
+
+    // Event for when server notifies of a round finishing
+    ROUND_FINISHED_RESPONSE("round_finished_response"),
 
     // Event for when server publishes to a room the client is subscribed to
     DRAW_PAYLOAD_PUBLISHED("draw_payload_published"),

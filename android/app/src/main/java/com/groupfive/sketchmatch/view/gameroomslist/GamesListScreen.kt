@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.groupfive.sketchmatch.CreateGamePopUp
+import com.groupfive.sketchmatch.view.mainmenu.CreateGamePopUp
 import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.navigator.Screen
@@ -111,6 +111,7 @@ fun GamesListScreen(
 
                 // Spacer
                 Spacer(modifier = Modifier.width(15.dp))
+
 
                 // Join by code button
                 Button(
