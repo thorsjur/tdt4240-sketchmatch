@@ -167,9 +167,9 @@ export const removeGameRoom = async (id) => {
     }
 }
 
-export const addPlayerToGameRoom = async (gameRoom, player) => {
+export const addPlayerToGameRoom = async (gameRoomId, player) => {
     try {
-        const doc = await collections.gamerooms.findOne(gameRoom.id).exec();
+        const doc = await collections.gamerooms.findOne(gameRoomId).exec();
         const players = doc.get('players');
         const newPlayers = players.push(player)
     

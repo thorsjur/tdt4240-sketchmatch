@@ -173,12 +173,13 @@ io.on("connection", (socket) => {
                 response.status = "error";
                 response.message = "game_room_already_full";
             } else {
-                gameRoom.addPlayer(player);
-                response.gameRoom = gameRoom;
+                gameRoomsRepository.joinGameRoom(dto.gameCode, player);
+                const updatedGameRoom = await gameRoomsRepository.getGameRoomByCode(dto.gameCode);
+                response.gameRoom = updatedGameRoom;
 
                 // Emit game_room_updated event to all clients
                 console.log(`Emitting game_room_updated event to all clients`);
-                io.emit("game_room_updated", gameRoom);
+                io.emit("game_room_updated", updatedGameRoom);
             }
         } catch (error) {
             response.status = "error";

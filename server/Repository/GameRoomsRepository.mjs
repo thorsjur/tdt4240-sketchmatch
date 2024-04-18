@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { GameRoom } from '../Models/GameRoom.mjs';
-import { addGameRoom, getAllGameRooms, getGameRoomByCode, getGameRoomById, removeGameRoom } from '../db/rxdbSetup.mjs';
+import { addGameRoom, addPlayerToGameRoom, getAllGameRooms, getGameRoomByCode, getGameRoomById, removeGameRoom } from '../db/rxdbSetup.mjs';
 
 export class GameRoomsRepository {
     constructor() {
@@ -45,6 +45,11 @@ export class GameRoomsRepository {
     // Remove game room by ID
     removeGameRoomById(gameRoomId) {
         removeGameRoom(gameRoomId);
+    }
+
+    // Adds a player to a game room
+    joinGameRoom(gameRoomId, player) {
+        addPlayerToGameRoom(gameRoomId, player);
     }
 
 }
