@@ -83,6 +83,9 @@ fun GuessScreen(
 
     val drawBoxPayLoad by GameData.drawBoxPayLoad.observeAsState()
 
+    // Clear the payload in the controller
+    controller.reset()
+
     // On drawBoxPayLoad change
     if (drawBoxPayLoad != null) {
         controller.importPath(drawBoxPayLoad!!)
