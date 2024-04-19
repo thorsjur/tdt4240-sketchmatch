@@ -15,8 +15,8 @@ To get started with the client, open the [`android`](/android/) directory in And
 
 ### Prerequisites
 
-- Android Studio
-- Node.js for the server
+- Android Studio with Android SDK version 34+
+- Node.js 20+ for the server
 - An Android device or emulator for testing the client
 
 ## Building

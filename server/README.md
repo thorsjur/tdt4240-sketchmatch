@@ -47,7 +47,7 @@ Note that these events are only used to demonstrate how the server can handle ev
 ## Architecture
 The server is structured into several components:
 
-  - Models: These are the data structures used by the server. They include `GameRoom`, `Player`, and `Round`.
+  - Models: These are the data structures used by the server. They include `GameRoom`, `Player`, `Guess` and `Round`.
 
   - Repositories: These are the data access layers for the server. They include `GameRoomsRepository` and `PlayersRepository`.
 
