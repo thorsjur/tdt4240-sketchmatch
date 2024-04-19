@@ -175,6 +175,11 @@ class MessageClient private constructor(
                 on(ResponseEvent.JOIN_ROOM_RESPONSE.value) { msg ->
                     invokeCallbacks(ResponseEvent.JOIN_ROOM_RESPONSE.value, msg)
                 }
+
+                on(ResponseEvent.PLAYER_JOINED_ROOM.value) { msg ->
+                    Log.i("Socket", msg)
+                    invokeCallbacks(ResponseEvent.PLAYER_JOINED_ROOM.value, msg)
+                }
             }
         } catch (e: URISyntaxException) {
 

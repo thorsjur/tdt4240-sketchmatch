@@ -5,11 +5,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.groupfive.sketchmatch.Leaderboard
+import com.groupfive.sketchmatch.view.gameroomslist.GamesListScreen
+import com.groupfive.sketchmatch.WaitingLobby
+import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.view.draw.DrawScreenLayout
 import com.groupfive.sketchmatch.view.gameroomslist.GamesListScreen
 import com.groupfive.sketchmatch.view.mainmenu.HelpScreen
-import com.groupfive.sketchmatch.view.mainmenu.MainMenuScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -63,6 +65,12 @@ fun SetupNavGraph(navController: NavHostController) {
             route = Screen.Draw.route + "/{roomId}"
         ) {
             DrawScreenLayout(navController = navController)
+        }
+
+        composable(
+            route = "waiting_lobby_screen"
+        ) {
+            WaitingLobby(navController = navController)
         }
     }
 }
