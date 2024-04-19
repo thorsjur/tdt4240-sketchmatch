@@ -3,7 +3,6 @@ package com.groupfive.sketchmatch.viewmodels
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.communication.MessageClient
@@ -12,7 +11,6 @@ import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.JoinGameByCodeRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
 import com.groupfive.sketchmatch.store.GameData
-import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.utils.SingleLiveEvent
 
 class GameRoomsViewModel : ViewModel() {
@@ -24,8 +22,6 @@ class GameRoomsViewModel : ViewModel() {
 
     val successEvent = MutableLiveData<SingleLiveEvent<Unit>>()
     val errorEvent = MutableLiveData<SingleLiveEvent<Unit>>()
-
-    val navigationEvent = MutableLiveData<SingleLiveEvent<String>>()
 
     init {
         // Initialize the list of game rooms with fake data
@@ -102,7 +98,7 @@ class GameRoomsViewModel : ViewModel() {
             joinGameByCodeMessage.postValue(response.message)
 
             if (response.status == "success") {
-                Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom.gameCode}")
+                Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom?.gameCode}")
 
                 // Update the current game room
                 GameData.currentGameRoom.postValue(response.gameRoom)
@@ -111,8 +107,6 @@ class GameRoomsViewModel : ViewModel() {
                 successEvent.postValue(SingleLiveEvent(Unit))  // Trigger the navigation event
 
                 // TODO: Navigate to the game room screen
-                navigationEvent.postValue(SingleLiveEvent(Screen.CommonLobby.route))
-
             } else {
                 // Display an error message
                 errorEvent.postValue(SingleLiveEvent(Unit))
