@@ -289,15 +289,15 @@ io.on("connection", (socket) => {
 gameRoomsRepository.on('round_has_been_created', gameRoom => {
   console.log(`Round has been created in game room: ${gameRoom.gameName}`);
   let dto = new GameRoomUpdateStatusResponseDTO();
-  dto.gameRoom = gameRoom;
+  dto.gameRoom = gameRoom.serialize();
 
-  io.to(gameRoom.id).emit('round_has_been_created_response', dto);
+  io.to(gameRoom.id).emit('round_is_created_response', dto);
 });
 
 gameRoomsRepository.on('round_has_started', gameRoom => {
   console.log(`Round has started in game room: ${gameRoom.gameName}`);
   let dto = new GameRoomUpdateStatusResponseDTO();
-  dto.gameRoom = gameRoom;
+  dto.gameRoom = gameRoom.serialize();
 
   io.to(gameRoom.id).emit('round_started_response', dto);
 });

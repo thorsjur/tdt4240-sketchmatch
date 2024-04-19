@@ -3,7 +3,8 @@ import { Player } from "./Player.mjs";
 
 export const GameRoomSettings = {
     ROUND_DURATION: 5,
-    LEADERBOARD_DURATION: 3
+    LEADERBOARD_DURATION: 3,
+    ROUND_CREATE_DELAY: 2000 // wait x ms before creating a new round after the game is full (just to make sure the last player has been navigated to the lobby screen)
 }
 
 export class GameRoom extends EventEmitter {
@@ -33,7 +34,7 @@ export class GameRoom extends EventEmitter {
             // Emit after 300 ms
             setTimeout(() => {
                 this.emit('round_has_been_created', this);
-            }, 300);
+            }, GameRoomSettings.ROUND_CREATE_DELAY);
         }
     }
 

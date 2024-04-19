@@ -68,6 +68,7 @@
     <string name="correct">Correct</string>
     <string name="incorrect">Incorrect</string>
     <string name="waiting_lobby_title">Waiting for more players to join!</string>
+    <string name="starting_the_game">The game is starting!</string>
     <string name="game_room_code">Game room code:</string>
     <string name="back_to_main_menu">Back to main menu</string>
     <string name="players_waiting">Players: %1$s</string>

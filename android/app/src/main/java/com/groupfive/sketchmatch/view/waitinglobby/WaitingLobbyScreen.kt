@@ -29,9 +29,11 @@ import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.viewmodels.WaitingLobbyViewModel
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.viewmodels.CreateGameViewModel
 
 @Composable
 fun WaitingLobby(
@@ -44,24 +46,30 @@ fun WaitingLobby(
     val gameRoomCode = gameRoom?.gameCode ?: "Unknown Code"
     val playersWaiting = "${gameRoom?.players?.size ?: 0} / ${gameRoom?.gameCapacity ?: 0}"
 
-    if (gameRoom?.players?.size == gameRoom?.gameCapacity) {
-        // If all players have joined and it is not the first setup, navigate accordingly
-        if (player?.isDrawing == true) {
-            LaunchedEffect("navigate") {
-                navController.navigate(Screen.Draw.route)
+    val events = viewModel.eventsFlow.collectAsState(initial = null)
+    val event = events.value // allow Smart cast
+
+    LaunchedEffect(event) {
+        when (event) {
+            is WaitingLobbyViewModel.Event.NavigateToDraw -> {
+                // Remove the current screen from the back stack
+                navController.popBackStack()
+                // Navigate to the draw screen
+                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
             }
-        } else {
-            LaunchedEffect("navigate") {
-                // Navigate to score board for the guessing players
-                //navController.navigate(Screen.GuesserLobby.route)
-            }
+            null -> { }
         }
     }
+
     Surface (modifier.fillMaxSize()){
+        var title = stringResource(R.string.waiting_lobby_title)
+        if((gameRoom?.players?.size ?: 0) == (gameRoom?.gameCapacity ?: 2)){
+            title = stringResource(R.string.starting_the_game)
+        }
         AlertDialog(
             onDismissRequest = {},
             title = { Text(
-                text = stringResource(R.string.waiting_lobby_title),
+                text = title,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = TextStyle(fontSize = 19.sp)
