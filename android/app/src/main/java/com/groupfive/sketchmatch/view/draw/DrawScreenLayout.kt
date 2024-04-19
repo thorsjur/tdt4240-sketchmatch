@@ -285,6 +285,11 @@ fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
 
                 var completed: Boolean = true;
 
+                // Check if player id is found in the list of players who guessed correctly
+                if (GameData.currentGameRoom.value?.guessedCorrectly?.contains(player.id) == false) {
+                    completed = false;
+                }
+
                 // If the player's action is complete, overlay a green-tinted checkmark
                 if (completed) {
                     Box(

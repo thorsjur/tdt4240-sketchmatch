@@ -88,6 +88,8 @@ fun GuessScreen(
         controller.importPath(drawBoxPayLoad!!)
     }
 
+
+
     LaunchedEffect(Unit) {
         guessViewModel.handleRender(controller)
     }
@@ -170,9 +172,24 @@ fun GuessScreen(
             }
         }
 
+        // Show correctness icon when GameRoom.guessedCorrectly is updated and the last element = current player id\
+        var guessedCorrectly = GameData.currentGameRoom.value?.guessedCorrectly
+        var showIcon: Boolean = GameData.lastGuessCorrectness.value == true
+
+        if (!guessedCorrectly.isNullOrEmpty()) {
+
+            if (guessedCorrectly.last() == GameData.currentPlayer.value?.id && showIcon) {
+                showCorrectnessIcon = true
+                guessWordIsCorrect = true
+            } else {
+                guessWordIsCorrect = false
+            }
+        }
+
         if (showCorrectnessIcon) {
             LaunchedEffect(key1 = Unit){
                 delay(2000)
+                GameData.lastGuessCorrectness.postValue(false)
                 showCorrectnessIcon = false
             }
             Box(modifier = Modifier.fillMaxSize(),
