@@ -1,6 +1,6 @@
-import { Guess } from "../Models/Guess.mjs";
-import { GameRoom } from "../Models/GameRoom.mjs";
 import { EventEmitter } from "events";
+import { GameRoom } from "../Models/GameRoom.mjs";
+import { Guess } from "../Models/Guess.mjs";
 
 export class GameRoomsRepository extends EventEmitter{
     constructor() {
@@ -67,6 +67,12 @@ export class GameRoomsRepository extends EventEmitter{
         this.gameRooms = this.gameRooms.filter(
             (gameRoom) => gameRoom.id !== id
         );
+    }
+
+    // Remove player from game room
+    removePlayerFromGameRoom(hwid, roomId) {
+        const gameRoom = this.getGameRoomById(roomId);
+        gameRoom?.removePlayerByHwid(hwid);
     }
 
     // Start the round

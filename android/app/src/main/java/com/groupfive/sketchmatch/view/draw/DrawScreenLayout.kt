@@ -1,5 +1,6 @@
 package com.groupfive.sketchmatch.view.draw
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,19 +32,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GuessScreen
-import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
+import com.groupfive.sketchmatch.viewmodels.GameRoomViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
-import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
+import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
 
 
 @Composable
@@ -51,11 +55,18 @@ fun DrawScreenLayout(
     modifier: Modifier = Modifier,
     navController: NavController,
     drawViewModel: DrawViewModel = viewModel(),
-    guessViewModel: GuessViewModel = viewModel()
+    guessViewModel: GuessViewModel = viewModel(),
+    gameRoomViewModel: GameRoomViewModel = viewModel()
 ) {
-    val currentWord = drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
+    val currentWord =
+        drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
     val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
     val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
+    val gameRoom by drawViewModel.gameRoom.observeAsState()
+
+    BackHandler {
+        drawViewModel.handleLeaveGame(navController)
+    }
 
     if (drawViewModel.showWordDialog.value) {
         WordChoiceDialog(
@@ -81,7 +92,7 @@ fun DrawScreenLayout(
                     }
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
-                        drawViewModel.goBackToMainMenu(
+                        drawViewModel.handleLeaveGame(
                             navController
                         )
                     })
@@ -107,7 +118,13 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    PlayersIconsBar(modifier, currentPlayers = drawViewModel.players.value)
+                    val players = gameRoom?.players
+                    if (!players.isNullOrEmpty()) {
+                        PlayersIconsBar(
+                            modifier,
+                            currentPlayers = players
+                        )
+                    }
                 }
             }
         }
@@ -119,7 +136,7 @@ fun WordChoiceDialog(
     drawViewModel: DrawViewModel,
     onDismissRequest: () -> Unit,
     roundTimerUpdateViewModel: RoundTimerUpdateViewModel,
-    ) {
+) {
     val easyWord by drawViewModel.easyWord
     val mediumWord by drawViewModel.mediumWord
     val hardWord by drawViewModel.hardWord
@@ -142,15 +159,19 @@ fun WordChoiceDialog(
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
-                ) { drawViewModel.onWordChosen(mediumWord);
+                ) {
+                    drawViewModel.onWordChosen(mediumWord);
                     setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
+                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
-                ) { drawViewModel.onWordChosen(hardWord);
+                ) {
+                    drawViewModel.onWordChosen(hardWord);
                     setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
+                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                }
             }
         },
         confirmButton = {
@@ -251,40 +272,50 @@ fun TopWordBar(
 
 @Composable
 fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
-
-    Row(modifier.padding(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         currentPlayers.forEach { player ->
-            Box(contentAlignment = Alignment.Center) {
-                Image(
-                    painter = painterResource(id = R.drawable.player_icon),
-                    contentDescription = "Player ${player.id}",
-                    modifier = Modifier.size(50.dp)
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+                modifier = Modifier.width(70.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(id = R.drawable.player_icon),
+                        contentDescription = "Player ${player.id}",
+                        modifier = Modifier.size(50.dp)
+                    )
 
-                // If the player's action is complete, overlay a green-tinted checkmark
-                if (player.isComplete) {
-                    Box(
-                        modifier = Modifier.size(45.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Surface(shape = MaterialTheme.shapes.extraLarge) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Background",
-                                tint = Color.Green.copy(alpha = 0.3f),
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .background(Color.Green.copy(alpha = 0.4f))
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Completed",
-                                tint = Color.White, // White checkmark
-                                modifier = Modifier.size(30.dp)
-                            )
+                    // If the player's action is complete, overlay a green-tinted checkmark
+                    if (player.hasGuessedCorrectly) {
+                        Box(
+                            modifier = Modifier.size(45.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Surface(shape = MaterialTheme.shapes.extraLarge) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = "Background",
+                                    tint = Color.Green.copy(alpha = 0.3f),
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .background(Color.Green.copy(alpha = 0.4f))
+                                )
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = "Completed",
+                                    tint = Color.White, // White checkmark
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
                         }
                     }
                 }
+                Text(
+                    text = player.nickname,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
             }
         }
     }

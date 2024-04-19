@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -22,8 +22,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     companion object {
         const val MAX_ROUNDS = 5
     }
-
-    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
 
     private val _showWordDialog = mutableStateOf(true)
     val showWordDialog: State<Boolean> = _showWordDialog
@@ -49,9 +47,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val _currentColor = mutableStateOf(Color.Black)
 
-    private val _players = mutableStateOf(List(5) { Player(it, false) })
-    val players: State<List<Player>> = _players
-
     private val _easyWord = mutableStateOf("")
     val easyWord: State<String> = _easyWord
 
@@ -66,25 +61,29 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val client = MessageClient.getInstance()
 
+    val gameRoom = GameData.currentGameRoom
+
     // Load initial words
     init {
         generateWords()
     }
 
-//    fun submitGuess() {
-//        val guess = currentGuess.value
-//        // TODO: Add the required functionality to the server for handling guesses.
-//    }
-
-    fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
-        roomId = roomId.toInt()
-    ) { controller.importPath(it) }
-
-    fun unsubscribeFromRoom() = client.unsubscribeFromRoom(roomId.toInt())
+    fun handleLeaveGame(navController: NavController) {
+        val currentGameRoom = gameRoom.value
+        if (currentGameRoom != null) {
+            val roomId = currentGameRoom.id
+            client.leaveRoom(roomId)
+        }
+        navController.popBackStack()
+    }
 
     fun publishFullDrawBoxPayload(controller: DrawController) {
-        val payload = controller.exportPath()
-        client.publishFullDrawBoxPayload(roomId.toInt(), payload)
+        val currentGameRoom = gameRoom.value
+        if (currentGameRoom != null) {
+            val roomId = currentGameRoom.id
+            val payload = controller.exportPath()
+            client.publishFullDrawBoxPayload(roomId, payload)
+        }
     }
 
     private suspend fun handleTimer() {
@@ -92,7 +91,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
             delay(1000)
             _timeCount.value--
         }
-        _players.value = _players.value.map { it.copy(isComplete = true) }
     }
 
     fun onWordChosen(word: String) {

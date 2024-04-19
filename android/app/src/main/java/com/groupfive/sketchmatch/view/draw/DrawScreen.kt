@@ -37,8 +37,6 @@ import io.ak1.drawbox.DrawBox
 import io.ak1.drawbox.rememberDrawController
 import io.ak1.rangvikalp.RangVikalp
 
-data class Player(val id: Int, var isComplete: Boolean)
-
 @Composable
 fun DrawScreen(
     modifier: Modifier = Modifier,

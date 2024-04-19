@@ -19,11 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
-import androidx.compose.material.icons.filled.Dangerous
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,14 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavController
-import com.groupfive.sketchmatch.navigator.Screen
-import com.groupfive.sketchmatch.view.misc.AlertPopup
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import io.ak1.drawbox.DrawBox
@@ -64,22 +55,22 @@ import kotlinx.coroutines.delay
 fun GuessScreen(
     modifier: Modifier = Modifier,
     drawViewModel: DrawViewModel,
-    lifecycle: LifecycleOwner = LocalLifecycleOwner.current,
     guessViewModel: GuessViewModel,
     timeCount: Int,
+    lifecycle: LifecycleOwner = LocalLifecycleOwner.current
 ) {
     val controller = rememberDrawController()
     val guessWordIsCorrect by guessViewModel.isCorrect.observeAsState()
     var showCorrectnessIcon by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        drawViewModel.subscribeToRoom(controller)
+        guessViewModel.handleRender(controller)
     }
     DisposableEffect(Unit) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY -> {
-                    drawViewModel.unsubscribeFromRoom()
+                    guessViewModel.handleDestroy()
                 }
 
                 else -> {}
@@ -90,9 +81,12 @@ fun GuessScreen(
             lifecycle.lifecycle.removeObserver(observer)
         }
     }
-    Box (modifier = modifier
-        .fillMaxWidth(),
-        contentAlignment = Alignment.Center){
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
         Column {
             Surface(
                 modifier = modifier
@@ -157,22 +151,23 @@ fun GuessScreen(
 
 
         if (showCorrectnessIcon) {
-            LaunchedEffect(key1 = Unit){
+            LaunchedEffect(key1 = Unit) {
                 delay(2000)
                 showCorrectnessIcon = false
             }
-            Box(modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center) {
-                if(showCorrectnessIcon){
-                    if (guessWordIsCorrect == true){
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (showCorrectnessIcon) {
+                    if (guessWordIsCorrect == true) {
                         Icon(
                             modifier = Modifier.size(230.dp),
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = stringResource(R.string.correct),
                             tint = Color.Green.copy(alpha = 0.3f)
-                            )
-                    }
-                    else{
+                        )
+                    } else {
                         Icon(
                             modifier = Modifier.size(230.dp),
                             imageVector = Icons.Filled.Cancel,

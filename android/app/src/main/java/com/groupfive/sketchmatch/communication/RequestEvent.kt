@@ -29,8 +29,11 @@ enum class RequestEvent(val value: String) {
 
     // Event for subscribing to a specific room
     SUBSCRIBE_TO_ROOM("subscribe_to_room"),
-    
+
     // Event for unsubscribing from a specific room
     UNSUBSCRIBE_FROM_ROOM("unsubscribe_from_room"),
+
+    // Event for leaving a specific room
+    LEAVE_ROOM("leave_room"),
 
 }
