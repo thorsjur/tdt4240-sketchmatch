@@ -30,9 +30,6 @@ class SetNicknameViewModel: ViewModel() {
                 // Set the current player in the GameData store
                 GameData.currentPlayer.postValue(response.player)
 
-                // TODO: Set the player object to the GameData singleton class/object
-                response.player?.let { GameData.currentPlayer.postValue(it) }
-
                 // Set the nickname in the view model
                 nickname.postValue(response.player?.nickname ?: "")
 

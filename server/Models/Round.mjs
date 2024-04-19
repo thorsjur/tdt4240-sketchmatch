@@ -1,6 +1,7 @@
+
 import { EventEmitter } from "events";
 
-export class Round extends EventEmitter {
+export class Round extends EventEmitter{
     constructor(sequenceNumber, gameRoomId, drawingPlayer) {
         super();
         this.sequenceNumber = sequenceNumber; // The number in the sequence of rounds that this round is (eg. 1 would be the first round in the game)
@@ -43,17 +44,18 @@ export class Round extends EventEmitter {
         this.timer = timer;
     }
 
+
     startRound(gameRoom) {
         let counter;
         counter = setInterval(() => {
             this.timer--;
-            this.emit("timer_tick", this.timer, gameRoom);
-
+            this.emit('timer_tick', this.timer, gameRoom);
+          
             // Stop the timer on 0
             if (this.timer == 0) {
                 clearInterval(counter);
                 gameRoom.updateStatus();
-                this.emit("round_finished", gameRoom);
+                this.emit('round_finished', gameRoom);
             }
         }, 1000);
     }

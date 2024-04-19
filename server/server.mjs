@@ -23,18 +23,19 @@ import { PublishPathRequestDTO } from "./Dto/Request/PublishPathRequestDTO.mjs";
 import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
 import { RoundFinishedResponseDTO } from "./Dto/Response/RoundFinishedResponseDTO.mjs";
 
+
 const app = express();
 const port = 40401;
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-    cors: {
-        origin: "*",
-        methods: ["*"],
-        allowedHeaders: ["*"],
-    },
-    path: "/socket.io/",
-    allowEIO3: true, // This seems to be necessary for the client to connect, i'm assuming the moko socket library is slightly outdated.
+  cors: {
+    origin: "*",
+    methods: ["*"],
+    allowedHeaders: ["*"],
+  },
+  path: "/socket.io/",
+  allowEIO3: true, // This seems to be necessary for the client to connect, i'm assuming the moko socket library is slightly outdated.
 });
 
 // Repositories
@@ -46,119 +47,117 @@ const playersRepository = new PlayersRepository();
 const gameRoomsRepository = new GameRoomsRepository();
 
 io.on("connection", (socket) => {
+  var hwid = socket.handshake.query.hwid;
+  console.log(`A user connected with HWID: ${hwid}`);
+
+  socket.on("disconnect", () => {
     var hwid = socket.handshake.query.hwid;
-    console.log(`A user connected with HWID: ${hwid}`);
+    console.log(`User disconnected with HWID: ${hwid}`);
 
-    socket.on("disconnect", () => {
-        var hwid = socket.handshake.query.hwid;
-        console.log(`User disconnected with HWID: ${hwid}`);
+    // TODO: Remove player from a game room if the game is not started
+    // TODO: Remove player from the players repository
+    // TODO: Decide what will happend with the game if the game is started
+  });
 
-        // TODO: Remove player from a game room if the game is not started
-        // TODO: Remove player from the players repository
-        // TODO: Decide what will happend with the game if the game is started
-    });
+  // On get_rooms event
+  socket.on("get_game_rooms", () => {
+    // Getting the game rooms from the repository
+    var dataToSend = gameRoomsRepository.getGameRooms();
 
-    // On get_rooms event
-    socket.on("get_game_rooms", () => {
-        // Getting the game rooms from the repository
-        var dataToSend = gameRoomsRepository.getGameRooms();
+    // Sending the game rooms to the client
+    socket.emit("game_room_list", dataToSend);
+  });
 
-        // Sending the game rooms to the client
-        socket.emit("game_room_list", dataToSend);
-    });
+  // On set_nickname event
+  socket.on("set_nickname", (data) => {
+    // Convert string json data to DTO object
+    let jsonData = JSON.parse(data);
 
-    // On set_nickname event
-    socket.on("set_nickname", (data) => {
-        // Convert string json data to DTO object
-        let jsonData = JSON.parse(data);
+    // Create response object which will be sent to the client
+    var response = new SetNicknameResponseDTO();
+    var hwid = socket.handshake.query.hwid;
 
-        // Create response object which will be sent to the client
-        var response = new SetNicknameResponseDTO();
-        var hwid = socket.handshake.query.hwid;
+    try {
+      // Create DTO object from the json data sent by the client
+      let dto = new SetNicknameRequestDTO();
 
-        try {
-            // Create DTO object from the json data sent by the client
-            let dto = new SetNicknameRequestDTO();
+      // Setting all properties from the json data to the DTO object
+      dto.setProperties(jsonData);
+      console.log(`Set nickname: ${dto.nickname}`);
 
-            // Setting all properties from the json data to the DTO object
-            dto.setProperties(jsonData);
-            console.log(`Set nickname: ${dto.nickname}`);
+      // Add player to the repository
+      playersRepository.addPlayer(hwid, dto.nickname);
+      var player = playersRepository.getPlayerByHWID(hwid);
+      response.player = player;
+    } catch (error) {
+      console.error(error.message);
+      response.status = "error";
+      response.message = "set_nickname_error_msg";
+    }
 
-            // Add player to the repository
-            playersRepository.addPlayer(hwid, dto.nickname);
-            var player = playersRepository.getPlayerByHWID(hwid);
-            response.player = player;
-        } catch (error) {
-            console.error(error.message);
-            response.status = "error";
-            response.message = "set_nickname_error_msg";
-        }
+    // Emit set_nickname_response only to the sender
+    socket.emit("set_nickname_response", response);
+  });
 
-        // Emit set_nickname_response only to the sender
-        socket.emit("set_nickname_response", response);
-    });
+  // On create_room event
+  socket.on("create_room", (data) => {
+    let jsonData = JSON.parse(data);
+    var response = new CreateGameResponseDTO();
 
-    // On create_room event
-    socket.on("create_room", (data) => {
-        let jsonData = JSON.parse(data);
-        var response = new CreateGameResponseDTO();
+    try {
+      let dto = new CreateGameRequestDTO();
+      dto.setProperties(jsonData);
 
-        try {
-            let dto = new CreateGameRequestDTO();
-            dto.setProperties(jsonData);
+      const player = playersRepository.getPlayerByHWID(hwid);
 
-            const player = playersRepository.getPlayerByHWID(hwid);
+      const gameRoom = gameRoomsRepository.createGameRoom(
+        dto.gameRoomName,
+        player,
+        dto.roomCapacity
+      );
 
-            const gameRoom = gameRoomsRepository.createGameRoom(
-                dto.gameRoomName,
-                player,
-                dto.roomCapacity
-            );
+      socket.join(gameRoom.getRoomId());
 
-            socket.join(gameRoom.getRoomId());
+      response.gameRoom = gameRoom;
 
-            response.gameRoom = gameRoom;
+      console.log(
+        `Creating room: ${gameRoom.gameName} with capacity ${gameRoom.gameCapacity}`
+      );
+    } catch (error) {
+      response.status = "error";
+      response.message = "Error creating game room";
+    }
 
-            socket.join(gameRoom.id);
+    socket.emit("game_room_created_response", response);
 
-            console.log(
-                `Creating room: ${gameRoom.gameName} with capacity ${gameRoom.gameCapacity}`
-            );
-        } catch (error) {
-            response.status = "error";
-            response.message = "Error creating game room";
-        }
+    if (response.status == "success") {
+      io.emit("game_room_created", response.gameRoom);
+    }
+  });
 
-        socket.emit("game_room_created_response", response);
+  socket.on("publish_path", (data) => {
+    const json = JSON.parse(data);
+    const dto = new PublishPathRequestDTO();
+    dto.setProperties(json);
 
-        if (response.status == "success") {
-            io.emit("game_room_created", response.gameRoom);
-        }
-    });
+    io.to(dto.roomId).emit("draw_payload_published", JSON.stringify(dto));
+  });
 
-    socket.on("publish_path", (data) => {
-        const json = JSON.parse(data);
-        const dto = new PublishPathRequestDTO();
-        dto.setProperties(json);
+  socket.on("subscribe_to_room", (data) => {
+    const json = JSON.parse(data);
+    const dto = new RoomEventRequestDTO();
+    dto.setProperties(json);
 
-        io.to(dto.roomId).emit("draw_payload_published", JSON.stringify(dto));
-    });
+    socket.join(dto.roomId);
+  });
 
-    socket.on("subscribe_to_room", (data) => {
-        const json = JSON.parse(data);
-        const dto = new RoomEventRequestDTO();
-        dto.setProperties(json);
+  socket.on("unsubscribe_from_room", (data) => {
+    const json = JSON.parse(data);
+    const dto = new RoomEventRequestDTO();
+    dto.setProperties(json);
 
-        socket.join(dto.roomId);
-    });
-
-    socket.on("unsubscribe_from_room", (data) => {
-        const json = JSON.parse(data);
-        const dto = new RoomEventRequestDTO();
-        dto.setProperties(json);
-
-        socket.leave(dto.roomId);
-    });
+    socket.leave(dto.roomId);
+  });
 
     // On check_guess event
     socket.on("check_guess", (data) => {
@@ -220,7 +219,7 @@ io.on("connection", (socket) => {
                 dto.gameRoomId
             );
             const round = gameRoomsRepository.findCurrentRound(gameRoom);
-
+         
             // Set draw word in the game room
             gameRoomsRepository.updateDrawWord(dto.drawWord, round);
             gameRoomsRepository.updateDifficulty(dto.difficulty, round);
@@ -247,11 +246,13 @@ io.on("connection", (socket) => {
         let jsonData = JSON.parse(data);
 
         try {
+
             let dto = new RoundTimerUpdateRequestDTO();
             dto.setProperties(jsonData);
 
             gameRoomsRepository.startRound(dto.gameRoomId);
-            console.log("Round started");
+            console.log("Round started")
+
         } catch (error) {
             response.status = "error";
             response.message = "Error updating timer";
@@ -267,35 +268,38 @@ io.on("connection", (socket) => {
         try {
             let dto = new JoinGameByCodeRequest();
             dto.setProperties(jsonData);
-
+    
             const player = playersRepository.getPlayerByHWID(hwid);
-
+       
             const gameRoom = gameRoomsRepository.getGameRoomByCode(
                 dto.gameCode
             );
-
+            
             const gameRoomId = gameRoomsRepository.getRoomIdFromGameCode(
-                dto.gameCode
-            );
+              dto.gameCode
+          );
+          
+
 
             if (!gameRoom) {
+              
                 response.status = "error";
                 response.message = "game_room_not_found";
             } else if (gameRoom.players.length >= gameRoom.gameCapacity) {
+         
                 response.status = "error";
                 response.message = "game_room_already_full";
             } else {
+  
                 gameRoom.addPlayer(player);
-
+          
                 socket.join(gameRoomId);
-
+             
                 response.gameRoom = gameRoom;
-
+        
                 // Emit game_room_updated event to all clients
                 console.log(`Emitting game_room_updated event to all clients`);
                 io.emit("game_room_updated", gameRoom);
-
-                io.to(gameRoom.id).emit("player_joined_room", response);
             }
         } catch (error) {
             response.status = "error";

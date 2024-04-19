@@ -38,10 +38,5 @@ enum class ResponseEvent(val value: String) {
 
     // Event for when server publishes to a room the client is subscribed to
     DRAW_PAYLOAD_PUBLISHED("draw_payload_published"),
-    
-    // Event for when server notifies of the timer being updated
-    UPDATE_TIMER_RESPONSE("update_timer_response"),
 
-    // Event for when server notifies of a player joining a game room
-    PLAYER_JOINED_ROOM("player_joined_room")
 }

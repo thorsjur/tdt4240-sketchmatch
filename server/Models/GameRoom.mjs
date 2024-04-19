@@ -1,6 +1,6 @@
 import { Round } from "./Round.mjs";
 
-export class GameRoom {
+export class GameRoom{
     constructor(id, gameCode, gameName, gameCapacity = 2) {
         this.id = id;
         this.gameCode = gameCode;
@@ -8,6 +8,7 @@ export class GameRoom {
         this.gameCapacity = gameCapacity;
         this.players = [];
         this.gameStatus = GameStatus.Waiting;
+   
 
         this.rounds = []; // Number of rounds match number of players
         this.currentRound = 1; // Current round being played (eg. 1 would be the first round in the game)
@@ -38,16 +39,14 @@ export class GameRoom {
 
     // Update status of the game
     updateStatus() {
-        if (
-            this.gameStatus == GameStatus.Waiting &&
-            this.rounds[this.currentRound - 1].getTimer() == 60
-        ) {
+        if ((this.gameStatus == GameStatus.Waiting) && (this.rounds[this.currentRound - 1].getTimer() == 60)) {
             this.gameStatus = GameStatus.Playing;
         } else if (this.rounds[this.currentRound - 1].getTimer() <= 0) {
             // If the timer has run out, move to the next round
-            if (this.currentRound + 1 > this.rounds.length) {
+            if (this.currentRound  + 1 > this.rounds.length) {
                 this.gameStatus = GameStatus.Finished;
-            } else {
+            }
+            else{
                 this.currentRound++;
             }
         }
