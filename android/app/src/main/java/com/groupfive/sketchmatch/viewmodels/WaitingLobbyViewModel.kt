@@ -26,6 +26,10 @@ class WaitingLobbyViewModel: ViewModel() {
         }
     }
 
+    fun clearCallbacks() {
+        client.removeAllCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value)
+        client.removeAllCallbacks(ResponseEvent.PLAYER_JOINED_ROOM.value)
+    }
 
     init {
         client.addCallback(ResponseEvent.PLAYER_JOINED_ROOM.value) { message ->
@@ -48,9 +52,6 @@ class WaitingLobbyViewModel: ViewModel() {
 
             val drawingPlayerID = GameData.currentGameRoom.value?.getDrawingPlayerId()
             val playerId = GameData.currentPlayer.value?.id
-
-            Log.i("LobbyViewModel", "Drawing player ID: $drawingPlayerID")
-            Log.i("LobbyViewModel", "Player ID: $playerId")
 
             if (drawingPlayerID == playerId) {
                 sendEvent(NavigationEvent.NavigateToDraw)

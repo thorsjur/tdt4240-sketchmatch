@@ -31,9 +31,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.viewmodels.LeaderboardViewModel
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.groupfive.sketchmatch.models.GameRoomStatus
+import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.getPlayerRankString
@@ -43,14 +46,15 @@ import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 @Composable
 fun Leaderboard(
     modifier: Modifier = Modifier,
-    //navController: NavController,
-    leaderboardViewModel: LeaderboardViewModel = viewModel(),
-    //roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
+    navController: NavController,
+    viewModel: LeaderboardViewModel = viewModel()
 ) {
     // if drawingplayer.id == currentplayer.id && secondsleft === 0 -> Then navigate to choose word
     val gameRoom by GameData.currentGameRoom.observeAsState()
+    val events = viewModel.eventsFlow.collectAsState(initial = null)
+    val event = events.value // allow Smart cast
 
-
+/*
     // the following code block is to navigate only the drawing player to the "choose word view"
 //    if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {
  //       navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
@@ -60,6 +64,21 @@ fun Leaderboard(
 
     // Navigate everyone to the leaderboard
     if (gameRoom?.gameStatus === GameRoomStatus.LEADERBOARD)
+        */
+
+    LaunchedEffect(event) {
+        when (event) {
+            is NavigationEvent.NavigateDrawerToChoose -> {
+                navController.popBackStack()
+                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+            }
+            is NavigationEvent.NavigateToDraw -> {
+                navController.popBackStack()
+                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+            }
+            null -> { }
+        }
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -75,7 +94,7 @@ fun Leaderboard(
             ) {
                 Text(
                     modifier = Modifier.padding(10.dp),
-                    text = if (leaderboardViewModel.secondsLeft != 0) {
+                    text = if (viewModel.secondsLeft != 0) {
                         getRoundString(gameRoom?.getCurrentRoundNumber() ?: 1, gameRoom?.players?.size ?: 1)
                     } else {
                         "${gameRoom?.getDrawingPlayerName()} is choosing a word"
@@ -84,21 +103,21 @@ fun Leaderboard(
                         fontWeight = FontWeight.ExtraBold
                     )
                 )
-                if (leaderboardViewModel.secondsLeft != 0) {
+                if (viewModel.secondsLeft != 0) {
                     Icon(
                         modifier = Modifier.padding(5.dp),
                         imageVector = Icons.Filled.Alarm,
                         contentDescription = "Alarm Icon"
                     )
                     Text(
-                        text = "${leaderboardViewModel.secondsLeft}",
+                        text = "${viewModel.secondsLeft}",
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
                     )
                 }
                 LaunchedEffect(key1 = Unit) {
-                    leaderboardViewModel.startCountDown()
+                    viewModel.startCountDown()
                 }
             }
             Players(
@@ -186,6 +205,9 @@ private fun PlayerCard(
 @Composable
 fun LeaderboardPreview() {
     SketchmatchTheme {
-        Leaderboard(leaderboardViewModel = LeaderboardViewModel())
+        Leaderboard(
+            navController = rememberNavController(),
+            viewModel = LeaderboardViewModel()
+        )
     }
 }

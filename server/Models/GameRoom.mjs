@@ -16,7 +16,7 @@ export class GameRoom extends EventEmitter {
         this.gameCapacity = gameCapacity;
         this.players = [];
         this.drawingPlayer = 0;
-        this.gameStatus = GameStatus.Waiting;
+        this.gameStatus = GameStatus.WAITING;
         this.roundTimestamp = GameRoomSettings.ROUND_DURATION;
         this.word = null;
         this.wordDifficultyPoints = null;

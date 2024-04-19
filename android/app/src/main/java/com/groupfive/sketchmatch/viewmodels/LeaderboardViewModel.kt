@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
+import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.store.GameData
@@ -39,13 +40,38 @@ class LeaderboardViewModel : ViewModel() {
         }
     }
     init {
-        client.addCallback(ResponseEvent.ROUND_STARTED_RESPONSE.value) { message ->
-            Log.i("LobbyViewModel", "ROUND_IS_STARTED_RESPONSE: $message")
+        client.addCallback(ResponseEvent.ROUND_FINISHED_RESPONSE.value) { message ->
+            Log.i("LeaderboardViewModel", "ROUND_FINISHED_RESPONSE: $message")
 
             val response = Gson().fromJson(message, GameRoomUpdateStatusResponseDTO::class.java)
 
             GameData.currentGameRoom.postValue(response.gameRoom)
-        })
+
+            Thread.sleep(100)
+
+            val gameRoom = GameData.currentGameRoom.value
+
+            val gameStatusIsChoosing = gameRoom?.gameStatus == GameRoomStatus.CHOOSING
+            val playerIsDrawing = gameRoom?.getDrawingPlayerId() == GameData.currentPlayer.value?.id
+
+            Log.i("LeaderboardViewModel", "gameRoom?.gameStatus: ${gameRoom?.gameStatus}")
+            Log.i("LeaderboardViewModel", "gameStatusIsChoosing: $gameStatusIsChoosing")
+            Log.i("LeaderboardViewModel", "playerIsDrawing: $playerIsDrawing")
+
+            if (gameStatusIsChoosing && playerIsDrawing) {
+                sendEvent(NavigationEvent.NavigateDrawerToChoose)
+            }
+        }
+
+        client.addCallback(ResponseEvent.ROUND_STARTED_RESPONSE.value) { message ->
+            Log.i("LeaderboardViewModel", "ROUND_STARTED_RESPONSE: $message")
+
+            val response = Gson().fromJson(message, GameRoomUpdateStatusResponseDTO::class.java)
+
+            GameData.currentGameRoom.postValue(response.gameRoom)
+
+            sendEvent(NavigationEvent.NavigateToDraw)
+        }
     }
 
     fun startCountDown() = fixedRateTimer(name = "countdown", initialDelay = 500L, period = 1000L) {

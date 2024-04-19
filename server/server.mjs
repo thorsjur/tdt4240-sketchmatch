@@ -12,7 +12,6 @@ import { CreateGameRequestDTO } from "./Dto/Request/CreateGameRequestDTO.mjs";
 import { JoinGameByCodeRequest } from "./Dto/Request/JoinGameByCodeRequestDTO.mjs";
 import { PublishPathRequestDTO } from "./Dto/Request/PublishPathRequestDTO.mjs";
 import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
-import { RoundTimerUpdateRequestDTO } from "./Dto/Request/RoundTimerUpdateRequestDTO.mjs";
 import { SetDrawWordRequestDTO } from "./Dto/Request/SetDrawWordRequestDTO.mjs";
 import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
 import { AnswerToGuessResponseDTO } from "./Dto/Response/AnswerToGuessResponseDTO.mjs";
@@ -349,8 +348,7 @@ httpServer.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
 
-
-/*
+/* 
 // Create new player
 const player1 = playersRepository.addPlayer("hwid1", "Player 1");
 const player2 = playersRepository.addPlayer("hwid2", "Player 2");
@@ -375,6 +373,5 @@ setTimeout(() => {
   // Start round
   gameRoomsRepository.startRound(gameRoom.id, "tsvetelin", WordDifficultyPoints.HARD);
   gameRoomsRepository.handleGuess(gameRoom.id, player2.id, "ivan");
-}, 10000);
-
-*/
+}, 15000);
+ */
