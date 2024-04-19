@@ -21,6 +21,7 @@ import { JoinGameResponseDTO } from "./Dto/Response/JoinGameResponseDTO.mjs";
 import { SetDrawWordResponseDTO } from "./Dto/Response/SetDrawWordResponseDTO.mjs";
 import { SetNicknameResponseDTO } from "./Dto/Response/SetNicknameResponseDTO.mjs";
 import { TimerTickResponseDTO } from "./Dto/Response/TimerTickResponseDTO.mjs";
+import { GameStatus } from "./Models/GameRoom.mjs";
 
 
 const app = express();
@@ -311,6 +312,10 @@ gameRoomsRepository.on("round_finished", (gameRoom) => {
   console.log(dto.gameRoom);
 
   io.to(gameRoom.id).emit('round_finished_response', dto); 
+
+  if (dto.gameRoom.gameStatus == GameStatus.FINISHED) {
+    dto.gameRoom.clearPlayerPoints();
+  }
 });
 
 gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {

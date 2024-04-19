@@ -184,6 +184,10 @@ export class GameRoom extends EventEmitter {
             this.players[this.drawingPlayer].setIsDrawing(true);
         }
     }
+
+    clearPlayerPoints() {
+        this.players.forEach(p => p.setScore(0));
+    }
 }
 
 // Enum for game status
