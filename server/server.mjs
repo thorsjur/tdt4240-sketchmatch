@@ -215,9 +215,6 @@ io.on("connection", (socket) => {
         }
 
         socket.emit("check_guess_response", response);
-
-        // TODO: Emit only to subscribed players
-        io.emit("check_guess_response", response.guess);
     });
 
     // On set_draw_word event
