@@ -207,7 +207,8 @@ class MessageClient private constructor(
             eventName = RequestEvent.SUBSCRIBE_TO_ROOM.value,
             msg = gson.toJson(
                 RoomEventRequestDTO(
-                    roomId = roomId
+                    roomId = roomId,
+                    hwid = hwid
                 )
             )
         )
@@ -220,7 +221,21 @@ class MessageClient private constructor(
             eventName = RequestEvent.UNSUBSCRIBE_FROM_ROOM.value,
             msg = gson.toJson(
                 RoomEventRequestDTO(
-                    roomId = roomId
+                    roomId = roomId,
+                    hwid = hwid
+                )
+            )
+        )
+    }
+
+    @Synchronized
+    fun leaveRoom(roomId: Int) {
+        sendMessage(
+            eventName = RequestEvent.LEAVE_ROOM.value,
+            msg = gson.toJson(
+                RoomEventRequestDTO(
+                    roomId = roomId,
+                    hwid = hwid
                 )
             )
         )

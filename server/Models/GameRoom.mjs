@@ -22,6 +22,10 @@ export class GameRoom{
         this.players = this.players.filter((p) => p.id !== player.id);
     }
 
+    removePlayerByHwid(hwid) {
+        this.players = this.players.filter((player) => player.hwid !== hwid);
+    }
+
     // Change game status
     changeGameStatus(status) {
         this.gameStatus = status;

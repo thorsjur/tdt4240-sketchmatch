@@ -39,6 +39,8 @@ class GuessViewModel : ViewModel() {
 
     fun handleRender(controller: DrawController) =
         client.addCallback(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) {
+            Log.i("GuessViewModel", "DRAW_PAYLOAD_PUBLISHED: $it")
+            
             val gson = Gson()
             val response = gson.fromJson(it, PayloadResponseDTO::class.java)
             val drawBoxPayLoad =

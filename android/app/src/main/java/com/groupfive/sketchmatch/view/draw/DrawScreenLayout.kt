@@ -1,5 +1,6 @@
 package com.groupfive.sketchmatch.view.draw
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,12 +29,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
@@ -43,6 +42,7 @@ import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
+import com.groupfive.sketchmatch.viewmodels.GameRoomViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
@@ -54,13 +54,17 @@ fun DrawScreenLayout(
     navController: NavController,
     drawViewModel: DrawViewModel = viewModel(),
     guessViewModel: GuessViewModel = viewModel(),
-    lifecycle: LifecycleOwner = LocalLifecycleOwner.current
+    gameRoomViewModel: GameRoomViewModel = viewModel()
 ) {
     val currentWord =
         drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
     val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
     val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
     val gameRoom by drawViewModel.gameRoom.observeAsState()
+
+    BackHandler {
+        drawViewModel.handleLeaveGame(navController)
+    }
 
     if (drawViewModel.showWordDialog.value) {
         WordChoiceDialog(
@@ -86,7 +90,7 @@ fun DrawScreenLayout(
                     }
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
-                        drawViewModel.goBackToMainMenu(
+                        drawViewModel.handleLeaveGame(
                             navController
                         )
                     })

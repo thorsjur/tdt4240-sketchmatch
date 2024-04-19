@@ -159,6 +159,21 @@ io.on("connection", (socket) => {
     socket.leave(dto.roomId);
   });
 
+  socket.on("leave_room", (data) => {
+    const json = JSON.parse(data);
+    const dto = new RoomEventRequestDTO();
+    dto.setProperties(json);
+    
+    console.log(`Removing player from game room ${dto.roomId} with hwid ${dto.hwid}`)
+    gameRoomsRepository.removePlayerFromGameRoom(dto.hwid, dto.roomId);
+
+    // Emit game_room_updated event to all clients
+    console.log(`Emitting game_room_updated event to all clients`);
+    const gameRoom = gameRoomsRepository.getGameRoomById(dto.roomId);
+    io.emit("game_room_updated", gameRoom);
+    socket.leave(dto.roomId);
+  });
+
     // On check_guess event
     socket.on("check_guess", (data) => {
         let jsonData = JSON.parse(data);
@@ -299,6 +314,11 @@ io.on("connection", (socket) => {
                 gameRoom.addPlayer(player);
           
                 socket.join(gameRoomId);
+
+                // Try to remove player from the game room on disconnect
+                socket.on("disconnect", () => {
+                    gameRoomsRepository.removePlayerFromGameRoom(hwid, gameRoomId);
+                });
              
                 response.gameRoom = gameRoom;
         

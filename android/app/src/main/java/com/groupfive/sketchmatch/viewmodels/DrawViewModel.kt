@@ -8,11 +8,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.google.gson.Gson
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
-import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
@@ -68,29 +66,15 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     // Load initial words
     init {
         generateWords()
+    }
 
-        // Updates the list of players in the global state to reflect who has guessed correctly,
-        // it is based on their hwid.
-        client.addCallback(ResponseEvent.PLAYER_GUESSED_CORRECTLY.value) { msg ->
-            val gameRoom = GameData.currentGameRoom
-            val currentValue = gameRoom.value
-            if (currentValue != null) {
-                val gson = Gson()
-                val hwid = gson.fromJson(msg, String::class.java)
-
-                gameRoom.postValue(currentValue.apply {
-                    players = players.filterNotNull().map { player ->
-                        if (player.hwid == hwid) player.apply {
-                            hasGuessedCorrectly = true
-                        } else {
-                            return@map player
-                        }
-                    }
-                })
-
-            }
+    fun handleLeaveGame(navController: NavController) {
+        val currentGameRoom = gameRoom.value
+        if (currentGameRoom != null) {
+            val roomId = currentGameRoom.id
+            client.leaveRoom(roomId)
         }
-
+        navController.popBackStack()
     }
 
     fun publishFullDrawBoxPayload(controller: DrawController) {
