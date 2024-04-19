@@ -4,7 +4,6 @@ class CheckGuessRequestDTO(
     var inputGuess: String,
     var gameRoomId: Int,
     var timestamp: Int,
-    val hwid: String? = null
 ) {
 
 }

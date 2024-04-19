@@ -208,7 +208,6 @@ class MessageClient private constructor(
             msg = gson.toJson(
                 RoomEventRequestDTO(
                     roomId = roomId,
-                    hwid = hwid
                 )
             )
         )
@@ -222,7 +221,6 @@ class MessageClient private constructor(
             msg = gson.toJson(
                 RoomEventRequestDTO(
                     roomId = roomId,
-                    hwid = hwid
                 )
             )
         )
@@ -235,7 +233,6 @@ class MessageClient private constructor(
             msg = gson.toJson(
                 RoomEventRequestDTO(
                     roomId = roomId,
-                    hwid = hwid
                 )
             )
         )
@@ -273,7 +270,7 @@ class MessageClient private constructor(
 
     @Synchronized
     fun checkGuess(inputGuess: String, gameRoomId: Int, timestamp: Int) {
-        val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId, timestamp, hwid)
+        val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId, timestamp)
         val gson = Gson()
         val data = gson.toJson(requestData)
 

@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -270,39 +272,50 @@ fun TopWordBar(
 
 @Composable
 fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
-    Row(modifier.padding(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         currentPlayers.forEach { player ->
-            Box(contentAlignment = Alignment.Center) {
-                Image(
-                    painter = painterResource(id = R.drawable.player_icon),
-                    contentDescription = "Player ${player.id}",
-                    modifier = Modifier.size(50.dp)
-                )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+                modifier = Modifier.width(70.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(id = R.drawable.player_icon),
+                        contentDescription = "Player ${player.id}",
+                        modifier = Modifier.size(50.dp)
+                    )
 
-                // If the player's action is complete, overlay a green-tinted checkmark
-                if (player.hasGuessedCorrectly) {
-                    Box(
-                        modifier = Modifier.size(45.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Surface(shape = MaterialTheme.shapes.extraLarge) {
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Background",
-                                tint = Color.Green.copy(alpha = 0.3f),
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .background(Color.Green.copy(alpha = 0.4f))
-                            )
-                            Icon(
-                                imageVector = Icons.Filled.Check,
-                                contentDescription = "Completed",
-                                tint = Color.White, // White checkmark
-                                modifier = Modifier.size(30.dp)
-                            )
+                    // If the player's action is complete, overlay a green-tinted checkmark
+                    if (player.hasGuessedCorrectly) {
+                        Box(
+                            modifier = Modifier.size(45.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Surface(shape = MaterialTheme.shapes.extraLarge) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = "Background",
+                                    tint = Color.Green.copy(alpha = 0.3f),
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .background(Color.Green.copy(alpha = 0.4f))
+                                )
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = "Completed",
+                                    tint = Color.White, // White checkmark
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
                         }
                     }
                 }
+                Text(
+                    text = player.nickname,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
             }
         }
     }
