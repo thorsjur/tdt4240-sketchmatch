@@ -40,8 +40,8 @@ import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
-import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
@@ -74,7 +74,7 @@ fun DrawScreenLayout(
 
     LaunchedEffect(event) {
         when (event) {
-            is NavigationEvent.NavigateToLeaderboard -> {
+            is Event.NavigateToLeaderboard -> {
                 drawViewModel.clearCallbacks()
                 // Remove the current screen from the back stack
                 navController.popBackStack()
@@ -123,8 +123,7 @@ fun DrawScreenLayout(
                     GuessScreen(
                         modifier = Modifier.weight(1f),
                         drawViewModel = drawViewModel,
-                        guessViewModel = guessViewModel,
-                        timeCount = timeCount,
+                        guessViewModel = guessViewModel
                     )
                 }
 

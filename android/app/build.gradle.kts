@@ -34,7 +34,7 @@ android {
         }
 
         debug {
-            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://10.22.69.83:40401\"")
+            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://10.22.226.197:40401\"")
         }
     }
     compileOptions {

@@ -146,10 +146,12 @@ class MessageClient private constructor(
                     invokeCallbacks(ResponseEvent.ROOM_DESTROYED.value, msg)
                 }
 
+                /*
                 // On CHECK_GUESS_RESPONSE_EVENT
                 on(ResponseEvent.CHECK_GUESS_RESPONSE.value) { msg ->
                     invokeCallbacks(ResponseEvent.CHECK_GUESS_RESPONSE.value, msg)
                 }
+                */
 
                 // On SET_DRAW_WORD_RESPONSE_EVENT
                 on(ResponseEvent.SET_DRAW_WORD_RESPONSE.value) { msg ->
@@ -286,7 +288,7 @@ class MessageClient private constructor(
     }
 
     @Synchronized
-    fun checkGuess(inputGuess: String, gameRoomId: Int, timestamp: Int) {
+    fun checkGuess(inputGuess: String, gameRoomId: Int) {
         val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId)
         val gson = Gson()
         val data = gson.toJson(requestData)

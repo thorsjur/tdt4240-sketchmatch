@@ -1,7 +1,10 @@
 package com.groupfive.sketchmatch.models
 
-open class NavigationEvent {
-    object NavigateToDraw : NavigationEvent()
-    object NavigateToLeaderboard : NavigationEvent()
-    object NavigateDrawerToChoose : NavigationEvent()
+open class Event {
+    object NavigateToDraw : Event()
+    object NavigateToLeaderboard : Event()
+    object NavigateDrawerToChoose : Event()
+    object NavigateToWaitingLobby : Event()
+    object CorrectGuessEvent : Event()
+    object IncorrectGuessEvent : Event()
 }

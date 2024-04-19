@@ -11,8 +11,8 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
-import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
@@ -31,10 +31,10 @@ class LeaderboardViewModel : ViewModel() {
     var secondsLeft by mutableIntStateOf(6)
     private val client = MessageClient.getInstance()
 
-    private val eventChannel = Channel<NavigationEvent>(Channel.BUFFERED)
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: NavigationEvent) {
+    fun sendEvent(event: Event) {
         viewModelScope.launch {
             eventChannel.send(event)
         }
@@ -59,7 +59,7 @@ class LeaderboardViewModel : ViewModel() {
             Log.i("LeaderboardViewModel", "playerIsDrawing: $playerIsDrawing")
 
             if (gameStatusIsChoosing && playerIsDrawing) {
-                sendEvent(NavigationEvent.NavigateDrawerToChoose)
+                sendEvent(Event.NavigateDrawerToChoose)
             }
         }
 
@@ -70,7 +70,7 @@ class LeaderboardViewModel : ViewModel() {
 
             GameData.currentGameRoom.postValue(response.gameRoom)
 
-            sendEvent(NavigationEvent.NavigateToDraw)
+            sendEvent(Event.NavigateToDraw)
         }
     }
 

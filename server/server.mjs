@@ -161,42 +161,21 @@ io.on("connection", (socket) => {
   // On check_guess event
   socket.on("check_guess", (data) => {
       let jsonData = JSON.parse(data);
-      var response = new CheckGuessResponseDTO();
 
       try {
           let dto = new CheckGuessRequestDTO();
           dto.setProperties(jsonData);
 
-          const gameRoom = gameRoomsRepository.getGameRoomById(
-              dto.gameRoomId
-          );
-          const round = gameRoomsRepository.findCurrentRound(gameRoom);
+          const gameRoom = gameRoomsRepository.getGameRoomById(dto.gameRoomId);
 
           const guessingPlayer = playersRepository.getPlayerByHWID(hwid);
-          const drawingPlayer = round.getDrawingPlayer();
-          const checkedGuess = gameRoomsRepository.checkGuess(
-              dto.inputGuess,
-              round,
-              dto.timestamp,
-              guessingPlayer,
-              drawingPlayer
-          );
-
-          response.guess = checkedGuess;
-
-          console.log(
-              `Checking guess: ${checkedGuess.inputGuess} - ${checkedGuess.isCorrect}`
-          );
+          gameRoomsRepository.handleGuess(gameRoom.id, guessingPlayer.id, dto.inputGuess)
+          
       } catch (error) {
           response.status = "error";
           response.message = "Error checking guess";
           console.log(response.message);
       }
-
-      socket.emit("check_guess_response", response);
-
-      // TODO: Emit only to subscribed players
-      io.emit("check_guess_response", response.guess);
   });
 
   // On set_draw_word event

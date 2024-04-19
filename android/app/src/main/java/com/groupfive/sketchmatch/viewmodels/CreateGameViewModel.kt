@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.CreateGameResponseDTO
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -25,10 +26,12 @@ class CreateGameViewModel : ViewModel() {
             eventChannel.send(event)
         }
     }
-
+/*
     sealed class Event {
         data class NavigateTo(val destination: Int): Event()
     }
+
+ */
 
     init {
 
@@ -49,7 +52,7 @@ class CreateGameViewModel : ViewModel() {
                 Log.i("CreateGameViewModel", "Game room created: ${response.gameRoom}")
 
                 // Navigate to the draw screen
-                sendEvent(Event.NavigateTo(1))
+                sendEvent(Event.NavigateToWaitingLobby)
 
                 // TODO: Subscribe player when moved to lobby
             } else {

@@ -35,13 +35,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
-import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.getPlayerRankString
-import com.groupfive.sketchmatch.utils.getRoundString
-import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 
 @Composable
 fun Leaderboard(
@@ -68,12 +66,12 @@ fun Leaderboard(
 
     LaunchedEffect(event) {
         when (event) {
-            is NavigationEvent.NavigateDrawerToChoose -> {
+            is Event.NavigateDrawerToChoose -> {
                 viewModel.clearCallbacks()
                 navController.popBackStack()
                 navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
             }
-            is NavigationEvent.NavigateToDraw -> {
+            is Event.NavigateToDraw -> {
                 viewModel.clearCallbacks()
                 navController.popBackStack()
                 navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")

@@ -57,6 +57,8 @@ export class GameRoom extends EventEmitter {
         this.wordDifficultyPoints = newWordDifficultyPoints;
         
         this.setGameStatus(GameStatus.PLAYING);
+        this.handleIsDrawingBoolean();
+
         this.emit('round_has_started', this);
         this.startRoundTimer();
     }
@@ -74,7 +76,7 @@ export class GameRoom extends EventEmitter {
 
     handleGuess(playerId, guessedWord) {
         var player = this.players.find((p) => p.id == playerId);
-        var drawer = this.players.find((p) => p.id == this.getDrawingPlayerId());
+        var drawer = this.players.find((p) => p.isDrawing == true);
         let isCorrect = guessedWord === this.word;
 
         if (isCorrect) {
@@ -164,6 +166,17 @@ export class GameRoom extends EventEmitter {
     getDrawingPlayerId() {
         var drawingPlayer = this.players[this.drawingPlayer];
         return drawingPlayer.id;
+    }
+
+    handleIsDrawingBoolean() {
+        if (this.drawingPlayer == 0) {
+            this.players[this.drawingPlayer].setIsDrawing(true);
+        } else if (this.drawingPlayer >= this.players.length) {
+            return;
+        } else {
+            this.players[this.drawingPlayer - 1].setIsDrawing(false);
+            this.players[this.drawingPlayer].setIsDrawing(true);
+        }
     }
 }
 

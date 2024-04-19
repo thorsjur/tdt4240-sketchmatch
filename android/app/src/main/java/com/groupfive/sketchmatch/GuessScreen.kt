@@ -1,5 +1,6 @@
 package com.groupfive.sketchmatch
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -34,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +53,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.view.misc.AlertPopup
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
@@ -66,14 +70,31 @@ fun GuessScreen(
     drawViewModel: DrawViewModel,
     lifecycle: LifecycleOwner = LocalLifecycleOwner.current,
     guessViewModel: GuessViewModel,
-    timeCount: Int,
 ) {
     val controller = rememberDrawController()
-    val guessWordIsCorrect by guessViewModel.isCorrect.observeAsState()
     var showCorrectnessIcon by rememberSaveable { mutableStateOf(false) }
+    val gameRoomId = GameData.currentGameRoom.value?.id ?: 0
+
+    var currentGuess = drawViewModel.currentGuess.value
+    var guessWordIsCorrect by rememberSaveable { mutableStateOf(false) }
+
+    val events = guessViewModel.eventsFlow.collectAsState(initial = null)
+    val event = events.value // allow Smart cast
 
     LaunchedEffect(Unit) {
         drawViewModel.subscribeToRoom(controller)
+    }
+    LaunchedEffect(event) {
+        when (event) {
+            is Event.CorrectGuessEvent -> {
+                guessWordIsCorrect = true
+                showCorrectnessIcon = true
+            }
+            is Event.IncorrectGuessEvent -> {
+                guessWordIsCorrect = false
+                showCorrectnessIcon = true
+            }
+        }
     }
     DisposableEffect(Unit) {
         val observer = LifecycleEventObserver { _, event ->
@@ -129,7 +150,7 @@ fun GuessScreen(
             ) {
                 OutlinedTextField(
                     modifier = Modifier.weight(2f),
-                    value = drawViewModel.currentGuess.value,
+                    value = currentGuess,
                     onValueChange = { drawViewModel.setCurrentGuess(it) },
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {
@@ -141,20 +162,15 @@ fun GuessScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    enabled = guessWordIsCorrect != true,
+                    enabled = !guessWordIsCorrect,
                     onClick = {
-                        guessViewModel.checkGuess(
-                            drawViewModel.currentGuess.value.lowercase(),
-                            1,
-                            timeCount
-                        );
+                        guessViewModel.checkGuess(currentGuess.lowercase(), gameRoomId);
                         showCorrectnessIcon = true
                     }) {
                     Text(text = "Make guess")
                 }
             }
         }
-
 
         if (showCorrectnessIcon) {
             LaunchedEffect(key1 = Unit){
@@ -163,8 +179,9 @@ fun GuessScreen(
             }
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center) {
-                if(showCorrectnessIcon){
-                    if (guessWordIsCorrect == true){
+                Log.i("GuessScreen", "guessWordIsCorrect: $guessWordIsCorrect")
+                if(showCorrectnessIcon) {
+                    if (guessWordIsCorrect){
                         Icon(
                             modifier = Modifier.size(230.dp),
                             imageVector = Icons.Filled.CheckCircle,
@@ -172,7 +189,7 @@ fun GuessScreen(
                             tint = Color.Green.copy(alpha = 0.3f)
                             )
                     }
-                    else{
+                    else {
                         Icon(
                             modifier = Modifier.size(230.dp),
                             imageVector = Icons.Filled.Cancel,

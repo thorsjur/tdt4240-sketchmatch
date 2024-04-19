@@ -8,7 +8,7 @@ import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
-import com.groupfive.sketchmatch.models.NavigationEvent
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -17,10 +17,10 @@ import kotlinx.coroutines.launch
 class WaitingLobbyViewModel: ViewModel() {
     private val client = MessageClient.getInstance()
 
-    private val eventChannel = Channel<NavigationEvent>(Channel.BUFFERED)
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: NavigationEvent) {
+    fun sendEvent(event: Event) {
         viewModelScope.launch {
             eventChannel.send(event)
         }
@@ -54,7 +54,7 @@ class WaitingLobbyViewModel: ViewModel() {
             val playerId = GameData.currentPlayer.value?.id
 
             if (drawingPlayerID == playerId) {
-                sendEvent(NavigationEvent.NavigateToDraw)
+                sendEvent(Event.NavigateToDraw)
             }
         }
 
@@ -65,7 +65,7 @@ class WaitingLobbyViewModel: ViewModel() {
 
             GameData.currentGameRoom.postValue(response.gameRoom)
 
-            sendEvent(NavigationEvent.NavigateToDraw)
+            sendEvent(Event.NavigateToDraw)
         }
     }
 }
