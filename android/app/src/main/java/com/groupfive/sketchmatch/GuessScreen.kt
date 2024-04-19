@@ -165,7 +165,7 @@ fun GuessScreen(
                         guessViewModel.checkGuess(currentGuess.lowercase(), gameRoomId);
                         showCorrectnessIcon = true
                     }) {
-                    Text(text = "Make guess")
+                    Text(text = "Guess")
                 }
             }
         }
