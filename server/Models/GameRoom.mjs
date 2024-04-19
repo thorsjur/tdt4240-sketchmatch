@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import { Player } from "./Player.mjs";
 
 export const GameRoomSettings = {
     ROUND_DURATION: 30,
@@ -75,13 +74,13 @@ export class GameRoom extends EventEmitter {
 
     handleGuess(playerId, guessedWord) {
         var player = this.players.find((p) => p.id === playerId);
-        //let drawer = this.players.get(this.drawingPlayer);
+        let drawer = this.players.find((p) => p.id === this.getDrawingPlayerId);
         let isCorrect = guessedWord === this.word;
 
         if (isCorrect) {
             player.incrementScore(this.calculateGuesserScore(this.roundTimestamp));
             this.guessedCorrectly.push(playerId);
-            //drawer.incrementScore(this.wordDifficultyPoints);
+            drawer.incrementScore(this.wordDifficultyPoints);
         }
 
         this.emit('answer_to_guess', playerId, isCorrect, this);
@@ -160,6 +159,11 @@ export class GameRoom extends EventEmitter {
             wordDifficultyPoints: this.wordDifficultyPoints,
             guessedCorrectly: this.guessedCorrectly
         }
+    }
+
+    getDrawingPlayerId() {
+        drawingPlayer = this.players[this.drawingPlayer];
+        return this.drawingPlayer.id;
     }
 }
 

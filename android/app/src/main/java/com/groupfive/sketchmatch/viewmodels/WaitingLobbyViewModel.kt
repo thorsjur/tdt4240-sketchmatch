@@ -48,6 +48,21 @@ class WaitingLobbyViewModel: ViewModel() {
 
             GameData.currentGameRoom.postValue(response.gameRoom)
 
+            val drawingPlayerID = GameData.currentGameRoom.value?.getDrawingPlayerId()
+            val playerId = GameData.currentPlayer.value?.id
+
+            if (drawingPlayerID === playerId) {
+                sendEvent(Event.NavigateToDraw)
+            }
+        }
+
+        client.addCallback(ResponseEvent.ROUND_STARTED_RESPONSE.value) { message ->
+            Log.i("LobbyViewModel", "ROUND_IS_STARTED_RESPONSE: $message")
+
+            val response = Gson().fromJson(message, GameRoomUpdateStatusResponseDTO::class.java)
+
+            GameData.currentGameRoom.postValue(response.gameRoom)
+
             sendEvent(Event.NavigateToDraw)
         }
     }

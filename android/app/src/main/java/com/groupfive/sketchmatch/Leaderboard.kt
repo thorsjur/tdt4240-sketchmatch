@@ -3,6 +3,7 @@ package com.groupfive.sketchmatch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ import com.groupfive.sketchmatch.viewmodels.LeaderboardViewModel
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
+import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.getPlayerRankString
@@ -41,9 +43,9 @@ import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 @Composable
 fun Leaderboard(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    //navController: NavController,
     leaderboardViewModel: LeaderboardViewModel = viewModel(),
-    roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
+    //roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
 ) {
     // if drawingplayer.id == currentplayer.id && secondsleft === 0 -> Then navigate to choose word
     val gameRoom by GameData.currentGameRoom.observeAsState()
@@ -53,8 +55,13 @@ fun Leaderboard(
 //    if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {
  //       navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
   //  }
+    // Navigate the drawer to the drawing screen
+    if (gameRoom?.gameStatus === GameRoomStatus.CHOOSING && gameRoom?.getDrawingPlayerId() === GameData.currentPlayer.value?.id)
 
-    Surface(modifier = Modifier) {
+    // Navigate everyone to the leaderboard
+    if (gameRoom?.gameStatus === GameRoomStatus.LEADERBOARD)
+
+    Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -179,6 +186,6 @@ private fun PlayerCard(
 @Composable
 fun LeaderboardPreview() {
     SketchmatchTheme {
-        //Leaderboard(navController = NavController())
+        Leaderboard(leaderboardViewModel = LeaderboardViewModel())
     }
 }

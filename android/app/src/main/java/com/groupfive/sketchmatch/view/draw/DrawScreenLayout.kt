@@ -68,6 +68,8 @@ fun DrawScreenLayout(
     val events = drawViewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
 
+    var playerIsDrawing = gameRoom?.getDrawingPlayerId() == player?.id
+
     LaunchedEffect(event) {
         when (event) {
             is DrawViewModel.Event.NavigateToLeaderboard -> {
@@ -81,7 +83,7 @@ fun DrawScreenLayout(
     }
 
     if (gameRoom?.gameStatus == GameRoomStatus.CHOOSING
-        && gameRoom?.getDrawingPlayerId() == player?.id) {
+        && playerIsDrawing) {
         WordChoiceDialog(
             drawViewModel = drawViewModel,
             onDismissRequest = drawViewModel::dismissWordDialog,
@@ -98,11 +100,6 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    // The following button is for testing the publishing/subscribing of the drawing.
-                    // It can be removed when the proper functionality is implemented.
-                    Button(onClick = { drawViewModel.toggleIsDrawing() }) {
-                        Text(text = if (drawViewModel.isDrawing.value) "Guess word" else "Draw word")
-                    }
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
                         drawViewModel.goBackToMainMenu(
@@ -113,7 +110,7 @@ fun DrawScreenLayout(
 
                 TopWordBar(modifier, currentWord, timeCount, drawViewModel)
 
-                if (drawViewModel.isDrawing.value) {
+                if (playerIsDrawing) {
                     DrawScreen(
                         modifier = Modifier.weight(1f),
                         drawViewModel = drawViewModel,
