@@ -40,6 +40,7 @@ import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.GameRoomStatus
+import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
@@ -72,9 +73,9 @@ fun DrawScreenLayout(
 
     LaunchedEffect(event) {
         when (event) {
-            is DrawViewModel.Event.NavigateToLeaderboard -> {
+            is NavigationEvent.NavigateToLeaderboard -> {
                 // Remove the current screen from the back stack
-                //navController.popBackStack()
+                navController.popBackStack()
                 // Navigate to the draw screen
                 navController.navigate(Screen.Leaderboard.route)
             }

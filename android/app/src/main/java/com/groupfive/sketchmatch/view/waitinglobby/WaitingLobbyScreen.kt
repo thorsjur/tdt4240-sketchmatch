@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.viewmodels.CreateGameViewModel
 
 @Composable
@@ -51,7 +52,7 @@ fun WaitingLobby(
 
     LaunchedEffect(event) {
         when (event) {
-            is WaitingLobbyViewModel.Event.NavigateToDraw -> {
+            is NavigationEvent.NavigateToDraw -> {
                 // Remove the current screen from the back stack
                 navController.popBackStack()
                 // Navigate to the draw screen

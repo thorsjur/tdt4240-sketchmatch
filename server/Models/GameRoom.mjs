@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 
 export const GameRoomSettings = {
-    ROUND_DURATION: 30,
+    ROUND_DURATION: 20,
     LEADERBOARD_DURATION: 6,
     ROUND_CREATE_DELAY: 2000 // wait x ms before creating a new round after the game is full (just to make sure the last player has been navigated to the lobby screen)
 }
@@ -73,8 +73,8 @@ export class GameRoom extends EventEmitter {
     }
 
     handleGuess(playerId, guessedWord) {
-        var player = this.players.find((p) => p.id === playerId);
-        let drawer = this.players.find((p) => p.id === this.getDrawingPlayerId);
+        var player = this.players.find((p) => p.id == playerId);
+        var drawer = this.players.find((p) => p.id == this.getDrawingPlayerId());
         let isCorrect = guessedWord === this.word;
 
         if (isCorrect) {
@@ -162,8 +162,8 @@ export class GameRoom extends EventEmitter {
     }
 
     getDrawingPlayerId() {
-        drawingPlayer = this.players[this.drawingPlayer];
-        return this.drawingPlayer.id;
+        var drawingPlayer = this.players[this.drawingPlayer];
+        return drawingPlayer.id;
     }
 }
 

@@ -15,6 +15,7 @@ import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
+import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
@@ -70,17 +71,13 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     private val client = MessageClient.getInstance()
 
 
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    private val eventChannel = Channel<NavigationEvent>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: Event) {
+    fun sendEvent(event: NavigationEvent) {
         viewModelScope.launch {
             eventChannel.send(event)
         }
-    }
-
-    sealed class Event {
-        object NavigateToLeaderboard : Event()
     }
 
 
@@ -103,7 +100,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
             val gameRoom = Gson().fromJson(message, GameRoomUpdateStatusResponseDTO::class.java)
 
             GameData.currentGameRoom.postValue(gameRoom.gameRoom)
-            sendEvent(Event.NavigateToLeaderboard)
+            sendEvent(NavigationEvent.NavigateToLeaderboard)
         }
 
         generateWords()

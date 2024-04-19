@@ -328,7 +328,9 @@ gameRoomsRepository.on("round_finished", (gameRoom) => {
   console.log(`Round finished in game room: ${gameRoom.gameName}. Game status: ${gameRoom.gameStatus}`);
   //console.log(gameRoom.serialize());
   let dto = new GameRoomUpdateStatusResponseDTO();
-  dto.gameRoom = gameRoom;
+  dto.gameRoom = gameRoom.serialize();
+
+  console.log(dto.gameRoom);
 
   io.to(gameRoom.id).emit('round_finished_response', dto); 
 });
@@ -347,8 +349,8 @@ httpServer.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
 
-/*
 
+/*
 // Create new player
 const player1 = playersRepository.addPlayer("hwid1", "Player 1");
 const player2 = playersRepository.addPlayer("hwid2", "Player 2");
