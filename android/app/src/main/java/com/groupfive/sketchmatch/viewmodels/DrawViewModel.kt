@@ -15,6 +15,7 @@ import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
+import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.models.NavigationEvent
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
@@ -84,6 +85,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     // Load initial words
     init {
+        Log.i("DrawViewModel", "DrawViewModel created")
         // Add a callback to handle incoming round_started_response message
         client.addCallback(ResponseEvent.ROUND_STARTED_RESPONSE.value) { message ->
             Log.i("DrawViewModel", "ROUND_STARTED_RESPONSE: $message")
@@ -101,6 +103,19 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
             GameData.currentGameRoom.postValue(gameRoom.gameRoom)
             sendEvent(NavigationEvent.NavigateToLeaderboard)
+        }
+
+        // Add a callback to handle incoming round_finished_response message
+        client.addCallback(ResponseEvent.ROUND_FINISHED_RESPONSE.value) { message ->
+            Log.i("DrawViewModel", "ROUND_FINISHED_RESPONSE: $message")
+            // Convert the json string to a GameRoom object with the draw word
+            val gameRoom = Gson().fromJson(message, GameRoomUpdateStatusResponseDTO::class.java)
+
+            GameData.currentGameRoom.postValue(gameRoom.gameRoom)
+
+            if(gameRoom.gameRoom.gameStatus == GameRoomStatus.FINISHED) {
+                sendEvent(NavigationEvent.NavigateToLeaderboard)
+            }
         }
 
         generateWords()

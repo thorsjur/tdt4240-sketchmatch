@@ -20,10 +20,18 @@ class GameRoom {
     }
 
     fun getDrawingPlayerId(): String {
+        if(drawingPlayer >= players.size) {
+            return "Unknown"
+        }
+
         return players[drawingPlayer].id
     }
 
     fun getDrawingPlayerName(): String {
+        if(drawingPlayer >= players.size) {
+            return ""
+        }
+
         return players[drawingPlayer].nickname
     }
 }

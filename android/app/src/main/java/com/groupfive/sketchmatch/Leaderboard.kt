@@ -94,18 +94,25 @@ fun Leaderboard(
             Row (
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val gameStatus = gameRoom?.gameStatus
+                val title = if (gameStatus == GameRoomStatus.FINISHED) {
+                    "Game over!"
+                } else if (viewModel.secondsLeft != 0) {
+                    "Round ${gameRoom?.getCurrentRoundNumber()}"
+                } else {
+                    "${gameRoom?.getDrawingPlayerName()} is choosing a word"
+                }
+
                 Text(
+
                     modifier = Modifier.padding(10.dp),
-                    text = if (viewModel.secondsLeft != 0) {
-                        getRoundString(gameRoom?.getCurrentRoundNumber() ?: 1, gameRoom?.players?.size ?: 1)
-                    } else {
-                        "${gameRoom?.getDrawingPlayerName()} is choosing a word"
-                    },
+                    text = title,
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.ExtraBold
                     )
                 )
-                if (viewModel.secondsLeft != 0) {
+                if (gameStatus != GameRoomStatus.FINISHED &&
+                    viewModel.secondsLeft != 0) {
                     Icon(
                         modifier = Modifier.padding(5.dp),
                         imageVector = Icons.Filled.Alarm,

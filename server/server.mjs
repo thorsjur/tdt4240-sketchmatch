@@ -155,7 +155,7 @@ io.on("connection", (socket) => {
     const dto = new RoomEventRequestDTO();
     dto.setProperties(json);
 
-    socket.leave(dto.roomId);
+    //socket.leave(dto.roomId);
   });
 
   // On check_guess event
