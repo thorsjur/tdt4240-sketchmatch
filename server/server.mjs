@@ -318,6 +318,7 @@ gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
   let dto = new AnswerToGuessResponseDTO();
   dto.isCorrect = isCorrect;
   dto.playerId = playerId;
+  dto.gameRoom = gameRoom;
 
 
   io.to(gameRoom.id).emit('answer_to_guess_response', dto); 

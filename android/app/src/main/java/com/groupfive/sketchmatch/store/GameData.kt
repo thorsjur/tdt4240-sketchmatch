@@ -9,4 +9,5 @@ object GameData {
     val currentGameRoom: MutableLiveData<GameRoom> = MutableLiveData()
     val currentPlayer: MutableLiveData<Player> = MutableLiveData()
     val drawBoxPayLoad: MutableLiveData<DrawBoxPayLoad> = MutableLiveData()
+    val lastGuessCorrectness: MutableLiveData<Boolean> = MutableLiveData()
 }

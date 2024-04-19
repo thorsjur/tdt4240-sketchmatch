@@ -44,11 +44,9 @@ class GuessViewModel: ViewModel(){
 
             isCorrect.postValue(guess.isCorrect)
 
-            if (guess.isCorrect) {
-                sendEvent(Event.CorrectGuessEvent)
-            } else {
-                sendEvent(Event.IncorrectGuessEvent)
-            }
+            GameData.lastGuessCorrectness.postValue(true)
+
+            GameData.currentGameRoom.postValue(guess.gameRoom)
         }
     }
 
