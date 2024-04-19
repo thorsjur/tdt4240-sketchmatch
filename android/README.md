@@ -22,6 +22,9 @@ You can build the APK and immediately install the application on an emulator or 
 ./gradlew installDebug
 ```
 
+**Note:** If you are used to the Android Studio IDE, you can also run the application by clicking the "Run" button in the IDE with an emulator or a connected device.
+You can read more about running the application on the [Android Developer website](https://developer.android.com/studio/run).
+
 ## Application Structure
 
 The application is structured into several packages, here are some of the key packages:
