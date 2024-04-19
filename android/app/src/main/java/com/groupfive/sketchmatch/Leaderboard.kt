@@ -47,12 +47,7 @@ fun Leaderboard(
 ) {
     // if drawingplayer.id == currentplayer.id && secondsleft === 0 -> Then navigate to choose word
     val gameRoom by GameData.currentGameRoom.observeAsState()
-    val roundStartedEvent by roundTimerUpdateViewModel.roundStartedEvent.observeAsState()
 
-    roundStartedEvent?.getContentIfNotHandled()?.let {
-        navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
-        roundTimerUpdateViewModel.roundStartedEvent.postValue(null)
-    }
 
     // the following code block is to navigate only the drawing player to the "choose word view"
 //    if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {

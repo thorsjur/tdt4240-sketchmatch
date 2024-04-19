@@ -1,5 +1,6 @@
 package com.groupfive.sketchmatch.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,13 +9,18 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
+import com.groupfive.sketchmatch.communication.ResponseEvent
+import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
@@ -49,9 +55,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val _currentColor = mutableStateOf(Color.Black)
 
-    private val _players = mutableStateOf(List(5) { Player(it, false) })
-    val players: State<List<Player>> = _players
-
     private val _easyWord = mutableStateOf("")
     val easyWord: State<String> = _easyWord
 
@@ -66,8 +69,43 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val client = MessageClient.getInstance()
 
+
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    val eventsFlow = eventChannel.receiveAsFlow()
+
+    fun sendEvent(event: Event) {
+        viewModelScope.launch {
+            eventChannel.send(event)
+        }
+    }
+
+    sealed class Event {
+        object NavigateToLeaderboard : Event()
+    }
+
+
+
     // Load initial words
     init {
+        // Add a callback to handle incoming round_started_response message
+        client.addCallback(ResponseEvent.ROUND_STARTED_RESPONSE.value) { message ->
+            Log.i("DrawViewModel", "ROUND_STARTED_RESPONSE: $message")
+            // Convert the json string to a GameRoom object with the draw word
+            val gameRoom = Gson().fromJson(message, GameRoomUpdateStatusResponseDTO::class.java)
+
+            GameData.currentGameRoom.postValue(gameRoom.gameRoom)
+        }
+
+        // Add a callback to handle incoming open_leaderboard_response message
+        client.addCallback(ResponseEvent.OPEN_LEADERBOARD_RESPONSE.value) { message ->
+            Log.i("DrawViewModel", "OPEN_LEADERBOARD_RESPONSE: $message")
+            // Convert the json string to a GameRoom object with the draw word
+            val gameRoom = Gson().fromJson(message, GameRoomUpdateStatusResponseDTO::class.java)
+
+            GameData.currentGameRoom.postValue(gameRoom.gameRoom)
+            sendEvent(Event.NavigateToLeaderboard)
+        }
+
         generateWords()
     }
 
@@ -92,14 +130,14 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
             delay(1000)
             _timeCount.value--
         }
-        _players.value = _players.value.map { it.copy(isComplete = true) }
+        //_players.value = _players.value.map { it.copy(isComplete = true) }
     }
 
     fun onWordChosen(word: String) {
         viewModelScope.launch {
             _currentWord.value = word
             _showWordDialog.value = false
-            toggleTimerRunning()
+            //toggleTimerRunning()
         }
     }
 

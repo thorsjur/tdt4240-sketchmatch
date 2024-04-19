@@ -301,14 +301,11 @@ class MessageClient private constructor(
     @Synchronized
     fun setDrawWord(drawWord: String, difficulty: Difficulty, gameRoomId: Int) {
         val requestData = SetDrawWordRequestDTO(drawWord, difficulty, gameRoomId)
-        val gson = Gson()
-        val data = gson.toJson(requestData)
+
+        val data = Gson().toJson(requestData)
 
         if (!isConnected()) return
-        socket.emit(
-            RequestEvent.SET_DRAW_WORD.value,
-            data
-        )
+        socket.emit(RequestEvent.SET_DRAW_WORD.value, data)
     }
 
     @Synchronized

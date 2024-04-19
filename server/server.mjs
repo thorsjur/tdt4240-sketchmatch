@@ -215,18 +215,16 @@ io.on("connection", (socket) => {
           // Setting all properties from the json data to the DTO object
           dto.setProperties(jsonData);
 
-          const gameRoom = gameRoomsRepository.getGameRoomById(
-              dto.gameRoomId
-          );
-          const round = gameRoomsRepository.findCurrentRound(gameRoom);
+          const gameRoom = gameRoomsRepository.getGameRoomById(dto.gameRoomId);
+
+          var difficulty = gameRoomsRepository.getDificultyObjByString(dto.difficulty);
         
           // Set draw word in the game room
-          gameRoomsRepository.updateDrawWord(dto.drawWord, round);
-          gameRoomsRepository.updateDifficulty(dto.difficulty, round);
+          gameRoomsRepository.startRound(gameRoom.id, dto.drawWord, difficulty);
           response.gameRoom = gameRoom;
 
           console.log(
-              `Setting draw word: ${dto.drawWord} & Setting difficulty: ${dto.difficulty}`
+              `Setting draw word: ${dto.drawWord} & Setting difficulty: ${difficulty}`
           );
       } catch (error) {
           response.status = "error";
@@ -235,10 +233,10 @@ io.on("connection", (socket) => {
       }
 
       // Emit set_draw_word_response only to the sender
-      socket.emit("set_draw_word_response", response);
+      //socket.emit("set_draw_word_response", response);
 
       // TODO: Emit only to subscribed players
-      io.emit("set_draw_word_response", response.gameRoom);
+      //io.emit("set_draw_word_response", response.gameRoom);
   });
 
   // On join_room_by_code event

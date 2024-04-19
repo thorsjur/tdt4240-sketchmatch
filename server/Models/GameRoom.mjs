@@ -2,8 +2,8 @@ import { EventEmitter } from "events";
 import { Player } from "./Player.mjs";
 
 export const GameRoomSettings = {
-    ROUND_DURATION: 5,
-    LEADERBOARD_DURATION: 3,
+    ROUND_DURATION: 30,
+    LEADERBOARD_DURATION: 6,
     ROUND_CREATE_DELAY: 2000 // wait x ms before creating a new round after the game is full (just to make sure the last player has been navigated to the lobby screen)
 }
 

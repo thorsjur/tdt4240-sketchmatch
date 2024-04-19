@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -35,16 +37,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GuessScreen
-import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.models.GameRoomStatus
+import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
+import com.groupfive.sketchmatch.viewmodels.WaitingLobbyViewModel
 
 
 @Composable
@@ -57,13 +61,27 @@ fun DrawScreenLayout(
     val currentWord = drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
     val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
     val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
-    val roundEndedEvent by roundTimerUpdateViewModel.roundEndedEvent.observeAsState()
 
-    roundEndedEvent?.getContentIfNotHandled()?.let {
-        navController.navigate(Screen.Leaderboard.route)
+    val gameRoom by GameData.currentGameRoom.observeAsState()
+    val player by GameData.currentPlayer.observeAsState()
+
+    val events = drawViewModel.eventsFlow.collectAsState(initial = null)
+    val event = events.value // allow Smart cast
+
+    LaunchedEffect(event) {
+        when (event) {
+            is DrawViewModel.Event.NavigateToLeaderboard -> {
+                // Remove the current screen from the back stack
+                //navController.popBackStack()
+                // Navigate to the draw screen
+                navController.navigate(Screen.Leaderboard.route)
+            }
+            null -> { }
+        }
     }
 
-    if (drawViewModel.showWordDialog.value) {
+    if (gameRoom?.gameStatus == GameRoomStatus.CHOOSING
+        && gameRoom?.getDrawingPlayerId() == player?.id) {
         WordChoiceDialog(
             drawViewModel = drawViewModel,
             onDismissRequest = drawViewModel::dismissWordDialog,
@@ -98,7 +116,8 @@ fun DrawScreenLayout(
                 if (drawViewModel.isDrawing.value) {
                     DrawScreen(
                         modifier = Modifier.weight(1f),
-                        drawViewModel = drawViewModel
+                        drawViewModel = drawViewModel,
+                        navController = navController
                     )
                 } else {
                     GuessScreen(
@@ -113,7 +132,7 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    PlayersIconsBar(modifier, currentPlayers = drawViewModel.players.value)
+                    GameData.currentGameRoom.value?.let { PlayersIconsBar(modifier, currentPlayers = it.players) }
                 }
             }
         }
@@ -142,21 +161,20 @@ fun WordChoiceDialog(
                     easyWord
                 ) {
                     drawViewModel.onWordChosen(easyWord);
-                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY, 1);
-                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY);
                 }
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
                 ) { drawViewModel.onWordChosen(mediumWord);
-                    setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
+                    setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM)
+                }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
                 ) { drawViewModel.onWordChosen(hardWord);
-                    setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1) }
+                    setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD)
+                }
             }
         },
         confirmButton = {
@@ -267,8 +285,10 @@ fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
                     modifier = Modifier.size(50.dp)
                 )
 
+                var completed: Boolean = true;
+
                 // If the player's action is complete, overlay a green-tinted checkmark
-                if (player.isComplete) {
+                if (completed) {
                     Box(
                         modifier = Modifier.size(45.dp),
                         contentAlignment = Alignment.Center

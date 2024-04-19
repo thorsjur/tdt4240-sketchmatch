@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 import { GameRoom } from "../Models/GameRoom.mjs";
+import { WordDifficultyPoints } from "../Models/GameRoom.mjs";
 
 export class GameRoomsRepository extends EventEmitter{
     constructor() {
@@ -94,5 +95,18 @@ export class GameRoomsRepository extends EventEmitter{
     handleGuess(gameRoomId, playerId, guessedWord) {
         const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.id === gameRoomId);
         gameRoom.handleGuess(playerId, guessedWord);
+    }
+
+    getDificultyObjByString(difficulty) {
+        switch (difficulty.toLowerCase()) {
+            case "easy":
+                return WordDifficultyPoints.EASY;
+            case "medium":
+                return WordDifficultyPoints.MEDIUM;
+            case "hard":
+                return WordDifficultyPoints.HARD;
+            default:
+                return WordDifficultyPoints.EASY;
+        }
     }
 }

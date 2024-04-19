@@ -23,6 +23,9 @@ enum class ResponseEvent(val value: String) {
 
     OPEN_LEADERBOARD_RESPONSE("open_leaderboard_response"),
 
+    // When a new round is created
+    ROUND_IS_CREATED_RESPONSE("round_is_created_response"),
+
     // Event for when server sends response of game room creation request
     ROOM_CREATED_RESPONSE("game_room_created_response"),
 
@@ -49,10 +52,7 @@ enum class ResponseEvent(val value: String) {
     DRAW_PAYLOAD_PUBLISHED("draw_payload_published"),
 
     // Event for when server notifies of a player joining a game room
-    PLAYER_JOINED_ROOM("player_joined_room"),
-
-    // When a new round is created
-    ROUND_IS_CREATED_RESPONSE("round_is_created_response")
+    PLAYER_JOINED_ROOM("player_joined_room")
 
 
 }

@@ -1,4 +1,4 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.draw
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -30,19 +30,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
-import com.groupfive.sketchmatch.view.draw.ControlBar
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import io.ak1.drawbox.DrawBox
 import io.ak1.drawbox.rememberDrawController
 import io.ak1.rangvikalp.RangVikalp
 
-data class Player(val id: Int, var isComplete: Boolean)
-
 @Composable
 fun DrawScreen(
     modifier: Modifier = Modifier,
-    drawViewModel: DrawViewModel
+    drawViewModel: DrawViewModel,
+    navController: NavController
 ) {
     val controller = rememberDrawController()
     Surface(
@@ -151,7 +151,8 @@ fun DrawScreenPreview(drawViewModel: DrawViewModel = viewModel()) {
     SketchmatchTheme {
         DrawScreen(
             modifier = Modifier,
-            drawViewModel = drawViewModel
+            drawViewModel = drawViewModel,
+            navController = rememberNavController()
         )
     }
 }

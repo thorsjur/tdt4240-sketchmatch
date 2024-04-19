@@ -9,22 +9,22 @@ class GameRoom {
     var gameName: String = ""
     var gameCapacity: Int = 2
     var players: List<Player> = emptyList()
-    var drawingPLayer: Int = 0
+    var drawingPlayer: Int = 0
     var gameStatus: GameRoomStatus = GameRoomStatus.WAITING
     var roundTimestamp: Int = 60
     var word: String = ""
     var guessedCorrectly: List<String> = emptyList()
 
     fun getCurrentRoundNumber(): Int {
-        return drawingPLayer + 1
+        return drawingPlayer + 1
     }
 
     fun getDrawingPlayerId(): String {
-        return players[drawingPLayer].id
+        return players[drawingPlayer].id
     }
 
     fun getDrawingPlayerName(): String {
-        return players[drawingPLayer].nickname
+        return players[drawingPlayer].nickname
     }
 }
 
