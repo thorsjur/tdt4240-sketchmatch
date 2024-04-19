@@ -46,12 +46,9 @@ import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
-import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
-import com.groupfive.sketchmatch.viewmodels.WaitingLobbyViewModel
-
 
 @Composable
 fun DrawScreenLayout(
@@ -222,6 +219,8 @@ fun TopWordBar(
 ) {
 
     var formattedTime = drawViewModel.formatTime(timeCount)
+    var numberOfPlayers = GameData.currentGameRoom.value?.players?.size
+    var currentRoundNumber = GameData.currentGameRoom.value?.getCurrentRoundNumber()
 
     Surface(
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15F),
@@ -264,7 +263,7 @@ fun TopWordBar(
                         imageVector = Icons.Filled.Numbers, contentDescription = "Number of rounds",
                         tint = MaterialTheme.colorScheme.inverseSurface
                     )
-                    Text(text = "${drawViewModel.currentRound.value}/${MAX_ROUNDS}")
+                    Text(text = "${currentRoundNumber}/${numberOfPlayers}")
                 }
             }
         }

@@ -20,13 +20,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlin.concurrent.fixedRateTimer
 
-// TODO: Remove the dummy values and standard player list and round number
-val p1 = Player("1","hwid1", "Ola", 15)
-val p2 = Player("2", "hwid1","Kari", 18)
-val p3 = Player("3", "hwid1","Arne", 27)
-val p4 = Player("4", "hwid1","Gunn", 24)
-val p5 = Player("5", "hwid1","Åse", 19)
-
 class LeaderboardViewModel : ViewModel() {
     var secondsLeft by mutableIntStateOf(6)
     private val client = MessageClient.getInstance()

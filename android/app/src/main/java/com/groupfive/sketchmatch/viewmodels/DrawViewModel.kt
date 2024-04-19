@@ -27,10 +27,6 @@ import kotlinx.coroutines.launch
 
 class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    companion object {
-        const val MAX_ROUNDS = 5
-    }
-
     private val roomId: String = checkNotNull(savedStateHandle["roomId"])
 
     private val _showWordDialog = mutableStateOf(true)
@@ -41,12 +37,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val _currentGuess = mutableStateOf("")
     val currentGuess: State<String> = _currentGuess
-
-    private val _currentRound = mutableIntStateOf(3)
-    val currentRound: State<Int> = _currentRound
-
-    private val _timeCount = mutableIntStateOf(59)
-    val timeCount: State<Int> = _timeCount
 
     private val _isTimerRunning = mutableStateOf(false)
     private var _isColorBarVisible = mutableStateOf(false)
@@ -137,22 +127,25 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         client.removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
     }
 
-//    fun submitGuess() {
-//        val guess = currentGuess.value
-//        // TODO: Add the required functionality to the server for handling guesses.
-//    }
+    /*
+    fun submitGuess() {
+        val guess = currentGuess.value
+        // TODO: Add the required functionality to the server for handling guesses.
+    }
 
     fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
         roomId = roomId.toInt()
     ) { controller.importPath(it) }
 
     fun unsubscribeFromRoom() = client.unsubscribeFromRoom(roomId.toInt())
+    */
 
     fun publishFullDrawBoxPayload(controller: DrawController) {
         val payload = controller.exportPath()
         client.publishFullDrawBoxPayload(roomId.toInt(), payload)
     }
 
+    /*
     private suspend fun handleTimer() {
         while (_timeCount.intValue > 0 && _isTimerRunning.value) {
             delay(1000)
@@ -160,6 +153,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
         //_players.value = _players.value.map { it.copy(isComplete = true) }
     }
+    */
 
     fun onWordChosen(word: String) {
         viewModelScope.launch {
@@ -169,6 +163,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
+    /*
     private fun toggleTimerRunning() {
         viewModelScope.launch {
             _isTimerRunning.value = !_isTimerRunning.value
@@ -179,6 +174,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     fun toggleIsDrawing() {
         _isDrawing.value = !_isDrawing.value
     }
+    */
 
     fun toggleColorBarVisibility() {
         if (_isSizePickerVisible.value) {

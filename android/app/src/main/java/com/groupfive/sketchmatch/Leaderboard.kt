@@ -47,22 +47,9 @@ fun Leaderboard(
     navController: NavController,
     viewModel: LeaderboardViewModel = viewModel()
 ) {
-    // if drawingplayer.id == currentplayer.id && secondsleft === 0 -> Then navigate to choose word
     val gameRoom by GameData.currentGameRoom.observeAsState()
     val events = viewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
-
-/*
-    // the following code block is to navigate only the drawing player to the "choose word view"
-//    if (gameRoom?.getCurrentRound()?.drawingPlayer?.id == GameData.currentPlayer.value?.id && leaderboardViewModel.secondsLeft == 0) {
- //       navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
-  //  }
-    // Navigate the drawer to the drawing screen
-    if (gameRoom?.gameStatus === GameRoomStatus.CHOOSING && gameRoom?.getDrawingPlayerId() === GameData.currentPlayer.value?.id)
-
-    // Navigate everyone to the leaderboard
-    if (gameRoom?.gameStatus === GameRoomStatus.LEADERBOARD)
-        */
 
     LaunchedEffect(event) {
         when (event) {
@@ -168,10 +155,10 @@ private fun PlayerCard(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(4.dp)
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp), //.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -193,7 +180,7 @@ private fun PlayerCard(
                 )
             }
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.padding(horizontal = 8.dp), //.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
