@@ -21,6 +21,7 @@ export class GameRoom extends EventEmitter {
         this.word = null;
         this.wordDifficultyPoints = null;
         this.guessedCorrectly = [];
+        this.stopTimer = false;
     }
 
     addPlayer(player) {
@@ -81,8 +82,12 @@ export class GameRoom extends EventEmitter {
 
         if (isCorrect) {
             player.incrementScore(this.calculateGuesserScore(this.roundTimestamp));
-            this.guessedCorrectly.push(playerId);
             drawer.incrementScore(this.wordDifficultyPoints);
+            if (!this.guessedCorrectly.includes(playerId)) { this.guessedCorrectly.push(playerId); }
+        }
+
+        if (this.guessedCorrectly.length == this.players.length - 1) {
+            this.stopTimer = true;
         }
 
         this.emit('answer_to_guess', playerId, isCorrect, this);
@@ -94,7 +99,7 @@ export class GameRoom extends EventEmitter {
             this.emit('round_timer_tick', this);
           
             // Stop the timer on 0
-            if (this.roundTimestamp == 0) {
+            if (this.roundTimestamp == 0 || this.stopTimer) {
                 clearInterval(counter);
                 this.endDrawingPeriod();
             }
@@ -140,6 +145,7 @@ export class GameRoom extends EventEmitter {
         this.word = null;
         this.wordDifficultyPoints = null;
         this.guessedCorrectly = [];
+        this.stopTimer = false;
     }
 
     getCurrentRoundNumber() {
