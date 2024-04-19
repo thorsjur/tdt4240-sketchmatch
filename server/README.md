@@ -17,6 +17,10 @@ npm install
 2. Start the server by running the following command:
 
 ```bash
+npm start
+```
+or
+```bash
 node server.mjs
 ```
 
