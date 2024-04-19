@@ -214,7 +214,7 @@ io.on("connection", (socket) => {
             console.log(response.message);
         }
 
-        socket.emit("check_guess_response", response);
+        socket.emit("check_guess_response", response.guess);
     });
 
     // On set_draw_word event
