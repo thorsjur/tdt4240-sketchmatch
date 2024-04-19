@@ -2,7 +2,7 @@ import { Guess } from "../Models/Guess.mjs";
 import { GameRoom } from "../Models/GameRoom.mjs";
 import { EventEmitter } from "events";
 
-export class GameRoomsRepository extends EventEmitter{
+export class GameRoomsRepository extends EventEmitter {
     constructor() {
         super();
         if (!GameRoomsRepository.instance) {
@@ -55,12 +55,10 @@ export class GameRoomsRepository extends EventEmitter{
         return this.gameRooms.find((gameRoom) => gameRoom.gameCode === code);
     }
 
-
     // Get roomId from gameCode
     getRoomIdFromGameCode(code) {
         return this.gameRooms.find((gameRoom) => gameRoom.gameCode === code).id;
     }
-
 
     // Remove game room by ID
     removeGameRoomById(id) {
@@ -71,10 +69,12 @@ export class GameRoomsRepository extends EventEmitter{
 
     // Start the round
     startRound(roomId) {
-        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.id === roomId);
+        const gameRoom = this.gameRooms.find(
+            (gameRoom) => gameRoom.id === roomId
+        );
 
-        console.log()
-        if(!gameRoom) {
+        console.log();
+        if (!gameRoom) {
             console.log(`Game room with ID ${roomId} not found`);
             return;
         }
@@ -82,15 +82,14 @@ export class GameRoomsRepository extends EventEmitter{
 
         round.startRound(gameRoom);
 
-        round.on('timer_tick', (time, gameRoom) => {
-            this.emit('timer_tick', time, gameRoom);
+        round.on("timer_tick", (time, gameRoom) => {
+            this.emit("timer_tick", time, gameRoom);
         });
 
-        round.on('round_finished', (gameRoom) => {
-            this.emit('round_finished', gameRoom);
+        round.on("round_finished", (gameRoom) => {
+            this.emit("round_finished", gameRoom);
         });
     }
-
 
     // Check if the guess is correct
     checkGuess(guess, round, timestamp, guessingPlayer, drawingPlayer) {

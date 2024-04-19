@@ -6,4 +6,5 @@ sealed class Screen(val route: String) {
     object GameRoomsList : Screen(route = "game_rooms_list_screen")
     object Test: Screen(route = "test_screen")
     object Draw: Screen(route = "draw_screen")
+    object CommonLobby : Screen("waiting_lobby_screen")
 }

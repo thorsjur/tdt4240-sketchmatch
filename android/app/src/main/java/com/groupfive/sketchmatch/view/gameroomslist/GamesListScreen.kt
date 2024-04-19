@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +43,9 @@ import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
+import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
+import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 
 @Composable
 fun GamesListScreen(
@@ -54,6 +57,7 @@ fun GamesListScreen(
     val gameRooms by viewModel.gameRooms.observeAsState()
     var openCreateGamePopup by remember { mutableStateOf(false) }
     var openJoinGameRoomByCodePopup by remember { mutableStateOf(false) }
+    val navigationRoute by viewModel.navigationEvent.observeAsState()
 
     val successEvent by viewModel.successEvent.observeAsState()
     val errorEvent by viewModel.errorEvent.observeAsState()
@@ -71,12 +75,20 @@ fun GamesListScreen(
         // TODO: Navigate to the game lobby screen in stead of Draw screen
         viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
         // TODO: Replace mockId with actual roomId
-        val mockId = 1234
-        navController.navigate(Screen.Draw.route + "/$mockId")
+        //val mockId = 1234
+        navController.navigate(Screen.CommonLobby.route
+                //+ "/$mockId"
+        )
     }
 
     errorEvent?.getContentIfNotHandled()?.let {
         viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
+    }
+
+    navigationRoute?.getContentIfNotHandled()?.let { route ->
+        LaunchedEffect(route) {
+            navController.navigate(route)
+        }
     }
 
     Surface(
@@ -187,8 +199,10 @@ fun GamesListScreen(
 
                 // TODO: Navigate to the game lobby screen
                 // TODO: Replace mockId with actual roomId
-                val mockId = 1234
-                navController.navigate(Screen.Draw.route + "/$mockId")
+                // val mockId = 1234
+                navController.navigate(Screen.CommonLobby.route
+                        //+ "/$mockId"
+                )
             }
         )
     }

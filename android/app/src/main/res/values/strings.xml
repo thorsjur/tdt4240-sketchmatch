@@ -66,4 +66,11 @@
     <string name="something_went_wrong">Something went wrong. Please try again or restart the app.</string>
     <string name="correct">Correct</string>
     <string name="incorrect">Incorrect</string>
+    <string name="waiting_lobby_title">Waiting for more players to join!</string>
+    <string name="game_room_code">Game room code:</string>
+    <string name="back_to_main_menu">Back to main menu</string>
+    <string name="players_waiting">Players: %1$s</string>
+    <string name="wait_for_drawer">Waiting for %1$s to choose a word to draw</string>
+    <string name="drawing_player">Player that will draw this round:</string>
+
 </resources>
