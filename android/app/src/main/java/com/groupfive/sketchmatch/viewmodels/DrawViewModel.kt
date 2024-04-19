@@ -106,6 +106,24 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         generateWords()
     }
 
+    // Remove all callbacks
+    fun clearCallbacks() {
+        client.removeAllCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value)
+        client.removeAllCallbacks(ResponseEvent.OPEN_LEADERBOARD_RESPONSE.value)
+        client.removeAllCallbacks(ResponseEvent.ROUND_FINISHED_RESPONSE.value)
+
+        // Remove timer ticker callback
+        client.removeAllCallbacks(ResponseEvent.ROUND_TIMER_TICK_RESPONSE.value)
+        client.removeAllCallbacks(ResponseEvent.LEADERBOARD_TIMER_TICK_RESPONSE.value)
+
+        // Remove set Word callbacks
+        client.removeAllCallbacks(ResponseEvent.SET_DRAW_WORD_RESPONSE.value)
+
+        // Remove drawing transmit callbacks
+        client.removeAllCallbacks(ResponseEvent.ROUND_IS_CREATED_RESPONSE.value)
+        client.removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
+    }
+
 //    fun submitGuess() {
 //        val guess = currentGuess.value
 //        // TODO: Add the required functionality to the server for handling guesses.

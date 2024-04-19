@@ -75,6 +75,7 @@ fun DrawScreenLayout(
     LaunchedEffect(event) {
         when (event) {
             is NavigationEvent.NavigateToLeaderboard -> {
+                drawViewModel.clearCallbacks()
                 // Remove the current screen from the back stack
                 navController.popBackStack()
                 // Navigate to the draw screen

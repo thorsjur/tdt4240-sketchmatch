@@ -69,10 +69,12 @@ fun Leaderboard(
     LaunchedEffect(event) {
         when (event) {
             is NavigationEvent.NavigateDrawerToChoose -> {
+                viewModel.clearCallbacks()
                 navController.popBackStack()
                 navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
             }
             is NavigationEvent.NavigateToDraw -> {
+                viewModel.clearCallbacks()
                 navController.popBackStack()
                 navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
             }

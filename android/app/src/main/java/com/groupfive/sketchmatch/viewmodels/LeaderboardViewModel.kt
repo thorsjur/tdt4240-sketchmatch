@@ -74,6 +74,11 @@ class LeaderboardViewModel : ViewModel() {
         }
     }
 
+    fun clearCallbacks() {
+        client.removeAllCallbacks(ResponseEvent.ROUND_FINISHED_RESPONSE.value)
+        client.removeAllCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value)
+    }
+
     fun startCountDown() = fixedRateTimer(name = "countdown", initialDelay = 500L, period = 1000L) {
         if (secondsLeft > 0) {
             secondsLeft--
