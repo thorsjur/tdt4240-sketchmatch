@@ -81,26 +81,23 @@ fun GuessScreen(
     val events = guessViewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
 
+    val drawBoxPayLoad by GameData.drawBoxPayLoad.observeAsState()
+
+    // On drawBoxPayLoad change
+    if (drawBoxPayLoad != null) {
+        controller.importPath(drawBoxPayLoad!!)
+    }
+
     LaunchedEffect(Unit) {
-        drawViewModel.subscribeToRoom(controller)
+        guessViewModel.handleRender(controller)
     }
-    LaunchedEffect(event) {
-        when (event) {
-            is Event.CorrectGuessEvent -> {
-                guessWordIsCorrect = true
-                showCorrectnessIcon = true
-            }
-            is Event.IncorrectGuessEvent -> {
-                guessWordIsCorrect = false
-                showCorrectnessIcon = true
-            }
-        }
-    }
+
+
     DisposableEffect(Unit) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_DESTROY -> {
-                    drawViewModel.unsubscribeFromRoom()
+                    guessViewModel.handleDestroy()
                 }
 
                 else -> {}
@@ -111,6 +108,7 @@ fun GuessScreen(
             lifecycle.lifecycle.removeObserver(observer)
         }
     }
+
     Box (modifier = modifier
         .fillMaxWidth(),
         contentAlignment = Alignment.Center){

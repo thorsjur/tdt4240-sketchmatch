@@ -8,10 +8,15 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.AnswerToGuessResponseDTO
+import com.groupfive.sketchmatch.communication.dto.response.PayloadResponseDTO
 import com.groupfive.sketchmatch.models.Event
+import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
+import com.groupfive.sketchmatch.store.GameData
+import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class GuessViewModel: ViewModel(){
     private val client = MessageClient.getInstance()
@@ -50,4 +55,21 @@ class GuessViewModel: ViewModel(){
     fun checkGuess(inputGuess: String, gameRoomId: Int) {
         client.checkGuess(inputGuess, gameRoomId)
     }
+
+    fun handleRender(controller: DrawController) =
+        client.addCallback(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) {
+            Log.i("GuessViewModel", "DRAW_PAYLOAD_PUBLISHED: $it")
+
+            val gson = Gson()
+            val response = gson.fromJson(it, PayloadResponseDTO::class.java)
+            val drawBoxPayLoad =
+                Json.decodeFromString(DrawBoxPayLoadSerializer, response.pathPayload)
+            //controller.importPath(drawBoxPayLoad)
+
+            GameData.drawBoxPayLoad.postValue(drawBoxPayLoad)
+
+            ///sendEvent(NavigationEvent.NewDrawingPayload)
+        }
+
+    fun handleDestroy() = client.removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
 }
