@@ -26,12 +26,10 @@ class CreateGameViewModel : ViewModel() {
             eventChannel.send(event)
         }
     }
-/*
-    sealed class Event {
-        data class NavigateTo(val destination: Int): Event()
-    }
 
- */
+    fun clearAllCallbacks() {
+        client.removeAllCallbacks()
+    }
 
     init {
 

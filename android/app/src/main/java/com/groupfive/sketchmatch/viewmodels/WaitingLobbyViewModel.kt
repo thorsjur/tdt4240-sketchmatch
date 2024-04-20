@@ -26,13 +26,12 @@ class WaitingLobbyViewModel: ViewModel() {
         }
     }
 
-    fun clearCallbacks() {
-        client.removeAllCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value)
-        client.removeAllCallbacks(ResponseEvent.PLAYER_JOINED_ROOM.value)
+    fun clearAllCallbacks() {
+        client.removeAllCallbacks()
     }
 
     init {
-        client.addCallback(ResponseEvent.PLAYER_JOINED_ROOM.value) { message ->
+        client.addCallback(ResponseEvent.JOIN_ROOM_RESPONSE.value) { message ->
             Log.i("LobbyViewModel", "PLAYER_JOINED_ROOM: $message")
 
             // Convert the json string to a list of GameRoom objects

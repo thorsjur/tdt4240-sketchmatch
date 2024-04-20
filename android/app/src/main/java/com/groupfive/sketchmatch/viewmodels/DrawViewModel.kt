@@ -215,6 +215,10 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
+    fun clearAllCallbacks() {
+        client.removeAllCallbacks()
+    }
+
     fun goBackToMainMenu(navController: NavController) {
         dismissWordDialog()
         navController.navigate(Screen.MainMenu.route)

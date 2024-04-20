@@ -40,26 +40,31 @@ import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.getPlayerRankString
+import com.groupfive.sketchmatch.utils.getRoundString
+import com.groupfive.sketchmatch.view.draw.LeaveGameButton
 
 @Composable
 fun Leaderboard(
-    modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: LeaderboardViewModel = viewModel()
 ) {
     val gameRoom by GameData.currentGameRoom.observeAsState()
     val events = viewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
+    val roundNumber = gameRoom?.getCurrentRoundNumber() ?: 1
+    val totalNumberOfRounds = gameRoom?.getTotalNumberOfRounds() ?: 2
+
+
 
     LaunchedEffect(event) {
         when (event) {
             is Event.NavigateDrawerToChoose -> {
-                viewModel.clearCallbacks()
+                viewModel.clearAllCallbacks()
                 navController.popBackStack()
                 navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
             }
             is Event.NavigateToDraw -> {
-                viewModel.clearCallbacks()
+                viewModel.clearAllCallbacks()
                 navController.popBackStack()
                 navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
             }
@@ -83,7 +88,8 @@ fun Leaderboard(
                 val title = if (gameStatus == GameRoomStatus.FINISHED) {
                     "Game over!"
                 } else if (viewModel.secondsLeft != 0) {
-                    "Round ${gameRoom?.getCurrentRoundNumber()}"
+                    //"Round ${gameRoom?.getCurrentRoundNumber()}"
+                    getRoundString(roundNumber, totalNumberOfRounds)
                 } else {
                     "${gameRoom?.getDrawingPlayerName()} is choosing a word"
                 }
@@ -96,10 +102,11 @@ fun Leaderboard(
                         fontWeight = FontWeight.ExtraBold
                     )
                 )
+
                 if (gameStatus != GameRoomStatus.FINISHED &&
                     viewModel.secondsLeft != 0) {
                     Icon(
-                        modifier = Modifier.padding(5.dp),
+                        modifier = Modifier.padding(vertical = 5.dp, horizontal = 15.dp),
                         imageVector = Icons.Filled.Alarm,
                         contentDescription = "Alarm Icon"
                     )
@@ -110,6 +117,15 @@ fun Leaderboard(
                         )
                     )
                 }
+
+                if (gameStatus == GameRoomStatus.FINISHED) {
+                    LeaveGameButton(onLeaveGameClicked = {
+                        viewModel.goBackToMainMenu(
+                            navController
+                        )
+                    })
+                }
+
                 LaunchedEffect(key1 = Unit) {
                     viewModel.startCountDown()
                 }

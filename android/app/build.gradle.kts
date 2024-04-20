@@ -34,7 +34,8 @@ android {
         }
 
         debug {
-            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://10.22.226.197:40401\"")
+            // TODO: Change IP-address
+            buildConfigField("String", "SOCKET_IO_ADDRESS", "\"http://10.22.71.228:40401\"")
         }
     }
     compileOptions {

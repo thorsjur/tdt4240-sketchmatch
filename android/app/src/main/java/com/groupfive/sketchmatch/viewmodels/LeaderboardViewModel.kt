@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
@@ -14,6 +15,7 @@ import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatus
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.models.Player
+import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -47,10 +49,6 @@ class LeaderboardViewModel : ViewModel() {
             val gameStatusIsChoosing = gameRoom?.gameStatus == GameRoomStatus.CHOOSING
             val playerIsDrawing = gameRoom?.getDrawingPlayerId() == GameData.currentPlayer.value?.id
 
-            Log.i("LeaderboardViewModel", "gameRoom?.gameStatus: ${gameRoom?.gameStatus}")
-            Log.i("LeaderboardViewModel", "gameStatusIsChoosing: $gameStatusIsChoosing")
-            Log.i("LeaderboardViewModel", "playerIsDrawing: $playerIsDrawing")
-
             if (gameStatusIsChoosing && playerIsDrawing) {
                 sendEvent(Event.NavigateDrawerToChoose)
             }
@@ -67,9 +65,14 @@ class LeaderboardViewModel : ViewModel() {
         }
     }
 
-    fun clearCallbacks() {
-        client.removeAllCallbacks(ResponseEvent.ROUND_FINISHED_RESPONSE.value)
-        client.removeAllCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value)
+    fun clearAllCallbacks() {
+        client.removeAllCallbacks()
+    }
+
+    fun goBackToMainMenu(navController: NavController) {
+        navController.popBackStack()
+        clearAllCallbacks()
+        navController.navigate(Screen.MainMenu.route)
     }
 
     fun startCountDown() = fixedRateTimer(name = "countdown", initialDelay = 500L, period = 1000L) {

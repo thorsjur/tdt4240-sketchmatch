@@ -197,7 +197,12 @@ class GameRoomsViewModel : ViewModel() {
         // Convert the DTO object to a JSON string
         val jsonData = Gson().toJson(dto)
 
+        removeAllCallbacks()
         client.sendMessage(RequestEvent.JOIN_ROOM_BY_CODE.value, jsonData)
+    }
+
+    fun clearAllCallbacks() {
+        client.removeAllCallbacks()
     }
 
     // Remove all callbacks

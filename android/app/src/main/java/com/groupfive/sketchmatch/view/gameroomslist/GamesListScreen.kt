@@ -78,6 +78,9 @@ fun GamesListScreen(
             Log.i("GamesListScreen", it)
         }
 
+        navController.popBackStack()
+        navController.popBackStack()
+        viewModel.clearAllCallbacks()
         navController.navigate(Screen.WaitingLobby.route)
     }
 
@@ -196,6 +199,9 @@ fun GamesListScreen(
                 // TODO: Navigate to the game lobby screen
                 // TODO: Replace mockId with actual roomId
                 val mockId = 1234
+                navController.popBackStack()
+                navController.popBackStack()
+                viewModel.clearAllCallbacks()
                 navController.navigate(Screen.Draw.route + "/$mockId")
             }
         )

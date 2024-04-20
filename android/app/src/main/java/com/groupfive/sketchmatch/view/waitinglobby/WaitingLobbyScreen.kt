@@ -52,7 +52,7 @@ fun WaitingLobby(
     LaunchedEffect(event) {
         when (event) {
             is Event.NavigateToDraw -> {
-                viewModel.clearCallbacks()
+                viewModel.clearAllCallbacks()
                 // Remove the current screen from the back stack
                 navController.popBackStack()
                 // Navigate to the draw screen
@@ -101,7 +101,9 @@ fun WaitingLobby(
                 }
             },
             confirmButton = {
-                Button(onClick = { navController.navigate(Screen.MainMenu.route) },
+                Button(onClick = {
+                    viewModel.clearAllCallbacks()
+                    navController.navigate(Screen.MainMenu.route) },
                     modifier
                         .fillMaxWidth()
                         .wrapContentWidth()) {

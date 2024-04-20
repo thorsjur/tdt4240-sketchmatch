@@ -77,19 +77,21 @@ fun MainMenuScreen(
         }
     }
 
-    UsernameEnterDialog(
-        modifier = Modifier,
-        onSubmit = { username ->
-        },
-        onSuccess = { message ->
-            // Show a toast message to the user
-            Toast.makeText(
-                context,
-                context.getString(R.string.set_nickname_success_msg),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    )
+    if (player?.nickname.isNullOrEmpty()) {
+        UsernameEnterDialog(
+            modifier = Modifier,
+            onSubmit = { username ->
+            },
+            onSuccess = { message ->
+                // Show a toast message to the user
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.set_nickname_success_msg),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        )
+    }
 }
 
 

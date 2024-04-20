@@ -24,15 +24,5 @@ class RoundTimerUpdateViewModel: ViewModel() {
             updatedTimerTick.postValue(updatedTimer.timerTick)
         }
 
-        /*
-        // Add a callback to handle incoming  message
-        client.addCallback(ResponseEvent.ROUND_FINISHED_RESPONSE.value) { message ->
-            Log.i("RoundTimerUpdateViewModel", "ROUND_FINISHED_RESPONSE_EVENT: $message")
-
-            // Parse the guess from the json message string
-            val gson = Gson()
-        }
-
-         */
     }
 }

@@ -21,7 +21,6 @@ import { JoinGameResponseDTO } from "./Dto/Response/JoinGameResponseDTO.mjs";
 import { SetDrawWordResponseDTO } from "./Dto/Response/SetDrawWordResponseDTO.mjs";
 import { SetNicknameResponseDTO } from "./Dto/Response/SetNicknameResponseDTO.mjs";
 import { TimerTickResponseDTO } from "./Dto/Response/TimerTickResponseDTO.mjs";
-import { GameStatus } from "./Models/GameRoom.mjs";
 
 
 const app = express();
@@ -305,17 +304,12 @@ gameRoomsRepository.on("leaderboard_timer_tick", (leaderboardTimer, gameRoom) =>
 
 gameRoomsRepository.on("round_finished", (gameRoom) => {
   console.log(`Round finished in game room: ${gameRoom.gameName}. Game status: ${gameRoom.gameStatus}`);
-  //console.log(gameRoom.serialize());
   let dto = new GameRoomUpdateStatusResponseDTO();
   dto.gameRoom = gameRoom.serialize();
 
   console.log(dto.gameRoom);
 
   io.to(gameRoom.id).emit('round_finished_response', dto); 
-
-  if (dto.gameRoom.gameStatus == GameStatus.FINISHED) {
-    dto.gameRoom.clearPlayerPoints();
-  }
 });
 
 gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {

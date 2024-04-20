@@ -146,13 +146,6 @@ class MessageClient private constructor(
                     invokeCallbacks(ResponseEvent.ROOM_DESTROYED.value, msg)
                 }
 
-                /*
-                // On CHECK_GUESS_RESPONSE_EVENT
-                on(ResponseEvent.CHECK_GUESS_RESPONSE.value) { msg ->
-                    invokeCallbacks(ResponseEvent.CHECK_GUESS_RESPONSE.value, msg)
-                }
-                */
-
                 // On SET_DRAW_WORD_RESPONSE_EVENT
                 on(ResponseEvent.SET_DRAW_WORD_RESPONSE.value) { msg ->
                     invokeCallbacks(ResponseEvent.SET_DRAW_WORD_RESPONSE.value, msg)
@@ -192,11 +185,6 @@ class MessageClient private constructor(
                 // On JOIN_ROOM_BY_CODE_RESPONSE
                 on(ResponseEvent.JOIN_ROOM_RESPONSE.value) { msg ->
                     invokeCallbacks(ResponseEvent.JOIN_ROOM_RESPONSE.value, msg)
-                }
-
-                // On JOIN_ROOM_BY_CODE_RESPONSE
-                on(ResponseEvent.PLAYER_JOINED_ROOM.value) { msg ->
-                    invokeCallbacks(ResponseEvent.PLAYER_JOINED_ROOM.value, msg)
                 }
 
                 // On ROUND_IS_CREATED_RESPONSE
@@ -342,6 +330,10 @@ class MessageClient private constructor(
     // Remove all callbacks for a specific event
     fun removeAllCallbacks(event: String) {
         eventCallbacks.remove(event)
+    }
+
+    fun removeAllCallbacks() {
+        eventCallbacks.clear()
     }
 
     fun unsubscribeFromEvent(event: String) {

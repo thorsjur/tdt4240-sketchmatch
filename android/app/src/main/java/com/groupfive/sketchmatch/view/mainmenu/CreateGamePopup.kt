@@ -1,6 +1,7 @@
 package com.groupfive.sketchmatch.view.mainmenu
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -56,8 +57,6 @@ import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.viewmodels.CreateGameViewModel
-import com.groupfive.sketchmatch.viewmodels.SetNicknameViewModel
-
 
 @Composable
 fun CreateGamePopUp(
@@ -75,7 +74,12 @@ fun CreateGamePopUp(
 
     LaunchedEffect(event) {
         when (event) {
-            is Event.NavigateToWaitingLobby -> navController.navigate(Screen.WaitingLobby.route)
+            is Event.NavigateToWaitingLobby -> {
+                navController.popBackStack()
+                viewModel.clearAllCallbacks()
+                navController.navigate(Screen.WaitingLobby.route)
+                Log.i("CreateGamePopUp", "CREATE_GAME_EVENT_RECEIVED")
+            }
             null -> { }
         }
     }

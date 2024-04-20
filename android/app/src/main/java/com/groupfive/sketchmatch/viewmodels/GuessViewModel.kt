@@ -25,10 +25,8 @@ class GuessViewModel: ViewModel(){
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: Event) {
-        viewModelScope.launch {
-            eventChannel.send(event)
-        }
+    fun clearAllCallbacks() {
+        client.removeAllCallbacks()
     }
 
     init {

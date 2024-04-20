@@ -16,7 +16,11 @@ class GameRoom {
     var guessedCorrectly: List<String> = emptyList()
 
     fun getCurrentRoundNumber(): Int {
-        return drawingPlayer + 1
+        return drawingPlayer
+    }
+
+    fun getTotalNumberOfRounds(): Int {
+        return players.size;
     }
 
     fun getDrawingPlayerId(): String {

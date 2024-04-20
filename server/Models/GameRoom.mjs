@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 
 export const GameRoomSettings = {
-    ROUND_DURATION: 20,
+    ROUND_DURATION: 60,
     LEADERBOARD_DURATION: 6,
     ROUND_CREATE_DELAY: 2000 // wait x ms before creating a new round after the game is full (just to make sure the last player has been navigated to the lobby screen)
 }
@@ -125,6 +125,11 @@ export class GameRoom extends EventEmitter {
     endGame() {
         this.setGameStatus(GameStatus.FINISHED);
         this.emit('round_finished', this);
+        this.clearPlayerPoints();
+    }
+
+    clearPlayerPoints() {
+        this.players.forEach(p => p.setScore(0));
     }
 
     calculateGuesserScore(timestamp) {
@@ -183,10 +188,6 @@ export class GameRoom extends EventEmitter {
             this.players[this.drawingPlayer - 1].setIsDrawing(false);
             this.players[this.drawingPlayer].setIsDrawing(true);
         }
-    }
-
-    clearPlayerPoints() {
-        this.players.forEach(p => p.setScore(0));
     }
 }
 

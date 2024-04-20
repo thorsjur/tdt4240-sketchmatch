@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
-import { GameRoom } from "../Models/GameRoom.mjs";
-import { WordDifficultyPoints } from "../Models/GameRoom.mjs";
+import { GameRoom, GameStatus, WordDifficultyPoints } from "../Models/GameRoom.mjs";
 
 export class GameRoomsRepository extends EventEmitter{
     constructor() {
@@ -15,7 +14,7 @@ export class GameRoomsRepository extends EventEmitter{
 
     // Get all game rooms
     getGameRooms() {
-        return this.gameRooms;
+        return this.gameRooms.filter(gameRoom => gameRoom.gameStatus == GameStatus.WAITING);
     }
 
     // Set the draw word for the game room
@@ -61,6 +60,9 @@ export class GameRoomsRepository extends EventEmitter{
 
         gameRoom.on('round_finished', gameRoom => {
             this.emit('round_finished', gameRoom);
+            if (gameRoom.gameStatus == GameStatus.FINISHED) {
+                this.removeGameRoomById(gameRoom.id);
+            }
         });
 
         gameRoom.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
