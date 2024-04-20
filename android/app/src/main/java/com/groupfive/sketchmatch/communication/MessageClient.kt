@@ -28,7 +28,7 @@ import java.net.URISyntaxException
  * per mobile client.
  */
 class MessageClient private constructor(
-    private val hwid: String? = null
+    private val uuid: String? = null
 ) {
 
     companion object {
@@ -36,9 +36,9 @@ class MessageClient private constructor(
         @Volatile
         private var instance: MessageClient? = null
 
-        fun getInstance(hwid: String? = null) =
+        fun getInstance(uuid: String? = null) =
             instance ?: synchronized(this) {
-                instance ?: MessageClient(hwid).also { instance = it }
+                instance ?: MessageClient(uuid).also { instance = it }
             }
     }
 
@@ -58,7 +58,7 @@ class MessageClient private constructor(
             val queryParams = mutableMapOf<String, String>()
 
             // Add the hardware ID to the query parameters
-            hwid?.let { queryParams["hwid"] = it }
+            uuid?.let { queryParams["hwid"] = it }
 
             socket = Socket(
                 endpoint = BuildConfig.SOCKET_IO_ADDRESS,

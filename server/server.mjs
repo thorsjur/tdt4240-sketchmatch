@@ -300,7 +300,6 @@ gameRoomsRepository.on('open_leaderboard', gameRoom => {
 });
 
 gameRoomsRepository.on('round_timer_tick', (gameRoom) => {
-  console.log(`Round timer tick in game room: ${gameRoom.gameName}: ${gameRoom.roundTimestamp}`);
   let dto = new TimerTickResponseDTO();
   dto.timerTick = gameRoom.roundTimestamp;
 
