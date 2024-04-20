@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 // Repositories
 import { PlayersRepository } from "./Repository/PlayersRepository.mjs";
 import { GameRoomsRepository } from "./Repository/GameRoomsRepository.mjs";
+import { GuessWordsRepository } from "./Repository/GuessWordsRepository.mjs";
 
 // DTOs
 import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
@@ -22,6 +23,7 @@ import { JoinGameResponseDTO } from "./Dto/Response/JoinGameResponseDTO.mjs";
 import { PublishPathRequestDTO } from "./Dto/Request/PublishPathRequestDTO.mjs";
 import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
 import { RoundFinishedResponseDTO } from "./Dto/Response/RoundFinishedResponseDTO.mjs";
+import { GetGuessWordsResponseDTO } from "./Dto/Response/GetGuessWordsResponseDTO.mjs";
 
 
 const app = express();
@@ -45,6 +47,7 @@ const io = new Server(httpServer, {
 // -----
 const playersRepository = new PlayersRepository();
 const gameRoomsRepository = new GameRoomsRepository();
+const guessWordsRepository = new GuessWordsRepository();
 
 io.on("connection", (socket) => {
   var hwid = socket.handshake.query.hwid;
@@ -219,10 +222,13 @@ io.on("connection", (socket) => {
                 dto.gameRoomId
             );
             const round = gameRoomsRepository.findCurrentRound(gameRoom);
-         
+
+            // Get draw guess by id
+            const drawWord = guessWordsRepository.getWordById(dto.drawWordId);
+
             // Set draw word in the game room
-            gameRoomsRepository.updateDrawWord(dto.drawWord, round);
-            gameRoomsRepository.updateDifficulty(dto.difficulty, round);
+            gameRoomsRepository.updateDrawWord(drawWord, round);
+            //gameRoomsRepository.updateDifficulty(dto.difficulty, round);
             response.gameRoom = gameRoom;
 
             console.log(
@@ -308,6 +314,14 @@ io.on("connection", (socket) => {
 
         // Emit join_room_by_code_response only to the sender
         socket.emit("join_room_response", response);
+    });
+
+    // On get_guess_words event
+    socket.on("get_guess_words", () => {
+        var response = new GetGuessWordsResponseDTO();
+        response.guessWords = guessWordsRepository.getRandomWords();
+
+        socket.emit("get_guess_words_response", response);
     });
 });
 

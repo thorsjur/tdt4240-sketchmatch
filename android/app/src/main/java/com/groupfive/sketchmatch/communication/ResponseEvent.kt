@@ -39,4 +39,7 @@ enum class ResponseEvent(val value: String) {
     // Event for when server publishes to a room the client is subscribed to
     DRAW_PAYLOAD_PUBLISHED("draw_payload_published"),
 
+    // Event when server sends response of get_guess_words request
+    GET_GUESS_WORDS_RESPONSE("get_guess_words_response"),
+
 }

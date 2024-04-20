@@ -26,7 +26,7 @@ class SetDrawWordViewModel: ViewModel() {
     }
 
 
-    fun setDrawWord(drawWord: String, difficulty: Difficulty, gameRoomId: Int) {
-        client.setDrawWord(drawWord, difficulty, gameRoomId)
+    fun setDrawWord(drawWordId: String) {
+        client.setDrawWord(drawWordId)
     }
 }

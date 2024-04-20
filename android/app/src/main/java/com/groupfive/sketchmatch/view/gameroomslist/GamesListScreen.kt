@@ -73,6 +73,9 @@ fun GamesListScreen(
         // TODO: Replace mockId with actual roomId
         val mockId = 1234
         navController.navigate(Screen.Draw.route + "/$mockId")
+
+        // Reset the success event
+        viewModel.successEvent.value = null
     }
 
     errorEvent?.getContentIfNotHandled()?.let {

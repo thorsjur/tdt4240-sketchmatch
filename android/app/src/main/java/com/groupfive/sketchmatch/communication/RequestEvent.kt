@@ -33,4 +33,7 @@ enum class RequestEvent(val value: String) {
     // Event for unsubscribing from a specific room
     UNSUBSCRIBE_FROM_ROOM("unsubscribe_from_room"),
 
+    // Event for getting the guess words from the server
+    GET_GUESS_WORDS("get_guess_words"),
+
 }

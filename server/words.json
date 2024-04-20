@@ -1,0 +1,142 @@
+[
+    {
+        "id": "1",
+        "word": "cat",
+        "difficulty": 0
+    },
+    {
+        "id": "2",
+        "word": "sun",
+        "difficulty": 0
+    },
+    {
+        "id": "3",
+        "word": "cup",
+        "difficulty": 0
+    },
+    {
+        "id": "4",
+        "word": "guitar",
+        "difficulty": 1
+    },
+    {
+        "id": "5",
+        "word": "penguin",
+        "difficulty": 1
+    },
+    {
+        "id": "6",
+        "word": "balloon",
+        "difficulty": 1
+    },
+    {
+        "id": "7",
+        "word": "submarine",
+        "difficulty": 2
+    },
+    {
+        "id": "8",
+        "word": "microscope",
+        "difficulty": 2
+    },
+    {
+        "id": "9",
+        "word": "chandelier",
+        "difficulty": 2
+    },
+    {
+        "id": "10",
+        "word": "helicopter",
+        "difficulty": 3
+    },
+    {
+        "id": "11",
+        "word": "television",
+        "difficulty": 3
+    },
+    {
+        "id": "12",
+        "word": "refrigerator",
+        "difficulty": 3
+    },
+    {
+        "id": "13",
+        "word": "university",
+        "difficulty": 3
+    },
+    {
+        "id": "14",
+        "word": "communication",
+        "difficulty": 3
+    },
+    {
+        "id": "15",
+        "word": "organization",
+        "difficulty": 3
+    },
+    {
+        "id": "16",
+        "word": "ant",
+        "difficulty": 0
+    },
+    {
+        "id": "17",
+        "word": "dog",
+        "difficulty": 0
+    },
+    {
+        "id": "18",
+        "word": "tree",
+        "difficulty": 0
+    },
+    {
+        "id": "19",
+        "word": "flower",
+        "difficulty": 0
+    },
+    {
+        "id": "20",
+        "word": "house",
+        "difficulty": 0
+    },
+    {
+        "id": "21",
+        "word": "car",
+        "difficulty": 0
+    },
+    {
+        "id": "22",
+        "word": "boat",
+        "difficulty": 0
+    },
+    {
+        "id": "23",
+        "word": "airplane",
+        "difficulty": 3
+    },
+    {
+        "id": "24",
+        "word": "bicycle",
+        "difficulty": 2
+    },
+    {
+        "id": "25",
+        "word": "motorcycle",
+        "difficulty": 3
+    },
+    {
+        "id": "26",
+        "word": "train",
+        "difficulty": 0
+    },
+    {
+        "id": "27",
+        "word": "truck",
+        "difficulty": 0
+    },
+    {
+        "id": "28",
+        "word": "bus",
+        "difficulty": 0
+    }
+]

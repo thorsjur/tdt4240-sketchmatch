@@ -1,17 +1,24 @@
 package com.groupfive.sketchmatch.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.Player
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
+import com.groupfive.sketchmatch.communication.RequestEvent
+import com.groupfive.sketchmatch.communication.ResponseEvent
+import com.groupfive.sketchmatch.communication.dto.response.GetGuessWordsResponseDTO
+import com.groupfive.sketchmatch.models.GuessWord
 import com.groupfive.sketchmatch.navigator.Screen
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.delay
@@ -66,9 +73,33 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     private val client = MessageClient.getInstance()
 
+    // List of guess words
+    val guessWords: MutableLiveData<List<GuessWord>> = MutableLiveData()
+
     // Load initial words
     init {
-        generateWords()
+        // Subscribe to GUESS_WORDS_RESPONSE to handle nickname setting responses
+        client.addCallback(ResponseEvent.GET_GUESS_WORDS_RESPONSE.value) { message ->
+            Log.i("DrawViewModel", "GET_GUESS_WORDS_RESPONSE: $message")
+            // Parse the response from the server
+            val response = Gson().fromJson(message, GetGuessWordsResponseDTO::class.java)
+
+            if(response.status == "success") {
+                Log.i("DrawViewModel", "GET_GUESS_WORDS_RESPONSE: ${response.guessWords}")
+                guessWords.postValue(response.guessWords)
+                viewModelScope.launch {
+                    _easyWord.value = response.guessWords[0].word
+                    _mediumWord.value = response.guessWords[1].word
+                    _hardWord.value = response.guessWords[2].word
+                }
+            } else {
+                // TODO: Handle the error... Try again? Exit the game?
+                // Because the game cannot continue without player choosing a word
+            }
+        }
+
+        // Get guess words from the server
+        client.sendMessage(RequestEvent.GET_GUESS_WORDS.value)
     }
 
 //    fun submitGuess() {
@@ -146,11 +177,8 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     }
 
     fun generateWords() {
-        viewModelScope.launch {
-            _easyWord.value = WordRepository.getRandomWord(Difficulty.EASY)
-            _mediumWord.value = WordRepository.getRandomWord(Difficulty.MEDIUM)
-            _hardWord.value = WordRepository.getRandomWord(Difficulty.HARD)
-        }
+        // Get guess words from the server
+        client.sendMessage(RequestEvent.GET_GUESS_WORDS.value)
     }
 
     fun goBackToMainMenu(navController: NavController) {

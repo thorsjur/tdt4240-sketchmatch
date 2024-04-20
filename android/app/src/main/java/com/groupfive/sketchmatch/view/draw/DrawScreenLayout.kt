@@ -1,5 +1,6 @@
 package com.groupfive.sketchmatch.view.draw
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -124,6 +125,8 @@ fun WordChoiceDialog(
     val mediumWord by drawViewModel.mediumWord
     val hardWord by drawViewModel.hardWord
 
+    val words by drawViewModel.guessWords.observeAsState()
+
     val setDrawWordViewModel: SetDrawWordViewModel = viewModel()
 
     AlertDialog(
@@ -136,20 +139,23 @@ fun WordChoiceDialog(
                     easyWord
                 ) {
                     drawViewModel.onWordChosen(easyWord);
-                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY, 1);
+                    val wordId = words?.find { it.word == easyWord }?.id ?: ""
+                    setDrawWordViewModel.setDrawWord(wordId);
                     roundTimerUpdateViewModel.roundTimerUpdate(1)
                 }
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
                 ) { drawViewModel.onWordChosen(mediumWord);
-                    setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM, 1)
+                    val wordId = words?.find { it.word == mediumWord }?.id ?: ""
+                    setDrawWordViewModel.setDrawWord(wordId)
                     roundTimerUpdateViewModel.roundTimerUpdate(1) }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
                 ) { drawViewModel.onWordChosen(hardWord);
-                    setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD, 1)
+                    val wordId = words?.find { it.word == hardWord }?.id ?: ""
+                    setDrawWordViewModel.setDrawWord(wordId)
                     roundTimerUpdateViewModel.roundTimerUpdate(1) }
             }
         },

@@ -14,6 +14,7 @@ import com.groupfive.sketchmatch.communication.dto.request.RoomEventRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.PayloadResponseDTO
 import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
 import com.groupfive.sketchmatch.serialization.PathWrapperSerializer
+import com.groupfive.sketchmatch.store.GameData
 import dev.icerock.moko.socket.Socket
 import dev.icerock.moko.socket.SocketEvent
 import dev.icerock.moko.socket.SocketOptions
@@ -175,6 +176,12 @@ class MessageClient private constructor(
                 on(ResponseEvent.JOIN_ROOM_RESPONSE.value) { msg ->
                     invokeCallbacks(ResponseEvent.JOIN_ROOM_RESPONSE.value, msg)
                 }
+
+                // On GET_GUESS_WORDS_RESPONSE
+                on(ResponseEvent.GET_GUESS_WORDS_RESPONSE.value) { msg ->
+                    Log.i("Socket", "GUESS_WORDS_RESPONSE: $msg")
+                    invokeCallbacks(ResponseEvent.GET_GUESS_WORDS_RESPONSE.value, msg)
+                }
             }
         } catch (e: URISyntaxException) {
 
@@ -272,8 +279,8 @@ class MessageClient private constructor(
     }
 
     @Synchronized
-    fun setDrawWord(drawWord: String, difficulty: Difficulty, gameRoomId: Int) {
-        val requestData = SetDrawWordRequestDTO(drawWord, difficulty, gameRoomId)
+    fun setDrawWord(drawWordId: String) {
+        val requestData = SetDrawWordRequestDTO(drawWordId, GameData.currentGameRoom.value?.id ?: 0)
         val gson = Gson()
         val data = gson.toJson(requestData)
 

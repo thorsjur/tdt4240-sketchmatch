@@ -9,6 +9,7 @@ import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.RoundFinishedResponseDTO
 import com.groupfive.sketchmatch.communication.dto.response.RoundTimerUpdateResponseDTO
 import com.groupfive.sketchmatch.models.GameRoom
+import com.groupfive.sketchmatch.store.GameData
 
 class RoundTimerUpdateViewModel: ViewModel() {
     private val client = MessageClient.getInstance()
@@ -41,6 +42,10 @@ class RoundTimerUpdateViewModel: ViewModel() {
             val gameRoom = gson.fromJson(message, RoundFinishedResponseDTO::class.java)
 
             updatedRoundGameRoom.postValue(gameRoom.gameRoom)
+
+            GameData.currentGameRoom.postValue(gameRoom.gameRoom)
+
+
         }
     }
 
