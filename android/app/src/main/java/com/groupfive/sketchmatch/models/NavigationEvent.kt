@@ -7,4 +7,6 @@ open class Event {
     object NavigateToWaitingLobby : Event()
     object CorrectGuessEvent : Event()
     object IncorrectGuessEvent : Event()
+    object RoomErrorEvent : Event()
+    object RoomSuccessEvent : Event()
 }

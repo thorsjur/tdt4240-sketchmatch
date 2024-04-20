@@ -46,12 +46,12 @@ const playersRepository = new PlayersRepository();
 const gameRoomsRepository = new GameRoomsRepository();
 
 io.on("connection", (socket) => {
-  var hwid = socket.handshake.query.hwid;
-  console.log(`A user connected with HWID: ${hwid}`);
+  var uuid = socket.handshake.query.hwid;
+  console.log(`A user connected with UUID: ${uuid}`);
 
   socket.on("disconnect", () => {
-    console.log(`User disconnected with HWID: ${hwid}`);
-
+    console.log(`User disconnected with UUID: ${uuid}`);
+    
     // TODO: Remove player from a game room if the game is not started
     // TODO: Remove player from the players repository
     // TODO: Decide what will happend with the game if the game is started
@@ -83,8 +83,8 @@ io.on("connection", (socket) => {
       console.log(`Set nickname: ${dto.nickname}`);
 
       // Add player to the repository
-      playersRepository.addPlayer(hwid, dto.nickname);
-      var player = playersRepository.getPlayerByHWID(hwid);
+      playersRepository.addPlayer(uuid, dto.nickname);
+      var player = playersRepository.getPlayerByHWID(uuid);
       response.player = player;
     } catch (error) {
       console.error(error.message);
@@ -105,7 +105,7 @@ io.on("connection", (socket) => {
       let dto = new CreateGameRequestDTO();
       dto.setProperties(jsonData);
 
-      const player = playersRepository.getPlayerByHWID(hwid);
+      const player = playersRepository.getPlayerByHWID(uuid);
 
       const gameRoom = gameRoomsRepository.createGameRoom(
         dto.gameRoomName,
@@ -161,8 +161,8 @@ io.on("connection", (socket) => {
     const dto = new RoomEventRequestDTO();
     dto.setProperties(json);
 
-    console.log(`Removing player from game room ${dto.roomId} with hwid ${hwid}`)
-    gameRoomsRepository.removePlayerFromGameRoom(hwid, dto.roomId);
+    console.log(`Removing player from game room ${dto.roomId} with hwid ${uuid}`)
+    gameRoomsRepository.removePlayerFromGameRoom(uuid, dto.roomId);
 
     // Emit game_room_updated event to all clients
     console.log(`Emitting game_room_updated event to all clients`);
@@ -181,7 +181,7 @@ io.on("connection", (socket) => {
 
           const gameRoom = gameRoomsRepository.getGameRoomById(dto.gameRoomId);
 
-          const guessingPlayer = playersRepository.getPlayerByHWID(hwid);
+          const guessingPlayer = playersRepository.getPlayerByHWID(uuid);
           gameRoomsRepository.handleGuess(gameRoom.id, guessingPlayer.id, dto.inputGuess)
           
       } catch (error) {
@@ -240,7 +240,7 @@ io.on("connection", (socket) => {
           let dto = new JoinGameByCodeRequest();
           dto.setProperties(jsonData);
   
-          const player = playersRepository.getPlayerByHWID(hwid);
+          const player = playersRepository.getPlayerByHWID(uuid);
       
           const gameRoom = gameRoomsRepository.getGameRoomByCode(
               dto.gameCode

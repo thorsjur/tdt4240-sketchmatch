@@ -25,8 +25,6 @@ import kotlinx.coroutines.launch
 
 class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
-
     private val _showWordDialog = mutableStateOf(true)
     val showWordDialog: State<Boolean> = _showWordDialog
 

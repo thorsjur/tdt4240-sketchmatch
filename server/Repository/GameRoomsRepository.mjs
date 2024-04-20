@@ -105,6 +105,10 @@ export class GameRoomsRepository extends EventEmitter{
         gameRoom.handleGuess(playerId, guessedWord);
     }
 
+    handlePlayerLeaving(playerId) {
+        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.players.some((player) => player.id === playerId));
+    }
+
     getDificultyObjByString(difficulty) {
         switch (difficulty.toLowerCase()) {
             case "easy":

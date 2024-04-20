@@ -3,15 +3,19 @@ package com.groupfive.sketchmatch.viewmodels
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.JoinGameByCodeRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.store.GameData
-import com.groupfive.sketchmatch.utils.SingleLiveEvent
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 class GameRoomsViewModel : ViewModel() {
     val gameRooms: MutableLiveData<List<GameRoom>> = MutableLiveData()
@@ -19,9 +23,8 @@ class GameRoomsViewModel : ViewModel() {
 
     val joinGameByCodeStatus: MutableLiveData<Boolean> = MutableLiveData()
     val joinGameByCodeMessage: MutableLiveData<String> = MutableLiveData()
-
-    val successEvent = MutableLiveData<SingleLiveEvent<Unit>>()
-    val errorEvent = MutableLiveData<SingleLiveEvent<Unit>>()
+    private val eventChannel = Channel<Event>(Channel.BUFFERED)
+    val eventsFlow = eventChannel.receiveAsFlow()
 
     init {
         // Initialize the list of game rooms with fake data
@@ -104,12 +107,14 @@ class GameRoomsViewModel : ViewModel() {
                 GameData.currentGameRoom.postValue(response.gameRoom)
 
                 joinGameByCodeStatus.postValue(true)
-                successEvent.postValue(SingleLiveEvent(Unit))  // Trigger the navigation event
-
-                // TODO: Navigate to the game room screen
+                viewModelScope.launch {
+                    eventChannel.send(Event.RoomSuccessEvent)
+                }
             } else {
                 // Display an error message
-                errorEvent.postValue(SingleLiveEvent(Unit))
+                viewModelScope.launch {
+                    eventChannel.send(Event.RoomErrorEvent)
+                }
             }
         }
 

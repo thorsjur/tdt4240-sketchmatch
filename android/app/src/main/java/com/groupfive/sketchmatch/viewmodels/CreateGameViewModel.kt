@@ -21,7 +21,7 @@ class CreateGameViewModel : ViewModel() {
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: Event) {
+    private fun sendEvent(event: Event) {
         viewModelScope.launch {
             eventChannel.send(event)
         }
