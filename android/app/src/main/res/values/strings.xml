@@ -6,8 +6,8 @@
     <string name="show_less">Show less</string>
     <string name="show_more">Show more</string>
     <string name="creating_a_game_title">Creating a game</string>
-    <string name="joining_a_game_title">Show less</string>
-    <string name="how_to_play_title">Show more</string>
+    <string name="joining_a_game_title">Joining a game</string>
+    <string name="how_to_play_title">How to play</string>
     <string name="desc1_1">Click on the \'Create Game\' button from the main menu</string>
     <string name="desc1_2">Choose a name for your game</string>
     <string name="desc1_3">Confirm your choices by pressing the \'Create Game\' button</string>

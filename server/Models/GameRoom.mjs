@@ -189,6 +189,10 @@ export class GameRoom extends EventEmitter {
             this.players[this.drawingPlayer].setIsDrawing(true);
         }
     }
+
+    getGameCode() {
+        return this.gameCode;
+    }
 }
 
 // Enum for game status
@@ -199,6 +203,7 @@ export const GameStatus = {
     CHOOSING: "CHOOSING",
     LEADERBOARD: "LEADERBOARD"
 };
+
 
 export const WordDifficultyPoints = {
     EASY: 5,

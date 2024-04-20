@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
-class GuessViewModel: ViewModel(){
+class GuessViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
     val isCorrect: MutableLiveData<Boolean> = MutableLiveData()
 

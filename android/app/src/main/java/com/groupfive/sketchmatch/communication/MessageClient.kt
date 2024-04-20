@@ -5,13 +5,12 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.BuildConfig
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.MESSAGE_EVENT
-import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.CheckGuessRequestDTO
-import com.groupfive.sketchmatch.communication.dto.request.SetDrawWordRequestDTO
-import com.groupfive.sketchmatch.communication.dto.request.RoundTimerUpdateRequestDTO
+import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.PublishPathRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.RoomEventRequestDTO
-import com.groupfive.sketchmatch.communication.dto.response.PayloadResponseDTO
+import com.groupfive.sketchmatch.communication.dto.request.RoundTimerUpdateRequestDTO
+import com.groupfive.sketchmatch.communication.dto.request.SetDrawWordRequestDTO
 import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
 import com.groupfive.sketchmatch.serialization.PathWrapperSerializer
 import dev.icerock.moko.socket.Socket
@@ -215,21 +214,16 @@ class MessageClient private constructor(
     }
 
     @Synchronized
-    fun subscribeToRoom(roomId: Int, callback: (DrawBoxPayLoad) -> Unit) {
+    fun subscribeToRoom(roomId: Int) {
         sendMessage(
             eventName = RequestEvent.SUBSCRIBE_TO_ROOM.value,
             msg = gson.toJson(
                 RoomEventRequestDTO(
-                    roomId = roomId
+                    roomId = roomId,
                 )
             )
         )
-        addCallback(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) {
-            val response = gson.fromJson(it, PayloadResponseDTO::class.java)
-            val drawBoxPayLoad =
-                Json.decodeFromString(DrawBoxPayLoadSerializer, response.pathPayload)
-            callback(drawBoxPayLoad)
-        }
+
     }
 
     @Synchronized
@@ -238,11 +232,22 @@ class MessageClient private constructor(
             eventName = RequestEvent.UNSUBSCRIBE_FROM_ROOM.value,
             msg = gson.toJson(
                 RoomEventRequestDTO(
-                    roomId = roomId
+                    roomId = roomId,
                 )
             )
         )
-        removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
+    }
+
+    @Synchronized
+    fun leaveRoom(roomId: Int) {
+        sendMessage(
+            eventName = RequestEvent.LEAVE_ROOM.value,
+            msg = gson.toJson(
+                RoomEventRequestDTO(
+                    roomId = roomId,
+                )
+            )
+        )
     }
 
     @Synchronized

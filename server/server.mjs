@@ -50,7 +50,6 @@ io.on("connection", (socket) => {
   console.log(`A user connected with HWID: ${hwid}`);
 
   socket.on("disconnect", () => {
-    var hwid = socket.handshake.query.hwid;
     console.log(`User disconnected with HWID: ${hwid}`);
 
     // TODO: Remove player from a game room if the game is not started
@@ -74,7 +73,6 @@ io.on("connection", (socket) => {
 
     // Create response object which will be sent to the client
     var response = new SetNicknameResponseDTO();
-    var hwid = socket.handshake.query.hwid;
 
     try {
       // Create DTO object from the json data sent by the client
@@ -156,6 +154,21 @@ io.on("connection", (socket) => {
     dto.setProperties(json);
 
     //socket.leave(dto.roomId);
+  });
+
+  socket.on("leave_room", (data) => {
+    const json = JSON.parse(data);
+    const dto = new RoomEventRequestDTO();
+    dto.setProperties(json);
+
+    console.log(`Removing player from game room ${dto.roomId} with hwid ${hwid}`)
+    gameRoomsRepository.removePlayerFromGameRoom(hwid, dto.roomId);
+
+    // Emit game_room_updated event to all clients
+    console.log(`Emitting game_room_updated event to all clients`);
+    const gameRoom = gameRoomsRepository.getGameRoomById(dto.roomId);
+    io.emit("game_room_updated", gameRoom);
+    socket.leave(dto.roomId);
   });
 
   // On check_guess event

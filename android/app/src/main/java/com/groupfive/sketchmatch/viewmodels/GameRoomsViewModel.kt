@@ -4,12 +4,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
-import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.request.JoinGameByCodeRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
+import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.utils.SingleLiveEvent
 

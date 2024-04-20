@@ -89,6 +89,12 @@ export class GameRoomsRepository extends EventEmitter{
         );
     }
 
+    // Remove player from game room
+    removePlayerFromGameRoom(hwid, roomId) {
+        const gameRoom = this.getGameRoomById(roomId);
+        gameRoom?.removePlayerByHwid(hwid);
+    }
+
     startRound(gameRoomId, newWord, newWordDifficultyPoints) {
         const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.id === gameRoomId);
         gameRoom.initializeRound(newWord, newWordDifficultyPoints);

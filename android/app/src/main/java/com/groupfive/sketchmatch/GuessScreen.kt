@@ -20,11 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
-import androidx.compose.material.icons.filled.Dangerous
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,12 +42,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavController
 import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.view.misc.AlertPopup
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import io.ak1.drawbox.DrawBox
@@ -64,8 +61,8 @@ import kotlinx.coroutines.delay
 fun GuessScreen(
     modifier: Modifier = Modifier,
     drawViewModel: DrawViewModel,
-    lifecycle: LifecycleOwner = LocalLifecycleOwner.current,
     guessViewModel: GuessViewModel,
+    timeCount: Int,
 ) {
     val controller = rememberDrawController()
     var showCorrectnessIcon by rememberSaveable { mutableStateOf(false) }
@@ -186,24 +183,25 @@ fun GuessScreen(
         }
 
         if (showCorrectnessIcon) {
-            LaunchedEffect(key1 = Unit){
+            LaunchedEffect(key1 = Unit) {
                 delay(2000)
                 GameData.lastGuessCorrectness.postValue(false)
                 showCorrectnessIcon = false
             }
-            Box(modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 Log.i("GuessScreen", "guessWordIsCorrect: $guessWordIsCorrect")
-                if(showCorrectnessIcon) {
-                    if (guessWordIsCorrect){
+                if (showCorrectnessIcon)  {
+                    if (guessWordIsCorrect) {
                         Icon(
                             modifier = Modifier.size(230.dp),
                             imageVector = Icons.Filled.CheckCircle,
                             contentDescription = stringResource(R.string.correct),
                             tint = Color.Green.copy(alpha = 0.3f)
-                            )
-                    }
-                    else {
+                        )
+                    } else {
                         Icon(
                             modifier = Modifier.size(230.dp),
                             imageVector = Icons.Filled.Cancel,
