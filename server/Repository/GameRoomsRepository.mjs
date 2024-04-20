@@ -69,6 +69,14 @@ export class GameRoomsRepository extends EventEmitter{
             this.emit('answer_to_guess', playerId, isCorrect, gameRoom);
         });
 
+        gameRoom.on('game_room_destroyed', gameRoom => {
+            this.emit('game_room_destroyed', gameRoom);
+        });
+
+        gameRoom.on('player_left_room', gameRoom => {
+            this.emit('player_left_room', gameRoom);
+        });
+
         return gameRoom;
     }
 
@@ -80,6 +88,11 @@ export class GameRoomsRepository extends EventEmitter{
     // Get game room by code
     getGameRoomByCode(code) {
         return this.gameRooms.find((gameRoom) => gameRoom.gameCode === code);
+    }
+
+    // Get game by player hwid
+    getGameRoomByPlayerHwid(hwid) {
+        return this.gameRooms.find((gameRoom) => gameRoom.players.some((player) => player.hwid === hwid));
     }
 
     // Remove game room by ID
@@ -105,8 +118,12 @@ export class GameRoomsRepository extends EventEmitter{
         gameRoom.handleGuess(playerId, guessedWord);
     }
 
-    handlePlayerLeaving(playerId) {
-        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.players.some((player) => player.id === playerId));
+    handlePlayerLeaving(uuid) {
+        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.players.some((player) => player.hwid === uuid));
+
+        if (gameRoom) {
+            gameRoom.removePlayerByHwid(uuid);
+        }
     }
 
     getDificultyObjByString(difficulty) {

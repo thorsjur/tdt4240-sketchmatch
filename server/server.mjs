@@ -159,18 +159,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("leave_room", (data) => {
-    const json = JSON.parse(data);
-    const dto = new RoomEventRequestDTO();
-    dto.setProperties(json);
+    console.log(`Leaving room: ${data}`);
+    const gameRoom = gameRoomsRepository.getGameRoomByPlayerHwid(uuid);
 
-    console.log(`Removing player from game room ${dto.roomId} with hwid ${uuid}`)
-    gameRoomsRepository.removePlayerFromGameRoom(uuid, dto.roomId);
-
-    // Emit game_room_updated event to all clients
-    console.log(`Emitting game_room_updated event to all clients`);
-    const gameRoom = gameRoomsRepository.getGameRoomById(dto.roomId);
-    io.emit("game_room_updated", gameRoom);
-    socket.leave(dto.roomId);
+    if(gameRoom) {
+      console.log(`Player ${uuid} has left the game room ${gameRoom.id}`);
+      gameRoomsRepository.handlePlayerLeaving(uuid);
+      socket.leave(gameRoom.id);
+    }
   });
 
   // On check_guess event
@@ -334,9 +330,29 @@ gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
   io.to(gameRoom.id).emit('answer_to_guess_response', dto);
 });
 
+gameRoomsRepository.on('player_left_room', gameRoom => {
+  console.log(`Player left room: ${gameRoom.gameName}`);
+  let dto = new JoinGameResponseDTO();
+  dto.gameRoom = gameRoom.serialize();
+  io.emit('player_left_room', dto);
+  io.emit('game_room_updated', gameRoom.serialize());
+});
+
+gameRoomsRepository.on('game_room_destroyed', gameRoom => {
+  console.log(`Game room destroyed: ${gameRoom.gameName}`);
+  io.emit('game_room_destroyed', gameRoom.serialize());
+});
+
 httpServer.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
+
+//const player1 = playersRepository.addPlayer("hwid1", "Player 1");
+//const player2 = playersRepository.addPlayer("hwid2", "Player 2");
+
+//const gameRoom = gameRoomsRepository.createGameRoom("Game Room 1", player1, 2);
+
+//gameRoomsRepository.handlePlayerLeaving(player1.id);
 
 /* 
 // Create new player

@@ -191,6 +191,18 @@ class MessageClient private constructor(
                     Log.i("Socket", "Round is created: $msg")
                     invokeCallbacks(ResponseEvent.ROUND_IS_CREATED_RESPONSE.value, msg)
                 }
+
+                // On PLAYER_JOINED_ROOM event
+                on(ResponseEvent.PLAYER_JOINED_ROOM.value) { msg ->
+                    Log.i("Socket", "Player joined room: $msg")
+                    invokeCallbacks(ResponseEvent.PLAYER_JOINED_ROOM.value, msg)
+                }
+
+                // On PLAYER_LEFT_ROOM event
+                on(ResponseEvent.PLAYER_LEFT_ROOM.value) { msg ->
+                    Log.i("Socket", "Player left room: $msg")
+                    invokeCallbacks(ResponseEvent.PLAYER_LEFT_ROOM.value, msg)
+                }
             }
         } catch (e: URISyntaxException) {
 

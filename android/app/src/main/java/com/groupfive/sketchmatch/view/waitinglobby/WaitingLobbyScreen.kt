@@ -102,8 +102,10 @@ fun WaitingLobby(
             },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.clearAllCallbacks()
-                    navController.navigate(Screen.MainMenu.route) },
+                    viewModel.leaveGameRoom()
+                        viewModel.clearAllCallbacks()
+                        navController.navigate(Screen.MainMenu.route)
+                    },
                     modifier
                         .fillMaxWidth()
                         .wrapContentWidth()) {

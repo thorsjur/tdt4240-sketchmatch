@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import com.groupfive.sketchmatch.Difficulty
 import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
+import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
 import com.groupfive.sketchmatch.models.Event
@@ -225,6 +226,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     fun goBackToMainMenu(navController: NavController) {
         dismissWordDialog()
         navController.navigate(Screen.MainMenu.route)
+        client.sendMessage(RequestEvent.LEAVE_ROOM.value, "")
     }
 
     fun formatTime(timeCount: Int): String {

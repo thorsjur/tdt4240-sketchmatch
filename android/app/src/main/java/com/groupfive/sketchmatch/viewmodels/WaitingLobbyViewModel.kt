@@ -5,10 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
+import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
 import com.groupfive.sketchmatch.models.Event
+import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -31,8 +33,17 @@ class WaitingLobbyViewModel: ViewModel() {
     }
 
     init {
-        client.addCallback(ResponseEvent.JOIN_ROOM_RESPONSE.value) { message ->
+        client.addCallback(ResponseEvent.PLAYER_JOINED_ROOM.value) { message ->
             Log.i("LobbyViewModel", "PLAYER_JOINED_ROOM: $message")
+
+            // Convert the json string to a list of GameRoom objects
+            val response = Gson().fromJson(message, JoinGameResponseDTO::class.java)
+
+            GameData.currentGameRoom.postValue(response.gameRoom)
+        }
+
+        client.addCallback(ResponseEvent.PLAYER_LEFT_ROOM.value) { message ->
+            Log.i("LobbyViewModel", "PLAYER_LEFT_ROOM: $message")
 
             // Convert the json string to a list of GameRoom objects
             val response = Gson().fromJson(message, JoinGameResponseDTO::class.java)
@@ -66,5 +77,9 @@ class WaitingLobbyViewModel: ViewModel() {
 
             sendEvent(Event.NavigateToDraw)
         }
+    }
+
+    fun leaveGameRoom() {
+        client.sendMessage(RequestEvent.LEAVE_ROOM.value)
     }
 }

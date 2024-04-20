@@ -51,4 +51,8 @@ enum class ResponseEvent(val value: String) {
 
     // Event for when server publishes to a room the client is subscribed to
     DRAW_PAYLOAD_PUBLISHED("draw_payload_published"),
+
+    PLAYER_JOINED_ROOM("player_joined_room"),
+
+    PLAYER_LEFT_ROOM("player_left_room"),
 }

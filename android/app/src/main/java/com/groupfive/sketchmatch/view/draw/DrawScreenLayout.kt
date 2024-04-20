@@ -106,9 +106,7 @@ fun DrawScreenLayout(
                 ) {
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
-                        drawViewModel.goBackToMainMenu(
-                            navController
-                        )
+                        drawViewModel.goBackToMainMenu(navController)
                     })
                 }
 
