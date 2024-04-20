@@ -52,9 +52,11 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`User disconnected with UUID: ${uuid}`);
     
-    // TODO: Remove player from a game room if the game is not started
-    // TODO: Remove player from the players repository
-    // TODO: Decide what will happend with the game if the game is started
+    // Handle player leaving the game room if he is in one
+    gameRoomsRepository.handlePlayerLeaving(uuid);
+
+    // Remove player from the repository
+    playersRepository.removePlayerByHWID(uuid);
   });
 
   // On get_rooms event
