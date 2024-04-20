@@ -1,6 +1,5 @@
 package com.groupfive.sketchmatch.view.draw
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,8 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -48,8 +45,10 @@ import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
+import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
+import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
 
 @Composable
 fun DrawScreenLayout(
@@ -57,7 +56,7 @@ fun DrawScreenLayout(
     navController: NavController,
     drawViewModel: DrawViewModel = viewModel(),
     guessViewModel: GuessViewModel = viewModel(),
-    gameRoomViewModel: GameRoomViewModel = viewModel()
+    gameRoomViewModel: GameRoomsViewModel = viewModel()
 ) {
     val currentWord =
         drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
@@ -105,7 +104,7 @@ fun DrawScreenLayout(
                 ) {
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
-                        drawViewModel.handleLeaveGame(
+                        drawViewModel.goBackToMainMenu(
                             navController
                         )
                     })

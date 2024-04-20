@@ -19,7 +19,6 @@ import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
-import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -63,17 +62,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     private val client = MessageClient.getInstance()
 
     val gameRoom = GameData.currentGameRoom
-
-
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    val eventsFlow = eventChannel.receiveAsFlow()
-
-    fun sendEvent(event: Event) {
-        viewModelScope.launch {
-            eventChannel.send(event)
-        }
-    }
-
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()

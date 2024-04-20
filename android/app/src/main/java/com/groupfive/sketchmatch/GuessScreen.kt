@@ -61,8 +61,8 @@ import kotlinx.coroutines.delay
 fun GuessScreen(
     modifier: Modifier = Modifier,
     drawViewModel: DrawViewModel,
+    lifecycle: LifecycleOwner = LocalLifecycleOwner.current,
     guessViewModel: GuessViewModel,
-    timeCount: Int,
 ) {
     val controller = rememberDrawController()
     var showCorrectnessIcon by rememberSaveable { mutableStateOf(false) }
