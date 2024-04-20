@@ -145,19 +145,30 @@ class MessageClient private constructor(
                     invokeCallbacks(ResponseEvent.ROOM_DESTROYED.value, msg)
                 }
 
-                // On CHECK_GUESS_RESPONSE_EVENT
-                on(ResponseEvent.CHECK_GUESS_RESPONSE.value) { msg ->
-                    invokeCallbacks(ResponseEvent.CHECK_GUESS_RESPONSE.value, msg)
-                }
-
                 // On SET_DRAW_WORD_RESPONSE_EVENT
                 on(ResponseEvent.SET_DRAW_WORD_RESPONSE.value) { msg ->
                     invokeCallbacks(ResponseEvent.SET_DRAW_WORD_RESPONSE.value, msg)
                 }
 
                 // On ROUND_TIMER_UPDATE_RESPONSE_EVENT
-                on(ResponseEvent.ROUND_TIMER_UPDATE_RESPONSE.value) { msg ->
-                    invokeCallbacks(ResponseEvent.ROUND_TIMER_UPDATE_RESPONSE.value, msg)
+                on(ResponseEvent.ROUND_TIMER_TICK_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROUND_TIMER_TICK_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.LEADERBOARD_TIMER_TICK_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.LEADERBOARD_TIMER_TICK_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.ANSWER_TO_GUESS_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ANSWER_TO_GUESS_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.ROUND_STARTED_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value, msg)
+                }
+
+                on(ResponseEvent.OPEN_LEADERBOARD_RESPONSE.value) { msg ->
+                    invokeCallbacks(ResponseEvent.OPEN_LEADERBOARD_RESPONSE.value, msg)
                 }
 
                 // On ROUND_FINISHED_RESPONSE_EVENT
@@ -175,9 +186,10 @@ class MessageClient private constructor(
                     invokeCallbacks(ResponseEvent.JOIN_ROOM_RESPONSE.value, msg)
                 }
 
-                // On PLAYER_GUESSED_CORRECTLY
-                on(ResponseEvent.PLAYER_GUESSED_CORRECTLY.value) { msg ->
-                    invokeCallbacks(ResponseEvent.PLAYER_GUESSED_CORRECTLY.value, msg)
+                // On ROUND_IS_CREATED_RESPONSE
+                on(ResponseEvent.ROUND_IS_CREATED_RESPONSE.value) { msg ->
+                    Log.i("Socket", "Round is created: $msg")
+                    invokeCallbacks(ResponseEvent.ROUND_IS_CREATED_RESPONSE.value, msg)
                 }
             }
         } catch (e: URISyntaxException) {
@@ -269,8 +281,8 @@ class MessageClient private constructor(
     }
 
     @Synchronized
-    fun checkGuess(inputGuess: String, gameRoomId: Int, timestamp: Int) {
-        val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId, timestamp)
+    fun checkGuess(inputGuess: String, gameRoomId: Int) {
+        val requestData = CheckGuessRequestDTO(inputGuess, gameRoomId)
         val gson = Gson()
         val data = gson.toJson(requestData)
 
@@ -284,14 +296,11 @@ class MessageClient private constructor(
     @Synchronized
     fun setDrawWord(drawWord: String, difficulty: Difficulty, gameRoomId: Int) {
         val requestData = SetDrawWordRequestDTO(drawWord, difficulty, gameRoomId)
-        val gson = Gson()
-        val data = gson.toJson(requestData)
+
+        val data = Gson().toJson(requestData)
 
         if (!isConnected()) return
-        socket.emit(
-            RequestEvent.SET_DRAW_WORD.value,
-            data
-        )
+        socket.emit(RequestEvent.SET_DRAW_WORD.value, data)
     }
 
     @Synchronized
@@ -326,6 +335,10 @@ class MessageClient private constructor(
     // Remove all callbacks for a specific event
     fun removeAllCallbacks(event: String) {
         eventCallbacks.remove(event)
+    }
+
+    fun removeAllCallbacks() {
+        eventCallbacks.clear()
     }
 
     fun unsubscribeFromEvent(event: String) {

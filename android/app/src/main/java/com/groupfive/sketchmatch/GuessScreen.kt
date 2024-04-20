@@ -1,5 +1,6 @@
 package com.groupfive.sketchmatch
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -29,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +46,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavController
+import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.view.misc.AlertPopup
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import io.ak1.drawbox.DrawBox
@@ -55,17 +61,36 @@ import kotlinx.coroutines.delay
 fun GuessScreen(
     modifier: Modifier = Modifier,
     drawViewModel: DrawViewModel,
+    lifecycle: LifecycleOwner = LocalLifecycleOwner.current,
     guessViewModel: GuessViewModel,
-    timeCount: Int,
-    lifecycle: LifecycleOwner = LocalLifecycleOwner.current
 ) {
     val controller = rememberDrawController()
-    val guessWordIsCorrect by guessViewModel.isCorrect.observeAsState()
     var showCorrectnessIcon by rememberSaveable { mutableStateOf(false) }
+    val gameRoomId = GameData.currentGameRoom.value?.id ?: 0
+
+    var currentGuess = drawViewModel.currentGuess.value
+    var guessWordIsCorrect by rememberSaveable { mutableStateOf(false) }
+
+    val events = guessViewModel.eventsFlow.collectAsState(initial = null)
+    val event = events.value // allow Smart cast
+
+    val drawBoxPayLoad by GameData.drawBoxPayLoad.observeAsState()
+
+    // Clear the payload in the controller
+    controller.reset()
+
+    // On drawBoxPayLoad change
+    if (drawBoxPayLoad != null) {
+        controller.importPath(drawBoxPayLoad!!)
+    }
+
+
 
     LaunchedEffect(Unit) {
         guessViewModel.handleRender(controller)
     }
+
+
     DisposableEffect(Unit) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
@@ -82,11 +107,9 @@ fun GuessScreen(
         }
     }
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
+    Box (modifier = modifier
+        .fillMaxWidth(),
+        contentAlignment = Alignment.Center){
         Column {
             Surface(
                 modifier = modifier
@@ -123,7 +146,7 @@ fun GuessScreen(
             ) {
                 OutlinedTextField(
                     modifier = Modifier.weight(2f),
-                    value = drawViewModel.currentGuess.value,
+                    value = currentGuess,
                     onValueChange = { drawViewModel.setCurrentGuess(it) },
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {
@@ -135,32 +158,43 @@ fun GuessScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    enabled = guessWordIsCorrect != true,
+                    enabled = !guessWordIsCorrect,
                     onClick = {
-                        guessViewModel.checkGuess(
-                            drawViewModel.currentGuess.value.lowercase(),
-                            1,
-                            timeCount
-                        );
+                        guessViewModel.checkGuess(currentGuess.lowercase(), gameRoomId);
                         showCorrectnessIcon = true
                     }) {
-                    Text(text = "Make guess")
+                    Text(text = "Guess")
                 }
             }
         }
 
+        // Show correctness icon when GameRoom.guessedCorrectly is updated and the last element = current player id\
+        var guessedCorrectly = GameData.currentGameRoom.value?.guessedCorrectly
+        var showIcon: Boolean = GameData.lastGuessCorrectness.value == true
+
+        if (!guessedCorrectly.isNullOrEmpty()) {
+
+            if (guessedCorrectly.last() == GameData.currentPlayer.value?.id && showIcon) {
+                showCorrectnessIcon = true
+                guessWordIsCorrect = true
+            } else {
+                guessWordIsCorrect = false
+            }
+        }
 
         if (showCorrectnessIcon) {
             LaunchedEffect(key1 = Unit) {
                 delay(2000)
+                GameData.lastGuessCorrectness.postValue(false)
                 showCorrectnessIcon = false
             }
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                if (showCorrectnessIcon) {
-                    if (guessWordIsCorrect == true) {
+                Log.i("GuessScreen", "guessWordIsCorrect: $guessWordIsCorrect")
+                if (showCorrectnessIcon)  {
+                    if (guessWordIsCorrect) {
                         Icon(
                             modifier = Modifier.size(230.dp),
                             imageVector = Icons.Filled.CheckCircle,

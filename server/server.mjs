@@ -12,16 +12,15 @@ import { CreateGameRequestDTO } from "./Dto/Request/CreateGameRequestDTO.mjs";
 import { JoinGameByCodeRequest } from "./Dto/Request/JoinGameByCodeRequestDTO.mjs";
 import { PublishPathRequestDTO } from "./Dto/Request/PublishPathRequestDTO.mjs";
 import { RoomEventRequestDTO } from "./Dto/Request/RoomEventRequestDTO.mjs";
-import { RoundTimerUpdateRequestDTO } from "./Dto/Request/RoundTimerUpdateRequestDTO.mjs";
 import { SetDrawWordRequestDTO } from "./Dto/Request/SetDrawWordRequestDTO.mjs";
 import { SetNicknameRequestDTO } from "./Dto/Request/SetNicknameRequestDTO.mjs";
-import { CheckGuessResponseDTO } from "./Dto/Response/CheckGuessResponseDTO.mjs";
+import { AnswerToGuessResponseDTO } from "./Dto/Response/AnswerToGuessResponseDTO.mjs";
 import { CreateGameResponseDTO } from "./Dto/Response/CreateGameResponseDTO.mjs";
+import { GameRoomUpdateStatusResponseDTO } from "./Dto/Response/GameRoomUpdateStatusResponseDTO.mjs";
 import { JoinGameResponseDTO } from "./Dto/Response/JoinGameResponseDTO.mjs";
-import { RoundFinishedResponseDTO } from "./Dto/Response/RoundFinishedResponseDTO.mjs";
-import { RoundTimerUpdateResponseDTO } from "./Dto/Response/RoundTimerUpdateResponseDTO.mjs";
 import { SetDrawWordResponseDTO } from "./Dto/Response/SetDrawWordResponseDTO.mjs";
 import { SetNicknameResponseDTO } from "./Dto/Response/SetNicknameResponseDTO.mjs";
+import { TimerTickResponseDTO } from "./Dto/Response/TimerTickResponseDTO.mjs";
 
 
 const app = express();
@@ -154,7 +153,7 @@ io.on("connection", (socket) => {
     const dto = new RoomEventRequestDTO();
     dto.setProperties(json);
 
-    socket.leave(dto.roomId);
+    //socket.leave(dto.roomId);
   });
 
   socket.on("leave_room", (data) => {
@@ -172,181 +171,199 @@ io.on("connection", (socket) => {
     socket.leave(dto.roomId);
   });
 
-    // On check_guess event
-    socket.on("check_guess", (data) => {
-        let jsonData = JSON.parse(data);
-        var response = new CheckGuessResponseDTO();
+  // On check_guess event
+  socket.on("check_guess", (data) => {
+      let jsonData = JSON.parse(data);
 
-        try {
-            let dto = new CheckGuessRequestDTO();
-            dto.setProperties(jsonData);
+      try {
+          let dto = new CheckGuessRequestDTO();
+          dto.setProperties(jsonData);
 
-            const gameRoom = gameRoomsRepository.getGameRoomById(
-                dto.gameRoomId
-            );
-            const round = gameRoomsRepository.findCurrentRound(gameRoom);
+          const gameRoom = gameRoomsRepository.getGameRoomById(dto.gameRoomId);
 
-            const guessingPlayer = playersRepository.getPlayerByHWID(hwid);
-            const drawingPlayer = round.getDrawingPlayer();
-            const checkedGuess = gameRoomsRepository.checkGuess(
-                dto.inputGuess,
-                round,
-                dto.timestamp,
-                guessingPlayer,
-                drawingPlayer
-            );
+          const guessingPlayer = playersRepository.getPlayerByHWID(hwid);
+          gameRoomsRepository.handleGuess(gameRoom.id, guessingPlayer.id, dto.inputGuess)
+          
+      } catch (error) {
+          response.status = "error";
+          response.message = "Error checking guess";
+          console.log(response.message);
+      }
+  });
 
-            response.guess = checkedGuess;
+  // On set_draw_word event
+  socket.on("set_draw_word", (data) => {
+      // Convert string json data to DTO object
+      let jsonData = JSON.parse(data);
 
-            console.log(
-                `Checking guess: ${checkedGuess.inputGuess} - ${checkedGuess.isCorrect}`
-            );
+      // Create response object which will be sent to the client
+      var response = new SetDrawWordResponseDTO();
 
-            if (checkedGuess.isCorrect && hwid) {
-              console.log("Player guessed correctly, emitting player_guessed_correctly event to room.");
-              io.to(dto.gameRoomId).emit("player_guessed_correctly", hwid);
-            }
-        } catch (error) {
-            response.status = "error";
-            response.message = "Error checking guess";
-            console.log(response.message);
-        }
+      try {
+          // Create DTO object from the json data sent by the client
+          let dto = new SetDrawWordRequestDTO();
 
-        socket.emit("check_guess_response", response.guess);
-    });
+          // Setting all properties from the json data to the DTO object
+          dto.setProperties(jsonData);
 
-    // On set_draw_word event
-    socket.on("set_draw_word", (data) => {
-        // Convert string json data to DTO object
-        let jsonData = JSON.parse(data);
+          const gameRoom = gameRoomsRepository.getGameRoomById(dto.gameRoomId);
 
-        // Create response object which will be sent to the client
-        var response = new SetDrawWordResponseDTO();
+          var difficulty = gameRoomsRepository.getDificultyObjByString(dto.difficulty);
+        
+          // Set draw word in the game room
+          gameRoomsRepository.startRound(gameRoom.id, dto.drawWord, difficulty);
+          response.gameRoom = gameRoom;
 
-        try {
-            // Create DTO object from the json data sent by the client
-            let dto = new SetDrawWordRequestDTO();
+          console.log(
+              `Setting draw word: ${dto.drawWord} & Setting difficulty: ${difficulty}`
+          );
+      } catch (error) {
+          response.status = "error";
+          response.message = "Error setting draw word";
+          console.log(response.message);
+      }
 
-            // Setting all properties from the json data to the DTO object
-            dto.setProperties(jsonData);
+      // Emit set_draw_word_response only to the sender
+      //socket.emit("set_draw_word_response", response);
 
-            const gameRoom = gameRoomsRepository.getGameRoomById(
-                dto.gameRoomId
-            );
-            const round = gameRoomsRepository.findCurrentRound(gameRoom);
-         
-            // Set draw word in the game room
-            gameRoomsRepository.updateDrawWord(dto.drawWord, round);
-            gameRoomsRepository.updateDifficulty(dto.difficulty, round);
-            response.gameRoom = gameRoom;
+      // TODO: Emit only to subscribed players
+      //io.emit("set_draw_word_response", response.gameRoom);
+  });
 
-            console.log(
-                `Setting draw word: ${dto.drawWord} & Setting difficulty: ${dto.difficulty}`
-            );
-        } catch (error) {
-            response.status = "error";
-            response.message = "Error setting draw word";
-            console.log(response.message);
-        }
+  // On join_room_by_code event
+  socket.on("join_room_by_code", (data) => {
+      let jsonData = JSON.parse(data);
 
-        // Emit set_draw_word_response only to the sender
-        socket.emit("set_draw_word_response", response);
-
-        // TODO: Emit only to subscribed players
-        io.emit("set_draw_word_response", response.gameRoom);
-    });
-
-    // On Round Timer Update event
-    socket.on("round_timer_update", (data) => {
-        let jsonData = JSON.parse(data);
-
-        try {
-
-            let dto = new RoundTimerUpdateRequestDTO();
-            dto.setProperties(jsonData);
-
-            gameRoomsRepository.startRound(dto.gameRoomId);
-            console.log("Round started")
-
-        } catch (error) {
-            response.status = "error";
-            response.message = "Error updating timer";
-            console.log(response.message);
-        }
-    });
-    // On join_room_by_code event
-    socket.on("join_room_by_code", (data) => {
-        let jsonData = JSON.parse(data);
-
-        console.log(`Joining room by code: ${jsonData.gameCode}`);
-        var response = new JoinGameResponseDTO();
-        try {
-            let dto = new JoinGameByCodeRequest();
-            dto.setProperties(jsonData);
-    
-            const player = playersRepository.getPlayerByHWID(hwid);
-       
-            const gameRoom = gameRoomsRepository.getGameRoomByCode(
-                dto.gameCode
-            );
-            
-            const gameRoomId = gameRoomsRepository.getRoomIdFromGameCode(
+      console.log(`Joining room by code: ${jsonData.gameCode}`);
+      var response = new JoinGameResponseDTO();
+      try {
+          let dto = new JoinGameByCodeRequest();
+          dto.setProperties(jsonData);
+  
+          const player = playersRepository.getPlayerByHWID(hwid);
+      
+          const gameRoom = gameRoomsRepository.getGameRoomByCode(
               dto.gameCode
           );
-          
-
-
-            if (!gameRoom) {
-              
-                response.status = "error";
-                response.message = "game_room_not_found";
-            } else if (gameRoom.players.length >= gameRoom.gameCapacity) {
-         
-                response.status = "error";
-                response.message = "game_room_already_full";
-            } else {
-  
-                gameRoom.addPlayer(player);
-          
-                socket.join(gameRoomId);
-
-                // Try to remove player from the game room on disconnect
-                socket.on("disconnect", () => {
-                    gameRoomsRepository.removePlayerFromGameRoom(hwid, gameRoomId);
-                });
-             
-                response.gameRoom = gameRoom;
-        
-                // Emit game_room_updated event to all clients
-                console.log(`Emitting game_room_updated event to all clients`);
-                io.emit("game_room_updated", gameRoom);
-            }
-        } catch (error) {
+      
+        if (!gameRoom) {
             response.status = "error";
-            response.message = "something_went_wrong";
-        }
+            response.message = "game_room_not_found";
+        } else if (gameRoom.players.length >= gameRoom.gameCapacity) {
+            response.status = "error";
+            response.message = "game_room_already_full";
+        } else {
+            gameRoom.addPlayer(player);
+      
+            socket.join(gameRoom.id);
+          
+            response.gameRoom = gameRoom.serialize();
 
-        // Emit join_room_by_code_response only to the sender
-        socket.emit("join_room_response", response);
-    });
+            // Emit game_room_updated event to all clients in the room
+            io.to(gameRoom.id).emit("player_joined_room", response);
+    
+            // Emit game_room_updated event to all clients
+            io.emit("game_room_updated", gameRoom.serialize());
+        }
+      } catch (error) {
+          response.status = "error";
+          response.message = "something_went_wrong";
+      }
+
+      // Emit join_room_by_code_response only to the sender
+      socket.emit("join_room_response", response);
+  });
 });
 
-gameRoomsRepository.on("timer_tick", (timer, gameRoom) => {
-    var responseRoundTimer = new RoundTimerUpdateResponseDTO();
-    responseRoundTimer.roundTimerTick = timer;
-    // Emit to all clients in the room
-    io.to(gameRoom.id).emit("round_timer_update_response", responseRoundTimer);
+gameRoomsRepository.on('round_has_been_created', gameRoom => {
+  console.log(`Round has been created in game room: ${gameRoom.gameName}`);
+  let dto = new GameRoomUpdateStatusResponseDTO();
+  dto.gameRoom = gameRoom.serialize();
+
+  io.to(gameRoom.id).emit('round_is_created_response', dto);
+});
+
+gameRoomsRepository.on('round_has_started', gameRoom => {
+  console.log(`Round has started in game room: ${gameRoom.gameName}`);
+  let dto = new GameRoomUpdateStatusResponseDTO();
+  dto.gameRoom = gameRoom.serialize();
+
+  io.to(gameRoom.id).emit('round_started_response', dto);
+});
+
+gameRoomsRepository.on('open_leaderboard', gameRoom => {
+  console.log(`Opening leaderboard in game room: ${gameRoom.gameName}`);
+  let dto = new GameRoomUpdateStatusResponseDTO();
+  dto.gameRoom = gameRoom;
+
+  io.to(gameRoom.id).emit('open_leaderboard_response', dto);  
+});
+
+gameRoomsRepository.on('round_timer_tick', (gameRoom) => {
+  console.log(`Round timer tick in game room: ${gameRoom.gameName}: ${gameRoom.roundTimestamp}`);
+  let dto = new TimerTickResponseDTO();
+  dto.timerTick = gameRoom.roundTimestamp;
+
+  io.to(gameRoom.id).emit('round_timer_tick_response', dto);
+});
+
+gameRoomsRepository.on("leaderboard_timer_tick", (leaderboardTimer, gameRoom) => {
+  console.log(`Leaderboard timer tick in game room: ${gameRoom.gameName}: ${leaderboardTimer}`);
+  let dto = new TimerTickResponseDTO();
+  dto.timerTick = leaderboardTimer;
+
+  io.to(gameRoom.id).emit('leaderboard_timer_tick_response', dto);
 });
 
 gameRoomsRepository.on("round_finished", (gameRoom) => {
-    console.log("Round finished");
+  console.log(`Round finished in game room: ${gameRoom.gameName}. Game status: ${gameRoom.gameStatus}`);
+  let dto = new GameRoomUpdateStatusResponseDTO();
+  dto.gameRoom = gameRoom.serialize();
 
-    var responseRoundFinished = new RoundFinishedResponseDTO();
-    responseRoundFinished.gameRoom = gameRoom;
-    // Emit to all clients in the room
-    io.to(gameRoom.id).emit("round_finished_response", responseRoundFinished);
+  console.log(dto.gameRoom);
+
+  io.to(gameRoom.id).emit('round_finished_response', dto); 
+});
+
+gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
+  console.log(`Answer to guess in game room: ${gameRoom.gameName}: ${isCorrect}`);
+  let dto = new AnswerToGuessResponseDTO();
+  dto.isCorrect = isCorrect;
+  dto.playerId = playerId;
+  dto.gameRoom = gameRoom;
+
+
+  io.to(gameRoom.id).emit('answer_to_guess_response', dto); 
 });
 
 httpServer.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
+
+/* 
+// Create new player
+const player1 = playersRepository.addPlayer("hwid1", "Player 1");
+const player2 = playersRepository.addPlayer("hwid2", "Player 2");
+
+// Create new game room
+const gameRoom = gameRoomsRepository.createGameRoom("Game Room 1", player1, 2);
+
+// Add player to the game room
+gameRoom.addPlayer(player2);
+
+import { WordDifficultyPoints } from "./Models/GameRoom.mjs";
+
+// Start round
+gameRoomsRepository.startRound(gameRoom.id, "ivan", WordDifficultyPoints.EASY);
+
+setTimeout(() => {
+  gameRoomsRepository.handleGuess(gameRoom.id, player2.id, "ivan");
+}, 1500);
+
+// wait for 10csec
+setTimeout(() => {
+  // Start round
+  gameRoomsRepository.startRound(gameRoom.id, "tsvetelin", WordDifficultyPoints.HARD);
+  gameRoomsRepository.handleGuess(gameRoom.id, player2.id, "ivan");
+}, 15000);
+ */

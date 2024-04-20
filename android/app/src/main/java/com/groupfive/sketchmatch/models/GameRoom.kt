@@ -9,19 +9,42 @@ class GameRoom {
     var gameName: String = ""
     var gameCapacity: Int = 2
     var players: List<Player> = emptyList()
-    var gameStatus: GameRoomStatus = GameRoomStatus.Waiting
-    var drawWord: String = ""
-    var rounds: MutableList<Round> = mutableListOf() // A round consists of a number of turns
-    var currentRound: Int = 1 // The current round being played
+    var drawingPlayer: Int = 0
+    var gameStatus: GameRoomStatus = GameRoomStatus.WAITING
+    var roundTimestamp: Int = 60
+    var word: String = ""
+    var guessedCorrectly: List<String> = emptyList()
 
-    fun getCurrentRound(): Round {
-        return rounds[currentRound - 1]
+    fun getCurrentRoundNumber(): Int {
+        return drawingPlayer
+    }
+
+    fun getTotalNumberOfRounds(): Int {
+        return players.size;
+    }
+
+    fun getDrawingPlayerId(): String {
+        if(drawingPlayer >= players.size) {
+            return "Unknown"
+        }
+
+        return players[drawingPlayer].id
+    }
+
+    fun getDrawingPlayerName(): String {
+        if(drawingPlayer >= players.size) {
+            return ""
+        }
+
+        return players[drawingPlayer].nickname
     }
 }
 
 // Enum class for game room status
 enum class GameRoomStatus {
-    Waiting,
-    Playing,
-    Finished
+    WAITING,
+    PLAYING,
+    FINISHED,
+    CHOOSING,
+    LEADERBOARD
 }

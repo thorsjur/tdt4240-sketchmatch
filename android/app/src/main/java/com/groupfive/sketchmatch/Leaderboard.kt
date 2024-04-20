@@ -3,6 +3,7 @@ package com.groupfive.sketchmatch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -15,30 +16,63 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.groupfive.sketchmatch.models.Player
-
-// TODO: Remove the dummy values and standard player list and round number
-val p1 = Player("1","hwid1", "Ola", 15)
-val p2 = Player("2", "hwid1","Kari", 18)
-val p3 = Player("3", "hwid1","Arne", 27)
-val p4 = Player("4", "hwid1","Gunn", 24)
-val p5 = Player("5", "hwid1","Åse", 19)
+import com.groupfive.sketchmatch.viewmodels.LeaderboardViewModel
+import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.models.Event
+import com.groupfive.sketchmatch.models.GameRoomStatus
+import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.utils.getPlayerRankString
+import com.groupfive.sketchmatch.utils.getRoundString
+import com.groupfive.sketchmatch.view.draw.LeaveGameButton
 
 @Composable
 fun Leaderboard(
-    modifier: Modifier = Modifier,
-    players: List<Player> = listOf(p1, p2, p3, p4, p5),
-    roundNumber: Int = 2
+    navController: NavController,
+    viewModel: LeaderboardViewModel = viewModel()
 ) {
-    Surface(modifier) {
+    val gameRoom by GameData.currentGameRoom.observeAsState()
+    val events = viewModel.eventsFlow.collectAsState(initial = null)
+    val event = events.value // allow Smart cast
+    val roundNumber = gameRoom?.getCurrentRoundNumber() ?: 1
+    val totalNumberOfRounds = gameRoom?.getTotalNumberOfRounds() ?: 2
+
+
+
+    LaunchedEffect(event) {
+        when (event) {
+            is Event.NavigateDrawerToChoose -> {
+                viewModel.clearAllCallbacks()
+                navController.popBackStack()
+                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+            }
+            is Event.NavigateToDraw -> {
+                viewModel.clearAllCallbacks()
+                navController.popBackStack()
+                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+            }
+            null -> { }
+        }
+    }
+
+    Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -47,14 +81,59 @@ fun Leaderboard(
                 contentDescription = null,
                 modifier = Modifier.size(250.dp)
             )
-            Text(
-                modifier = Modifier.padding(10.dp),
-                text = getRoundString(roundNumber, players.size),
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.ExtraBold
+            Row (
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val gameStatus = gameRoom?.gameStatus
+                val title = if (gameStatus == GameRoomStatus.FINISHED) {
+                    "Game over!"
+                } else if (viewModel.secondsLeft != 0) {
+                    //"Round ${gameRoom?.getCurrentRoundNumber()}"
+                    getRoundString(roundNumber, totalNumberOfRounds)
+                } else {
+                    "${gameRoom?.getDrawingPlayerName()} is choosing a word"
+                }
+
+                Text(
+
+                    modifier = Modifier.padding(10.dp),
+                    text = title,
+                    style = MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    )
                 )
+
+                if (gameStatus != GameRoomStatus.FINISHED &&
+                    viewModel.secondsLeft != 0) {
+                    Icon(
+                        modifier = Modifier.padding(vertical = 5.dp, horizontal = 15.dp),
+                        imageVector = Icons.Filled.Alarm,
+                        contentDescription = "Alarm Icon"
+                    )
+                    Text(
+                        text = "${viewModel.secondsLeft}",
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+
+                if (gameStatus == GameRoomStatus.FINISHED) {
+                    LeaveGameButton(onLeaveGameClicked = {
+                        viewModel.goBackToMainMenu(
+                            navController
+                        )
+                    })
+                }
+
+                LaunchedEffect(key1 = Unit) {
+                    viewModel.startCountDown()
+                }
+            }
+            Players(
+                modifier = Modifier,
+                players = gameRoom?.players ?: emptyList()
             )
-            Players(modifier = modifier, players = players)
         }
     }
 }
@@ -92,10 +171,10 @@ private fun PlayerCard(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(4.dp)
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp), //.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -117,7 +196,7 @@ private fun PlayerCard(
                 )
             }
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.padding(horizontal = 8.dp), //.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -136,6 +215,9 @@ private fun PlayerCard(
 @Composable
 fun LeaderboardPreview() {
     SketchmatchTheme {
-//        Leaderboard()
+        Leaderboard(
+            navController = rememberNavController(),
+            viewModel = LeaderboardViewModel()
+        )
     }
 }

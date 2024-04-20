@@ -4,7 +4,7 @@ export class JoinGameResponseDTO extends BaseDTO {
 
     // Properties declaration. If true, the property is required
     status = "success";
-    message = "You have joined the game room successfully";
+    message = "game_room_enter_success";
     gameRoom;
 
     // Override the setProperties method

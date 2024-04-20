@@ -1,6 +1,5 @@
 package com.groupfive.sketchmatch.view.draw
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -32,23 +33,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.DrawScreen
 import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.models.Event
+import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.models.Player
+import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
-import com.groupfive.sketchmatch.viewmodels.DrawViewModel.Companion.MAX_ROUNDS
-import com.groupfive.sketchmatch.viewmodels.GameRoomViewModel
+import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
-
 
 @Composable
 fun DrawScreenLayout(
@@ -56,19 +56,36 @@ fun DrawScreenLayout(
     navController: NavController,
     drawViewModel: DrawViewModel = viewModel(),
     guessViewModel: GuessViewModel = viewModel(),
-    gameRoomViewModel: GameRoomViewModel = viewModel()
+    gameRoomViewModel: GameRoomsViewModel = viewModel()
 ) {
     val currentWord =
         drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
     val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
     val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
-    val gameRoom by drawViewModel.gameRoom.observeAsState()
 
-    BackHandler {
-        drawViewModel.handleLeaveGame(navController)
+    val gameRoom by GameData.currentGameRoom.observeAsState()
+    val player by GameData.currentPlayer.observeAsState()
+
+    val events = drawViewModel.eventsFlow.collectAsState(initial = null)
+    val event = events.value // allow Smart cast
+
+    var playerIsDrawing = gameRoom?.getDrawingPlayerId() == player?.id
+
+    LaunchedEffect(event) {
+        when (event) {
+            is Event.NavigateToLeaderboard -> {
+                drawViewModel.clearAllCallbacks()
+                // Remove the current screen from the back stack
+                navController.popBackStack()
+                // Navigate to the draw screen
+                navController.navigate(Screen.Leaderboard.route)
+            }
+            null -> { }
+        }
     }
 
-    if (drawViewModel.showWordDialog.value) {
+    if (gameRoom?.gameStatus == GameRoomStatus.CHOOSING
+        && playerIsDrawing) {
         WordChoiceDialog(
             drawViewModel = drawViewModel,
             onDismissRequest = drawViewModel::dismissWordDialog,
@@ -85,14 +102,9 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    // The following button is for testing the publishing/subscribing of the drawing.
-                    // It can be removed when the proper functionality is implemented.
-                    Button(onClick = { drawViewModel.toggleIsDrawing() }) {
-                        Text(text = if (drawViewModel.isDrawing.value) "Guess word" else "Draw word")
-                    }
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
-                        drawViewModel.handleLeaveGame(
+                        drawViewModel.goBackToMainMenu(
                             navController
                         )
                     })
@@ -100,17 +112,17 @@ fun DrawScreenLayout(
 
                 TopWordBar(modifier, currentWord, timeCount, drawViewModel)
 
-                if (drawViewModel.isDrawing.value) {
+                if (playerIsDrawing) {
                     DrawScreen(
                         modifier = Modifier.weight(1f),
-                        drawViewModel = drawViewModel
+                        drawViewModel = drawViewModel,
+                        navController = navController
                     )
                 } else {
                     GuessScreen(
                         modifier = Modifier.weight(1f),
                         drawViewModel = drawViewModel,
-                        guessViewModel = guessViewModel,
-                        timeCount = timeCount,
+                        guessViewModel = guessViewModel
                     )
                 }
 
@@ -118,13 +130,7 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val players = gameRoom?.players
-                    if (!players.isNullOrEmpty()) {
-                        PlayersIconsBar(
-                            modifier,
-                            currentPlayers = players
-                        )
-                    }
+                    GameData.currentGameRoom.value?.let { PlayersIconsBar(modifier, currentPlayers = it.players) }
                 }
             }
         }
@@ -153,24 +159,19 @@ fun WordChoiceDialog(
                     easyWord
                 ) {
                     drawViewModel.onWordChosen(easyWord);
-                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY, 1);
-                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY);
                 }
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
-                ) {
-                    drawViewModel.onWordChosen(mediumWord);
-                    setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                ) { drawViewModel.onWordChosen(mediumWord);
+                    setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM)
                 }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
-                ) {
-                    drawViewModel.onWordChosen(hardWord);
-                    setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD, 1)
-                    roundTimerUpdateViewModel.roundTimerUpdate(1)
+                ) { drawViewModel.onWordChosen(hardWord);
+                    setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD)
                 }
             }
         },
@@ -220,6 +221,8 @@ fun TopWordBar(
 ) {
 
     var formattedTime = drawViewModel.formatTime(timeCount)
+    var numberOfPlayers = GameData.currentGameRoom.value?.players?.size
+    var currentRoundNumber = GameData.currentGameRoom.value?.getCurrentRoundNumber()
 
     Surface(
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15F),
@@ -262,7 +265,7 @@ fun TopWordBar(
                         imageVector = Icons.Filled.Numbers, contentDescription = "Number of rounds",
                         tint = MaterialTheme.colorScheme.inverseSurface
                     )
-                    Text(text = "${drawViewModel.currentRound.value}/${MAX_ROUNDS}")
+                    Text(text = "${currentRoundNumber}/${numberOfPlayers}")
                 }
             }
         }
@@ -274,48 +277,44 @@ fun TopWordBar(
 fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         currentPlayers.forEach { player ->
-            Column(
-                verticalArrangement = Arrangement.spacedBy(3.dp),
-                modifier = Modifier.width(70.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Image(
-                        painter = painterResource(id = R.drawable.player_icon),
-                        contentDescription = "Player ${player.id}",
-                        modifier = Modifier.size(50.dp)
-                    )
+            Box(contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(id = R.drawable.player_icon),
+                    contentDescription = "Player ${player.id}",
+                    modifier = Modifier.size(50.dp)
+                )
 
-                    // If the player's action is complete, overlay a green-tinted checkmark
-                    if (player.hasGuessedCorrectly) {
-                        Box(
-                            modifier = Modifier.size(45.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Surface(shape = MaterialTheme.shapes.extraLarge) {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = "Background",
-                                    tint = Color.Green.copy(alpha = 0.3f),
-                                    modifier = Modifier
-                                        .size(30.dp)
-                                        .background(Color.Green.copy(alpha = 0.4f))
-                                )
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = "Completed",
-                                    tint = Color.White, // White checkmark
-                                    modifier = Modifier.size(30.dp)
-                                )
-                            }
+                var completed: Boolean = true;
+
+                // Check if player id is found in the list of players who guessed correctly
+                if (GameData.currentGameRoom.value?.guessedCorrectly?.contains(player.id) == false) {
+                    completed = false;
+                }
+
+                // If the player's action is complete, overlay a green-tinted checkmark
+                if (completed) {
+                    Box(
+                        modifier = Modifier.size(45.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Surface(shape = MaterialTheme.shapes.extraLarge) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = "Background",
+                                tint = Color.Green.copy(alpha = 0.3f),
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .background(Color.Green.copy(alpha = 0.4f))
+                            )
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = "Completed",
+                                tint = Color.White, // White checkmark
+                                modifier = Modifier.size(30.dp)
+                            )
                         }
                     }
                 }
-                Text(
-                    text = player.nickname,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
-                )
             }
         }
     }

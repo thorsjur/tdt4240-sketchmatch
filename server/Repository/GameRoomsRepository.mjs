@@ -1,6 +1,5 @@
 import { EventEmitter } from "events";
-import { GameRoom } from "../Models/GameRoom.mjs";
-import { Guess } from "../Models/Guess.mjs";
+import { GameRoom, GameStatus, WordDifficultyPoints } from "../Models/GameRoom.mjs";
 
 export class GameRoomsRepository extends EventEmitter{
     constructor() {
@@ -15,7 +14,7 @@ export class GameRoomsRepository extends EventEmitter{
 
     // Get all game rooms
     getGameRooms() {
-        return this.gameRooms;
+        return this.gameRooms.filter(gameRoom => gameRoom.gameStatus == GameStatus.WAITING);
     }
 
     // Set the draw word for the game room
@@ -30,17 +29,45 @@ export class GameRoomsRepository extends EventEmitter{
     // Create a new game room
     createGameRoom(name, player, capacity) {
         // Generate a random ID for the game room
-        // var id = Math.floor(Math.random() * 1000000);
-        var id = 1;
+        var id = Math.floor(Math.random() * 1000000);
 
         // Generate a HEX code for the game room to be used as a "enter by code" feature
         var gameCode = Math.random().toString(16).substr(2, 6);
 
         let gameRoom = new GameRoom(id, gameCode, name, capacity);
         gameRoom.addPlayer(player);
-        gameRoom.initializeRounds();
-
         this.gameRooms.push(gameRoom);
+
+        gameRoom.on('round_has_been_created', gameRoom => {
+            this.emit('round_has_been_created', gameRoom);
+        });
+
+        gameRoom.on('round_has_started', gameRoom => {
+            this.emit('round_has_started', gameRoom);
+        });
+
+        gameRoom.on('open_leaderboard', gameRoom => {
+            this.emit('open_leaderboard', gameRoom);
+        });
+
+        gameRoom.on('round_timer_tick', (gameRoom) => {
+            this.emit('round_timer_tick', gameRoom);
+        });
+
+        gameRoom.on('leaderboard_timer_tick', (leaderboardTimer, gameRoom) => {
+            this.emit('leaderboard_timer_tick', leaderboardTimer, gameRoom);
+        });
+
+        gameRoom.on('round_finished', gameRoom => {
+            this.emit('round_finished', gameRoom);
+            if (gameRoom.gameStatus == GameStatus.FINISHED) {
+                this.removeGameRoomById(gameRoom.id);
+            }
+        });
+
+        gameRoom.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
+            this.emit('answer_to_guess', playerId, isCorrect, gameRoom);
+        });
 
         return gameRoom;
     }
@@ -55,13 +82,6 @@ export class GameRoomsRepository extends EventEmitter{
         return this.gameRooms.find((gameRoom) => gameRoom.gameCode === code);
     }
 
-
-    // Get roomId from gameCode
-    getRoomIdFromGameCode(code) {
-        return this.gameRooms.find((gameRoom) => gameRoom.gameCode === code).id;
-    }
-
-
     // Remove game room by ID
     removeGameRoomById(id) {
         this.gameRooms = this.gameRooms.filter(
@@ -75,58 +95,26 @@ export class GameRoomsRepository extends EventEmitter{
         gameRoom?.removePlayerByHwid(hwid);
     }
 
-    // Start the round
-    startRound(roomId) {
-        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.id === roomId);
-
-        console.log()
-        if(!gameRoom) {
-            console.log(`Game room with ID ${roomId} not found`);
-            return;
-        }
-        const round = this.findCurrentRound(gameRoom);
-
-        round.startRound(gameRoom);
-
-        round.on('timer_tick', (time, gameRoom) => {
-            this.emit('timer_tick', time, gameRoom);
-        });
-
-        round.on('round_finished', (gameRoom) => {
-            this.emit('round_finished', gameRoom);
-        });
+    startRound(gameRoomId, newWord, newWordDifficultyPoints) {
+        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.id === gameRoomId);
+        gameRoom.initializeRound(newWord, newWordDifficultyPoints);
     }
 
-
-    // Check if the guess is correct
-    checkGuess(guess, round, timestamp, guessingPlayer, drawingPlayer) {
-        const isCorrect = round.drawWord === guess;
-
-        if (isCorrect) {
-            this.givePoints(round, timestamp, guessingPlayer, drawingPlayer);
-        }
-        return new Guess(guess, isCorrect);
+    handleGuess(gameRoomId, playerId, guessedWord) {
+        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.id === gameRoomId);
+        gameRoom.handleGuess(playerId, guessedWord);
     }
 
-    givePoints(round, timestamp, guessingPlayer, drawingPlayer) {
-        //Give guesser points
-        const guessingScore = round.calculateGuesserScore(timestamp);
-        guessingPlayer.setScore(guessingPlayer.getScore() + guessingScore);
-        // Give drawer points
-        const drawingScore = round.calculateDrawerScore();
-        if (drawingPlayer) {
-            drawingPlayer.setScore(drawingPlayer.getScore() + drawingScore);
-        } else {
-            console.log("No drawing player found");
+    getDificultyObjByString(difficulty) {
+        switch (difficulty.toLowerCase()) {
+            case "easy":
+                return WordDifficultyPoints.EASY;
+            case "medium":
+                return WordDifficultyPoints.MEDIUM;
+            case "hard":
+                return WordDifficultyPoints.HARD;
+            default:
+                return WordDifficultyPoints.EASY;
         }
-
-        // TODO: Update points in database (maybe do elsewhere) (will send points when round is over)
-    }
-
-    // Find current round
-    findCurrentRound(gameRoom) {
-        const rounds = gameRoom.getRounds();
-        const currentRound = rounds[gameRoom.currentRound - 1];
-        return currentRound;
     }
 }

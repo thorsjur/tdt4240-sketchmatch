@@ -1,4 +1,4 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.utils
 
 fun getPlayerRankString(rank: Int): String {
     when (rank) {

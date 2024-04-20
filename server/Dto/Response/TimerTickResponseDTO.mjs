@@ -1,8 +1,8 @@
 import { BaseDTO } from "../BaseDTO.mjs";
 
-export class RoundTimerUpdateResponseDTO extends BaseDTO {
+export class TimerTickResponseDTO extends BaseDTO {
     // Properties declaration. If true, the property is required
-    roundTimerTick = true;
+    timerTick = true;
 
     // Override the setProperties method
     setProperties(dataJson) {
