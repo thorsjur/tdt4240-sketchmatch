@@ -24,7 +24,7 @@ class GameRoom {
     }
 
     fun getDrawingPlayerId(): String {
-        if(drawingPlayer >= players.size) {
+        if (drawingPlayer >= players.size) {
             return "Unknown"
         }
 
@@ -32,12 +32,14 @@ class GameRoom {
     }
 
     fun getDrawingPlayerName(): String {
-        if(drawingPlayer >= players.size) {
+        if (drawingPlayer >= players.size) {
             return ""
         }
 
         return players[drawingPlayer].nickname
     }
+
+    fun getCurrentWordMask() = "_ ".repeat(word.length)
 }
 
 // Enum class for game room status

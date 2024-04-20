@@ -320,8 +320,6 @@ gameRoomsRepository.on("round_finished", (gameRoom) => {
   let dto = new GameRoomUpdateStatusResponseDTO();
   dto.gameRoom = gameRoom.serialize();
 
-  console.log(dto.gameRoom);
-
   io.to(gameRoom.id).emit('round_finished_response', dto); 
 });
 
