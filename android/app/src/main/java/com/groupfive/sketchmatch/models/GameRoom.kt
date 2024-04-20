@@ -16,7 +16,10 @@ class GameRoom {
     var guessedCorrectly: List<String> = emptyList()
 
     fun getCurrentRoundNumber(): Int {
-        return drawingPlayer
+        return drawingPlayer +
+                (if (gameStatus == GameRoomStatus.FINISHED
+                    || gameStatus == GameRoomStatus.CHOOSING)
+                    0 else 1)
     }
 
     fun getTotalNumberOfRounds(): Int {

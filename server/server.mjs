@@ -140,6 +140,7 @@ io.on("connection", (socket) => {
     io.to(dto.roomId).emit("draw_payload_published", JSON.stringify(dto));
   });
 
+  // TODO: Remove in the cleanup if it is not used
   socket.on("subscribe_to_room", (data) => {
     const json = JSON.parse(data);
     const dto = new RoomEventRequestDTO();
@@ -148,6 +149,7 @@ io.on("connection", (socket) => {
     socket.join(dto.roomId);
   });
 
+  // TODO: Remove in the cleanup if it is not used
   socket.on("unsubscribe_from_room", (data) => {
     const json = JSON.parse(data);
     const dto = new RoomEventRequestDTO();
@@ -329,8 +331,7 @@ gameRoomsRepository.on('answer_to_guess', (playerId, isCorrect, gameRoom) => {
   dto.playerId = playerId;
   dto.gameRoom = gameRoom;
 
-
-  io.to(gameRoom.id).emit('answer_to_guess_response', dto); 
+  io.to(gameRoom.id).emit('answer_to_guess_response', dto);
 });
 
 httpServer.listen(port, () => {

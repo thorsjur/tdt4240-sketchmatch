@@ -3,6 +3,7 @@ package com.groupfive.sketchmatch.viewmodels
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
@@ -13,15 +14,25 @@ import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
 import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class GuessViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
-    val isCorrect: MutableLiveData<Boolean> = MutableLiveData()
+    var isCorrect: Boolean = false
 
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    val eventsFlow = eventChannel.receiveAsFlow()
+    private val _eventsFlow = MutableSharedFlow<Event>()
+    val eventsFlow = _eventsFlow.asSharedFlow()
+
+    fun sendEvent(event: Event) {
+        viewModelScope.launch {
+            _eventsFlow.emit(event)
+        }
+    }
 
     fun clearAllCallbacks() {
         client.removeAllCallbacks()
@@ -32,17 +43,21 @@ class GuessViewModel : ViewModel() {
         client.addCallback(ResponseEvent.ANSWER_TO_GUESS_RESPONSE.value) { message ->
             Log.i("GuessViewModel", "ANSWER_TO_GUESS_RESPONSE: $message")
 
-            // Parse the guess from the json message string
-            val gson = Gson()
-
             // Convert the json string to a Guess object
-            val guess = gson.fromJson(message, AnswerToGuessResponseDTO::class.java)
+            val guess = Gson().fromJson(message, AnswerToGuessResponseDTO::class.java)
 
-            isCorrect.postValue(guess.isCorrect)
-
+            //isCorrect.postValue(guess.isCorrect)
             GameData.lastGuessCorrectness.postValue(true)
-
             GameData.currentGameRoom.postValue(guess.gameRoom)
+
+            if(guess.playerId == GameData.currentPlayer.value?.id) {
+                isCorrect = guess.isCorrect
+
+                // Wait for 2 seconds before sending the GuessAnswerEvent
+                viewModelScope.launch {
+                    sendEvent(Event.GuessAnswerEvent)
+                }
+            }
         }
     }
 

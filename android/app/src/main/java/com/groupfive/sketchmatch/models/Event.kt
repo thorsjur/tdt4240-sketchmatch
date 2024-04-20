@@ -9,4 +9,5 @@ open class Event {
     object IncorrectGuessEvent : Event()
     object RoomErrorEvent : Event()
     object RoomSuccessEvent : Event()
+    object GuessAnswerEvent : Event()
 }
