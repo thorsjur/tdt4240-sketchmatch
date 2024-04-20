@@ -323,7 +323,7 @@ class MessageClient private constructor(
         if (list == null) {
             eventCallbacks[event] = mutableListOf(callback)
         } else {
-            list.add { callback }
+            list.add(callback)
         }
     }
 

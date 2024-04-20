@@ -11,6 +11,8 @@ import com.groupfive.sketchmatch.communication.dto.response.CreateGameResponseDT
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -18,12 +20,12 @@ class CreateGameViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
     val isError: MutableLiveData<Boolean> = MutableLiveData()
 
-    private val eventChannel = Channel<Event>(Channel.BUFFERED)
-    val eventsFlow = eventChannel.receiveAsFlow()
+    private val _eventsFlow = MutableSharedFlow<Event>()
+    val eventsFlow = _eventsFlow.asSharedFlow()
 
     private fun sendEvent(event: Event) {
         viewModelScope.launch {
-            eventChannel.send(event)
+            _eventsFlow.emit(event)
         }
     }
 
