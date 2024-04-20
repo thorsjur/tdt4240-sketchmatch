@@ -2,7 +2,6 @@ package com.groupfive.sketchmatch.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
@@ -21,7 +20,6 @@ import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -72,6 +70,8 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
+    fun handleRender(controller: DrawController) = controller.reset()
+
     // Load initial words
     init {
         Log.i("DrawViewModel", "DrawViewModel created")
@@ -102,7 +102,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
             GameData.currentGameRoom.postValue(gameRoom.gameRoom)
 
-            if(gameRoom.gameRoom.gameStatus == GameRoomStatus.FINISHED) {
+            if (gameRoom.gameRoom.gameStatus == GameRoomStatus.FINISHED) {
                 sendEvent(Event.NavigateToLeaderboard)
             }
         }

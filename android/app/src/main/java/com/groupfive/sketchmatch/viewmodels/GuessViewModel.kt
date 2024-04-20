@@ -3,7 +3,6 @@ package com.groupfive.sketchmatch.viewmodels
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.ResponseEvent
@@ -15,7 +14,6 @@ import com.groupfive.sketchmatch.store.GameData
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 class GuessViewModel : ViewModel() {
@@ -52,7 +50,10 @@ class GuessViewModel : ViewModel() {
         client.checkGuess(inputGuess, gameRoomId)
     }
 
-    fun handleRender(controller: DrawController) =
+    fun handleRender(controller: DrawController) {
+        controller.reset()
+        GameData.drawBoxPayLoad.postValue(null)
+        
         client.addCallback(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) {
             Log.i("GuessViewModel", "DRAW_PAYLOAD_PUBLISHED: $it")
 
@@ -66,6 +67,8 @@ class GuessViewModel : ViewModel() {
 
             ///sendEvent(NavigationEvent.NewDrawingPayload)
         }
+    }
+
 
     fun handleDestroy() = client.removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
 }
