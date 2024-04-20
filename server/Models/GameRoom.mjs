@@ -42,7 +42,6 @@ export class GameRoom extends EventEmitter {
         this.players = this.players.filter((p) => p.id !== player.id);
     }
 
-    // Get roomId
     getRoomId() {
         return this.id;
     }
@@ -192,6 +191,18 @@ export class GameRoom extends EventEmitter {
 
     getGameCode() {
         return this.gameCode;
+    }
+
+    getGuessedCorrectly() {
+        return this.guessedCorrectly;
+    }
+
+    getGameStatus() {
+        return this.gameStatus;
+    }
+
+    getPlayers() {
+        return this.players;
     }
 }
 
