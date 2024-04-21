@@ -18,7 +18,9 @@ class GameRoom {
     fun getCurrentRoundNumber(): Int {
         return drawingPlayer +
                 (if (gameStatus == GameRoomStatus.FINISHED
-                    || gameStatus == GameRoomStatus.CHOOSING)
+                    || gameStatus == GameRoomStatus.CHOOSING
+                    || gameStatus == GameRoomStatus.LEADERBOARD
+                )
                     0 else 1)
     }
 

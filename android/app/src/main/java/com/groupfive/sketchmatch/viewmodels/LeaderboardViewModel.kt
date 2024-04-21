@@ -3,7 +3,6 @@ package com.groupfive.sketchmatch.viewmodels
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +13,6 @@ import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
-import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +27,7 @@ class LeaderboardViewModel : ViewModel() {
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: Event) {
+    private fun sendEvent(event: Event) {
         viewModelScope.launch {
             eventChannel.send(event)
         }

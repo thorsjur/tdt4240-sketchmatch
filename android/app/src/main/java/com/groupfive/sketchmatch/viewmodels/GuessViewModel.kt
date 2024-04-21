@@ -27,7 +27,7 @@ class GuessViewModel : ViewModel() {
     private val _eventsFlow = MutableSharedFlow<Event>()
     val eventsFlow = _eventsFlow.asSharedFlow()
 
-    fun sendEvent(event: Event) {
+    private fun sendEvent(event: Event) {
         viewModelScope.launch {
             _eventsFlow.emit(event)
         }

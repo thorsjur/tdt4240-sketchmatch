@@ -11,10 +11,10 @@ import com.groupfive.sketchmatch.communication.dto.request.SetNicknameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.response.SetNicknameResponseDTO
 import com.groupfive.sketchmatch.store.GameData
 
-class SetNicknameViewModel: ViewModel() {
+class SetNicknameViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
     val nicknameSetStatus: MutableLiveData<Boolean> = MutableLiveData()
-    val nicknameSetMessage: MutableLiveData<String> = MutableLiveData()
+    private val nicknameSetMessage: MutableLiveData<String> = MutableLiveData()
     val nickname: MutableLiveData<String> = MutableLiveData()
 
     init {

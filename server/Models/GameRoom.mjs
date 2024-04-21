@@ -68,20 +68,6 @@ export class GameRoom extends EventEmitter {
         }
     }
 
-    removePlayer(player) {
-        if(this.gameStatus != GameStatus.WAITING) {
-            this.endGame();
-        }
-        
-        this.players = this.players.filter((p) => p.id !== player.id);
-
-        if(this.players.length === 0) {
-            this.destroy();
-        } else {
-            this.emit('player_left_room', this);
-        }
-    }
-
     getRoomId() {
         return this.id;
     }

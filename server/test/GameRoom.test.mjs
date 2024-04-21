@@ -1,4 +1,4 @@
-import { GameRoom, GameStatus, GameRoomSettings } from '../Models/GameRoom.mjs';
+import { GameRoom, GameRoomSettings, GameStatus } from '../Models/GameRoom.mjs';
 import { Player } from '../Models/Player.mjs';
 
 describe('GameRoom', () => {
@@ -13,18 +13,6 @@ describe('GameRoom', () => {
     gameRoom.addPlayer(player);
 
     expect(gameRoom.players.length).toBe(1);
-  });
-
-  it('should remove a player from the game room', () => {
-    const player1 = new Player(1, 'hwid1', 'player1');
-    const player2 = new Player(2, 'hwid2', 'player2');
-
-    gameRoom.addPlayer(player1);
-    gameRoom.addPlayer(player2);
-    gameRoom.removePlayer(player1);
-
-    expect(gameRoom.players.length).toBe(1);
-    expect(gameRoom.players[0]).toBe(player2);
   });
 
   it('should initialize a round', () => {
@@ -206,5 +194,89 @@ describe('GameRoom', () => {
   
     expect(player1.getIsDrawing()).toBe(false);
   });
-  
+
+  it('should remove player from game using playerId', () => {
+    const player1 = new Player(1, 'hwid1', 'player1');
+    const player2 = new Player(2, 'hwid2', 'player2');
+    const player3 = new Player(3, 'hwid3', 'player3');
+
+    gameRoom.addPlayer(player1);
+    gameRoom.addPlayer(player2);
+    gameRoom.addPlayer(player3);
+
+    gameRoom.removePlayerById(1);
+
+    const expectedPlayers = [player2, player3];
+
+    expect(gameRoom.getPlayers()).toEqual(expectedPlayers);
+  });
+
+    it('should remove player from game using hwid', () => {
+    const player1 = new Player(1, 'hwid1', 'player1');
+    const player2 = new Player(2, 'hwid2', 'player2');
+    const player3 = new Player(3, 'hwid3', 'player3');
+
+    gameRoom.addPlayer(player1);
+    gameRoom.addPlayer(player2);
+    gameRoom.addPlayer(player3);
+
+    gameRoom.removePlayerByHwid('hwid1');
+
+    const expectedPlayers = [player2, player3];
+
+    expect(gameRoom.getPlayers()).toEqual(expectedPlayers);
+  });
+
+  it('should ensure game ends if it is in progress and a player is removed by hwid', () => {
+    const player1 = new Player(1, 'hwid1', 'player1');
+    const player2 = new Player(2, 'hwid2', 'player2');
+    const player3 = new Player(3, 'hwid3', 'player3');
+
+    gameRoom.addPlayer(player1);
+    gameRoom.addPlayer(player2);
+    gameRoom.addPlayer(player3);
+
+    player1.incrementScore(50);
+    player2.incrementScore(30);
+    player3.incrementScore(80);
+
+    gameRoom.setGameStatus(GameStatus.PLAYING);
+
+    expect(gameRoom.players[0].getScore()).toBe(50);
+    expect(gameRoom.players[1].getScore()).toBe(30);
+    expect(gameRoom.players[2].getScore()).toBe(80);
+
+    gameRoom.removePlayerByHwid('hwid1');
+
+    expect(gameRoom.getGameStatus()).toBe(GameStatus.FINISHED);
+    expect(gameRoom.players[0].getScore()).toBe(0);
+    expect(gameRoom.players[1].getScore()).toBe(0);
+  })
+
+    it('should ensure game ends if it is in progress and a player is removed by playerId', () => {
+    const player1 = new Player(1, 'hwid1', 'player1');
+    const player2 = new Player(2, 'hwid2', 'player2');
+    const player3 = new Player(3, 'hwid3', 'player3');
+
+    gameRoom.addPlayer(player1);
+    gameRoom.addPlayer(player2);
+    gameRoom.addPlayer(player3);
+
+    player1.incrementScore(50);
+    player2.incrementScore(30);
+    player3.incrementScore(80);
+
+    gameRoom.setGameStatus(GameStatus.PLAYING);
+
+    expect(gameRoom.players[0].getScore()).toBe(50);
+    expect(gameRoom.players[1].getScore()).toBe(30);
+    expect(gameRoom.players[2].getScore()).toBe(80);
+
+    gameRoom.removePlayerById(1);
+
+    expect(gameRoom.getGameStatus()).toBe(GameStatus.FINISHED);
+    expect(gameRoom.players[0].getScore()).toBe(0);
+    expect(gameRoom.players[1].getScore()).toBe(0);
+  })
+
 });

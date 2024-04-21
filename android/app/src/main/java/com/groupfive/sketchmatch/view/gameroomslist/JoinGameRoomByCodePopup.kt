@@ -47,9 +47,8 @@ fun JoinGameRoomByCodePopup(
     onSubmit: (String) -> Unit,
     onDismiss: () -> Unit,
     onSuccess: () -> Unit
-){
-    val context = LocalContext.current
-    var viewModel: GameRoomsViewModel = viewModel()
+) {
+    val viewModel: GameRoomsViewModel = viewModel()
     val joinGameByCodeStatus by viewModel.joinGameByCodeStatus.observeAsState(false)
     val joinGameByCodeMessage by viewModel.joinGameByCodeMessage.observeAsState("")
 
@@ -88,7 +87,7 @@ fun JoinGameRoomByCodePopupContent(
 ) {
     var gameNameString by remember { mutableStateOf("") }
 
-    Column (horizontalAlignment = Alignment.CenterHorizontally){
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(id = R.string.join_game_by_code),
             style = MaterialTheme.typography.headlineMedium.copy(
@@ -134,13 +133,14 @@ fun JoinGameRoomByCodePopupContent(
                 .padding(bottom = 10.dp)
                 .width(150.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.onPrimaryContainer),
+                containerColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
             onClick = {
                 onSubmit(gameNameString)
             },
             enabled = gameNameString.isNotBlank(),
         ) {
-            Text(stringResource(id = R.string.submit))
+            Text(stringResource(id = R.string.join_game_room_button))
         }
     }
 }
@@ -150,7 +150,7 @@ fun JoinGameRoomByCodeErrorMessage(
     context: Context = LocalContext.current,
     messageId: String
 ) {
-    var message = when(messageId){
+    val message = when (messageId) {
         "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
         "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)
         else -> stringResource(id = R.string.something_went_wrong)

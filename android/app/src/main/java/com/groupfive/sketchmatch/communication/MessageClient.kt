@@ -6,17 +6,13 @@ import com.groupfive.sketchmatch.BuildConfig
 import com.groupfive.sketchmatch.communication.dto.request.CheckGuessRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.PublishPathRequestDTO
-import com.groupfive.sketchmatch.communication.dto.request.RoomEventRequestDTO
-import com.groupfive.sketchmatch.communication.dto.request.RoundTimerUpdateRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.SetDrawWordRequestDTO
 import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
-import com.groupfive.sketchmatch.serialization.PathWrapperSerializer
 import com.groupfive.sketchmatch.store.Difficulty
 import dev.icerock.moko.socket.Socket
 import dev.icerock.moko.socket.SocketEvent
 import dev.icerock.moko.socket.SocketOptions
 import io.ak1.drawbox.DrawBoxPayLoad
-import io.ak1.drawbox.PathWrapper
 import kotlinx.serialization.json.Json
 import java.net.URISyntaxException
 
@@ -208,60 +204,9 @@ class MessageClient private constructor(
     }
 
     @Synchronized
-    fun closeConnection() {
-        socket.disconnect()
-    }
-
-    @Synchronized
     fun sendMessage(eventName: String, msg: String = "") {
         if (!isConnected()) return
         socket.emit(eventName, msg)
-    }
-
-    @Synchronized
-    fun subscribeToRoom(roomId: Int) {
-        sendMessage(
-            eventName = RequestEvent.SUBSCRIBE_TO_ROOM.value,
-            msg = gson.toJson(
-                RoomEventRequestDTO(
-                    roomId = roomId,
-                )
-            )
-        )
-
-    }
-
-    @Synchronized
-    fun unsubscribeFromRoom(roomId: Int) {
-        sendMessage(
-            eventName = RequestEvent.UNSUBSCRIBE_FROM_ROOM.value,
-            msg = gson.toJson(
-                RoomEventRequestDTO(
-                    roomId = roomId,
-                )
-            )
-        )
-    }
-
-    @Synchronized
-    fun leaveRoom(roomId: Int) {
-        sendMessage(
-            eventName = RequestEvent.LEAVE_ROOM.value,
-            msg = gson.toJson(
-                RoomEventRequestDTO(
-                    roomId = roomId,
-                )
-            )
-        )
-    }
-
-    @Synchronized
-    fun publishPathToRoom(roomId: Int, path: PathWrapper) {
-        val stringifiedPath = Json.encodeToString(PathWrapperSerializer, path)
-        val request = PublishPathRequestDTO(roomId, stringifiedPath)
-        val data = gson.toJson(request)
-
-        sendMessage(RequestEvent.PUBLISH_PATH.value, data)
     }
 
     @Synchronized
@@ -308,19 +253,6 @@ class MessageClient private constructor(
         socket.emit(RequestEvent.SET_DRAW_WORD.value, data)
     }
 
-    @Synchronized
-    fun roundTimerUpdate(gameRoomId: Int) {
-        val requestData = RoundTimerUpdateRequestDTO(gameRoomId)
-        val gson = Gson()
-        val data = gson.toJson(requestData)
-
-        if (!isConnected()) return
-        socket.emit(
-            RequestEvent.ROUND_TIMER_UPDATE.value,
-            data
-        )
-    }
-
     fun addCallback(event: String, callback: (String) -> Unit) {
         println("$event callback added.")
         Log.i("Socket", "$event callback added.")
@@ -332,11 +264,6 @@ class MessageClient private constructor(
         }
     }
 
-    fun removeCallback(event: String, callback: (String) -> Unit) {
-        val list = eventCallbacks[event]
-        list?.remove(callback)
-    }
-
     // Remove all callbacks for a specific event
     fun removeAllCallbacks(event: String) {
         eventCallbacks.remove(event)
@@ -344,18 +271,6 @@ class MessageClient private constructor(
 
     fun removeAllCallbacks() {
         eventCallbacks.clear()
-    }
-
-    fun unsubscribeFromEvent(event: String) {
-        // TODO: Implement unsubscribeFromEvent if the library supports it
-        // We need to unsubscribe the socket from the event to prevent receiving unwanted messages
-        // E.g. when the user navigates from Game Rooms screen to another screen and we don't want to receive room updates anymore.
-    }
-
-    fun subscribeToEvent(event: String) {
-        // TODO: Implement subscribeToEvent if the library supports it
-        // We need to subscribe back to the event to start receiving messages again
-        // E.g. when the user navigates back to the Game Rooms screen and we want to receive room updates again.
     }
 
     private fun isConnected() =

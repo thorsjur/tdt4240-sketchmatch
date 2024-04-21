@@ -1,4 +1,5 @@
 package com.groupfive.sketchmatch.communication.dto.request
 
-class JoinGameByCodeRequestDTO(val gameCode: String) {
-}
+data class JoinGameByCodeRequestDTO(
+    val gameCode: String
+)

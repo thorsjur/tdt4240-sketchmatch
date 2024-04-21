@@ -101,7 +101,7 @@ class GameRoomsViewModel : ViewModel() {
             joinGameByCodeMessage.postValue(response.message)
 
             if (response.status == "success") {
-                Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom?.gameCode}")
+                Log.i("GameRoomsViewModel", "Joined room with code ${response.gameRoom.gameCode}")
 
                 // Update the current game room
                 GameData.currentGameRoom.postValue(response.gameRoom)
@@ -123,7 +123,7 @@ class GameRoomsViewModel : ViewModel() {
     }
 
     // Populate the list with new data
-    fun populateGameRooms(rooms: List<GameRoom>) {
+    private fun populateGameRooms(rooms: List<GameRoom>) {
         gameRooms.postValue(rooms)
     }
 
@@ -156,7 +156,7 @@ class GameRoomsViewModel : ViewModel() {
     }
 
     // Add a new game room to the list
-    fun addGameRoom(room: GameRoom) {
+    private fun addGameRoom(room: GameRoom) {
         val currentRooms = gameRooms.value.orEmpty().toMutableList()
         currentRooms.add(room)
         gameRooms.postValue(currentRooms)
@@ -168,7 +168,7 @@ class GameRoomsViewModel : ViewModel() {
     }
 
     // Update an existing game room
-    fun updateGameRoom(room: GameRoom) {
+    private fun updateGameRoom(room: GameRoom) {
         try {
             val currentRooms = gameRooms.value.orEmpty().toMutableList()
             val index = currentRooms.indexOfFirst { it.id == room.id }
@@ -183,7 +183,7 @@ class GameRoomsViewModel : ViewModel() {
     }
 
     // Remove a game room from the list
-    fun removeGameRoom(room: GameRoom) {
+    private fun removeGameRoom(room: GameRoom) {
         try {
             val currentRooms = gameRooms.value.orEmpty().toMutableList()
             val index = currentRooms.indexOfFirst { it.id == room.id }

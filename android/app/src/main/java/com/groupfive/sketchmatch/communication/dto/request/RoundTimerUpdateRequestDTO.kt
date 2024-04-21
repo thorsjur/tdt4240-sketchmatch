@@ -1,6 +1,5 @@
 package com.groupfive.sketchmatch.communication.dto.request
 
-class RoundTimerUpdateRequestDTO(
-    var gameRoomId: Int) {
-
-}
+data class RoundTimerUpdateRequestDTO(
+    val gameRoomId: Int
+)

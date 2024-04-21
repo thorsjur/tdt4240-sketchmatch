@@ -31,8 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import io.ak1.drawbox.DrawBox
@@ -42,8 +40,7 @@ import io.ak1.rangvikalp.RangVikalp
 @Composable
 fun DrawScreen(
     modifier: Modifier = Modifier,
-    drawViewModel: DrawViewModel,
-    navController: NavController
+    drawViewModel: DrawViewModel
 ) {
     val controller = rememberDrawController()
 
@@ -157,8 +154,7 @@ fun DrawScreenPreview(drawViewModel: DrawViewModel = viewModel()) {
     SketchmatchTheme {
         DrawScreen(
             modifier = Modifier,
-            drawViewModel = drawViewModel,
-            navController = rememberNavController()
+            drawViewModel = drawViewModel
         )
     }
 }

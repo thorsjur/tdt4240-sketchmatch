@@ -13,7 +13,6 @@ enum class ResponseEvent(val value: String) {
     ROOM_UPDATED("game_room_updated"),
 
     // Event for when server notifies of a game room being destroyed
-    // Currently, we don't have anything for this on the server
     ROOM_DESTROYED("game_room_destroyed"),
 
     // Event for when server sends a list of game rooms
@@ -52,7 +51,9 @@ enum class ResponseEvent(val value: String) {
     // Event for when server publishes to a room the client is subscribed to
     DRAW_PAYLOAD_PUBLISHED("draw_payload_published"),
 
+    // Event for all clients in a room that a new player has joined
     PLAYER_JOINED_ROOM("player_joined_room"),
 
+    // Event for all clients in a room that a player has left a room
     PLAYER_LEFT_ROOM("player_left_room"),
 }

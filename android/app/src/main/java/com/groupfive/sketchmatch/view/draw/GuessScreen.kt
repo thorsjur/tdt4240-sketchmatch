@@ -157,8 +157,7 @@ fun GuessScreen(
                         .fillMaxHeight(),
                     enabled = !guessViewModel.isCorrect,
                     onClick = {
-                        guessViewModel.checkGuess(currentGuess.lowercase(), gameRoomId);
-                        //showCorrectnessIcon = true
+                        guessViewModel.checkGuess(currentGuess.lowercase(), gameRoomId)
                     }) {
                     Text(text = "Guess")
                 }
@@ -171,7 +170,6 @@ fun GuessScreen(
                     is Event.GuessAnswerEvent -> {
                         showCorrectnessIcon = true
                     }
-
                     null -> {}
                 }
             }

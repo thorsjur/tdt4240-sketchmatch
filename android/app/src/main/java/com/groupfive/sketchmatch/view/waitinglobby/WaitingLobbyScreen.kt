@@ -41,7 +41,6 @@ fun WaitingLobby(
     navController: NavController,
     viewModel: WaitingLobbyViewModel = viewModel()
 ){
-    val player by GameData.currentPlayer.observeAsState()
     val gameRoom by GameData.currentGameRoom.observeAsState()
     val gameRoomCode = gameRoom?.gameCode ?: "Unknown Code"
     val playersWaiting = "${gameRoom?.players?.size ?: 0} / ${gameRoom?.gameCapacity ?: 0}"
