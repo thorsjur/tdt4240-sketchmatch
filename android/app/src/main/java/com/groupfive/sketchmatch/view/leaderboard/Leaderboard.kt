@@ -88,7 +88,7 @@ fun Leaderboard(
             )
 
 
-            if (gameRoom?.gameStatus != GameRoomStatus.FINISHED) {
+            if (gameRoom?.gameStatus != GameRoomStatus.FINISHED && viewModel.secondsLeft > 0) {
                 Text(
                     text = String.format(
                         stringResource(R.string.the_word_was_x),
@@ -106,7 +106,6 @@ fun Leaderboard(
                     // Get string from resources strings
                     stringResource(R.string.game_over)
                 } else if (viewModel.secondsLeft != 0) {
-                    //"Round ${gameRoom?.getCurrentRoundNumber()}"
                     getRoundString(roundNumber, totalNumberOfRounds)
                 } else {
                     String.format(
