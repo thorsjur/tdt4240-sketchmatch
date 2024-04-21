@@ -140,7 +140,7 @@ fun JoinGameRoomByCodePopupContent(
             },
             enabled = gameNameString.isNotBlank(),
         ) {
-            Text(stringResource(id = R.string.submit))
+            Text(stringResource(id = R.string.join_game_room_button))
         }
     }
 }
