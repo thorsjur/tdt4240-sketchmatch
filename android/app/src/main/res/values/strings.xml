@@ -49,7 +49,7 @@
     <string name="submit">Submit</string>
     <string name="set_nickname_success_msg">Nickname set successfully</string>
     <string name="set_nickname_error_msg">Something went wrong. Please try again or restart the game.</string>
-    <string name="greetings_message">Hey, %1$s!</string>
+    <string name="greetings_message">Welcome, %1$s!</string>
     <string name="choose_word">Choose a word to draw</string>
     <string name="easy_word">Easy</string>
     <string name="medium_word">Medium</string>

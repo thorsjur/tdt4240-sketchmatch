@@ -50,7 +50,7 @@
     <string name="submit">Send inn</string>
     <string name="set_nickname_success_msg">Kallenavnet ditt ble satt vellykket</string>
     <string name="set_nickname_error_msg">Noe gikk galt. Vennligst prøv igjen eller start spillet på nytt.</string>
-    <string name="greetings_message">Hei, %1$s!</string>
+    <string name="greetings_message">Velkommen, %1$s!</string>
     <string name="choose_word">Velg et ord å tegne</string>
     <string name="easy_word">Lett</string>
     <string name="medium_word">Middels</string>
