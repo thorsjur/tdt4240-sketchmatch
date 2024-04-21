@@ -85,7 +85,10 @@ fun UsernameEnterDialogContent(
 ) {
     var gameNameString by remember { mutableStateOf("") }
 
-    Column (horizontalAlignment = Alignment.CenterHorizontally){
+    Column (
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = stringResource(id = R.string.set_nickname_modal_title),
             style = MaterialTheme.typography.headlineMedium.copy(

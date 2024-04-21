@@ -130,7 +130,6 @@ fun CreateGameDialog(
                 containerColor = MaterialTheme.colorScheme.primary
             ),
         ) {
-
             CreateGameDialogContent(
                 onCreateGameRoom = onCreateGameRoom,
                 numOfPlayers = numOfPlayers,
@@ -153,7 +152,10 @@ fun CreateGameDialogContent(
 ) {
     val enableConfirm = gameNameString.isNotBlank() && numOfPlayers in 2..5
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = stringResource(R.string.create_game_room_popup_title),
             style = MaterialTheme.typography.headlineMedium.copy(
