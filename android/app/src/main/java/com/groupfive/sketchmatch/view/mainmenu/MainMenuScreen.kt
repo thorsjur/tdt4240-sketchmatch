@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -64,8 +65,10 @@ fun MainMenuScreen(
             )
             if (player?.nickname != null && player?.nickname!!.isNotEmpty()) {
                 CreateGreetingsText(username = player?.nickname!!)
+            } else {
+                Spacer(modifier = Modifier.padding(bottom = 50.dp))
             }
-            CreateGameButton(onCreateGameClicked = { openCreateGamePopup = true})
+            CreateGameButton(onCreateGameClicked = { openCreateGamePopup = true })
             JoinGameButton(onJoinGameClicked = { navController.navigate(Screen.GameRoomsList.route) })
             HelpButton(onHelpClicked = { navController.navigate(Screen.Help.route) })
 
