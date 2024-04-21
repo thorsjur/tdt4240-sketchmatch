@@ -348,38 +348,3 @@ gameRoomsRepository.on('game_room_destroyed', gameRoom => {
 httpServer.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
-
-//const player1 = playersRepository.addPlayer("hwid1", "Player 1");
-//const player2 = playersRepository.addPlayer("hwid2", "Player 2");
-
-//const gameRoom = gameRoomsRepository.createGameRoom("Game Room 1", player1, 2);
-
-//gameRoomsRepository.handlePlayerLeaving(player1.id);
-
-/* 
-// Create new player
-const player1 = playersRepository.addPlayer("hwid1", "Player 1");
-const player2 = playersRepository.addPlayer("hwid2", "Player 2");
-
-// Create new game room
-const gameRoom = gameRoomsRepository.createGameRoom("Game Room 1", player1, 2);
-
-// Add player to the game room
-gameRoom.addPlayer(player2);
-
-import { WordDifficultyPoints } from "./Models/GameRoom.mjs";
-
-// Start round
-gameRoomsRepository.startRound(gameRoom.id, "ivan", WordDifficultyPoints.EASY);
-
-setTimeout(() => {
-  gameRoomsRepository.handleGuess(gameRoom.id, player2.id, "ivan");
-}, 1500);
-
-// wait for 10csec
-setTimeout(() => {
-  // Start round
-  gameRoomsRepository.startRound(gameRoom.id, "tsvetelin", WordDifficultyPoints.HARD);
-  gameRoomsRepository.handleGuess(gameRoom.id, player2.id, "ivan");
-}, 15000);
- */
