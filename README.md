@@ -58,6 +58,10 @@ You can start the server by running the following command in the [``server``](./
 npm start
 ```
 
+## APK
+The APK file for the project is located in the [`apk`](/apk/) directory. 
+
+
 ## Project Structure
 
 The project is structured into several packages and directories:
