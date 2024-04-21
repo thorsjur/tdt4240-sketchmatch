@@ -67,7 +67,6 @@ fun GuessScreen(
     val gameRoomId = GameData.currentGameRoom.value?.id ?: 0
 
     var currentGuess = drawViewModel.currentGuess.value
-    var guessWordIsCorrect by rememberSaveable { mutableStateOf(false) }
 
     val events = guessViewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
@@ -156,7 +155,7 @@ fun GuessScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    enabled = !guessWordIsCorrect,
+                    enabled = !guessViewModel.isCorrect,
                     onClick = {
                         guessViewModel.checkGuess(currentGuess.lowercase(), gameRoomId);
                         //showCorrectnessIcon = true

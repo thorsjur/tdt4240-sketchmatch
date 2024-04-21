@@ -119,7 +119,7 @@ export class GameRoomsRepository extends EventEmitter{
     }
 
     handlePlayerLeaving(uuid) {
-        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.players.some((player) => player.hwid === uuid));
+        const gameRoom = this.gameRooms.find((gameRoom) => gameRoom.players.some((player) => player && player.hwid === uuid));
 
         if (gameRoom) {
             gameRoom.removePlayerByHwid(uuid);

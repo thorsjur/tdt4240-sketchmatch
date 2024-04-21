@@ -1,6 +1,9 @@
 package com.groupfive.sketchmatch.viewmodels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -19,7 +22,7 @@ import kotlinx.serialization.json.Json
 
 class GuessViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
-    var isCorrect: Boolean = false
+    var isCorrect by mutableStateOf(false)
 
     private val _eventsFlow = MutableSharedFlow<Event>()
     val eventsFlow = _eventsFlow.asSharedFlow()
@@ -46,7 +49,7 @@ class GuessViewModel : ViewModel() {
             GameData.lastGuessCorrectness.postValue(true)
             GameData.currentGameRoom.postValue(guess.gameRoom)
 
-            if(guess.playerId == GameData.currentPlayer.value?.id) {
+            if (guess.playerId == GameData.currentPlayer.value?.id) {
                 isCorrect = guess.isCorrect
 
                 // Wait for 2 seconds before sending the GuessAnswerEvent
@@ -64,7 +67,7 @@ class GuessViewModel : ViewModel() {
     fun handleRender(controller: DrawController) {
         controller.reset()
         GameData.drawBoxPayLoad.postValue(null)
-        
+
         client.addCallback(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value) {
             Log.i("GuessViewModel", "DRAW_PAYLOAD_PUBLISHED: $it")
 
