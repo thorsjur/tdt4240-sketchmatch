@@ -27,9 +27,6 @@ class GameRoomsViewModel : ViewModel() {
     val eventsFlow = eventChannel.receiveAsFlow()
 
     init {
-        // Initialize the list of game rooms with fake data
-        populateFakeGameRooms()
-
         // Add a callback to handle incoming rooms_list messages
         client.addCallback(ResponseEvent.ROOMS_LIST.value) { message ->
             Log.i("GameRoomsViewModel", "ROOMS_LIST_EVENT: $message")
