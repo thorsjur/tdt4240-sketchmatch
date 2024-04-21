@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Check
@@ -210,7 +211,7 @@ fun LeaveGameButton(onLeaveGameClicked: () -> Unit) {
     Button(
         modifier = Modifier
             .padding(vertical = 3.dp)
-            .width(125.dp),
+            .wrapContentWidth(),
         onClick = onLeaveGameClicked
     ) {
         Text(text = stringResource(R.string.leave_game))

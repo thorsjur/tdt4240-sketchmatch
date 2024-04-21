@@ -74,4 +74,7 @@
     <string name="players_waiting">Players: %1$s</string>
     <string name="wait_for_drawer">Waiting for %1$s to choose a word to draw</string>
     <string name="drawing_player">Player that will draw this round:</string>
+    <string name="game_over">Game over!</string>
+    <string name="player_x_choosing_word">Player %1$s is choosing a word</string>
+    <string name="the_word_was_x">The word was %1$s!</string>
 </resources>

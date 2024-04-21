@@ -26,9 +26,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -84,25 +86,42 @@ fun Leaderboard(
                 contentDescription = null,
                 modifier = Modifier.size(250.dp)
             )
+
+
+            if (gameRoom?.gameStatus != GameRoomStatus.FINISHED) {
+                Text(
+                    text = String.format(
+                        stringResource(R.string.the_word_was_x),
+                        "\"${GameData.currentGameRoom.value?.word}\"" ?: "Unknown"
+                    ),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val gameStatus = gameRoom?.gameStatus
                 val title = if (gameStatus == GameRoomStatus.FINISHED) {
-                    "Game over!"
+                    // Get string from resources strings
+                    stringResource(R.string.game_over)
                 } else if (viewModel.secondsLeft != 0) {
                     //"Round ${gameRoom?.getCurrentRoundNumber()}"
                     getRoundString(roundNumber, totalNumberOfRounds)
                 } else {
-                    "${gameRoom?.getDrawingPlayerName()} is choosing a word"
+                    String.format(
+                        stringResource(R.string.wait_for_drawer),
+                        gameRoom?.getDrawingPlayerName()
+                    )
                 }
 
                 Text(
-
                     modifier = Modifier.padding(10.dp),
                     text = title,
                     style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.ExtraBold
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 25.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 )
 
@@ -117,7 +136,8 @@ fun Leaderboard(
                     Text(
                         text = "${viewModel.secondsLeft}",
                         style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 25.sp
                         )
                     )
                 }
