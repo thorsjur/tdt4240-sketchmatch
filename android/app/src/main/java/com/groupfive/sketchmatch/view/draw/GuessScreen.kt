@@ -1,6 +1,5 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.draw
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -46,10 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavController
+import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.store.GameData
-import com.groupfive.sketchmatch.navigator.Screen
-import com.groupfive.sketchmatch.view.misc.AlertPopup
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import io.ak1.drawbox.DrawBox
@@ -69,7 +67,6 @@ fun GuessScreen(
     val gameRoomId = GameData.currentGameRoom.value?.id ?: 0
 
     var currentGuess = drawViewModel.currentGuess.value
-    var guessWordIsCorrect by rememberSaveable { mutableStateOf(false) }
 
     val events = guessViewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
@@ -83,8 +80,6 @@ fun GuessScreen(
     if (drawBoxPayLoad != null) {
         controller.importPath(drawBoxPayLoad!!)
     }
-
-
 
     LaunchedEffect(Unit) {
         guessViewModel.handleRender(controller)
@@ -107,9 +102,11 @@ fun GuessScreen(
         }
     }
 
-    Box (modifier = modifier
-        .fillMaxWidth(),
-        contentAlignment = Alignment.Center){
+    Box(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
         Column {
             Surface(
                 modifier = modifier
@@ -158,61 +155,59 @@ fun GuessScreen(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    enabled = !guessWordIsCorrect,
+                    enabled = !guessViewModel.isCorrect,
                     onClick = {
                         guessViewModel.checkGuess(currentGuess.lowercase(), gameRoomId);
-                        showCorrectnessIcon = true
+                        //showCorrectnessIcon = true
                     }) {
                     Text(text = "Guess")
                 }
             }
         }
 
-        // Show correctness icon when GameRoom.guessedCorrectly is updated and the last element = current player id\
-        var guessedCorrectly = GameData.currentGameRoom.value?.guessedCorrectly
-        var showIcon: Boolean = GameData.lastGuessCorrectness.value == true
+        LaunchedEffect(key1 = guessViewModel) {
+            guessViewModel.eventsFlow.collect { event ->
+                when (event) {
+                    is Event.GuessAnswerEvent -> {
+                        showCorrectnessIcon = true
+                    }
 
-        if (!guessedCorrectly.isNullOrEmpty()) {
-
-            if (guessedCorrectly.last() == GameData.currentPlayer.value?.id && showIcon) {
-                showCorrectnessIcon = true
-                guessWordIsCorrect = true
-            } else {
-                guessWordIsCorrect = false
+                    null -> {}
+                }
             }
         }
 
         if (showCorrectnessIcon) {
             LaunchedEffect(key1 = Unit) {
                 delay(2000)
-                GameData.lastGuessCorrectness.postValue(false)
                 showCorrectnessIcon = false
             }
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Log.i("GuessScreen", "guessWordIsCorrect: $guessWordIsCorrect")
-                if (showCorrectnessIcon)  {
-                    if (guessWordIsCorrect) {
-                        Icon(
-                            modifier = Modifier.size(230.dp),
-                            imageVector = Icons.Filled.CheckCircle,
-                            contentDescription = stringResource(R.string.correct),
-                            tint = Color.Green.copy(alpha = 0.3f)
-                        )
-                    } else {
-                        Icon(
-                            modifier = Modifier.size(230.dp),
-                            imageVector = Icons.Filled.Cancel,
-                            contentDescription = stringResource(R.string.incorrect),
-                            tint = Color.Red.copy(alpha = 0.3f),
-                        )
-                    }
 
+            if (guessViewModel.isCorrect) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        modifier = Modifier.size(230.dp),
+                        imageVector = Icons.Filled.CheckCircle,
+                        contentDescription = stringResource(R.string.correct),
+                        tint = Color.Green.copy(alpha = 0.3f)
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        modifier = Modifier.size(230.dp),
+                        imageVector = Icons.Filled.Cancel,
+                        contentDescription = stringResource(R.string.incorrect),
+                        tint = Color.Red.copy(alpha = 0.3f),
+                    )
                 }
             }
-
         }
     }
 }

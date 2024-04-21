@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.Check
@@ -36,13 +37,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.Difficulty
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
@@ -80,12 +80,14 @@ fun DrawScreenLayout(
                 // Navigate to the draw screen
                 navController.navigate(Screen.Leaderboard.route)
             }
-            null -> { }
+
+            null -> {}
         }
     }
 
     if (gameRoom?.gameStatus == GameRoomStatus.CHOOSING
-        && playerIsDrawing) {
+        && playerIsDrawing
+    ) {
         WordChoiceDialog(
             drawViewModel = drawViewModel,
             onDismissRequest = drawViewModel::dismissWordDialog,
@@ -104,13 +106,11 @@ fun DrawScreenLayout(
                 ) {
                     Spacer(modifier.weight(1f))
                     LeaveGameButton(onLeaveGameClicked = {
-                        drawViewModel.goBackToMainMenu(
-                            navController
-                        )
+                        drawViewModel.goBackToMainMenu(navController)
                     })
                 }
 
-                TopWordBar(modifier, currentWord, timeCount, drawViewModel)
+                TopWordBar(modifier, currentWord, timeCount, drawViewModel, playerIsDrawing)
 
                 if (playerIsDrawing) {
                     DrawScreen(
@@ -130,7 +130,12 @@ fun DrawScreenLayout(
                     modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    GameData.currentGameRoom.value?.let { PlayersIconsBar(modifier, currentPlayers = it.players) }
+                    GameData.currentGameRoom.value?.let {
+                        PlayersIconsBar(
+                            modifier,
+                            currentPlayers = it.players
+                        )
+                    }
                 }
             }
         }
@@ -164,13 +169,15 @@ fun WordChoiceDialog(
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
-                ) { drawViewModel.onWordChosen(mediumWord);
+                ) {
+                    drawViewModel.onWordChosen(mediumWord);
                     setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM)
                 }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
-                ) { drawViewModel.onWordChosen(hardWord);
+                ) {
+                    drawViewModel.onWordChosen(hardWord);
                     setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD)
                 }
             }
@@ -204,7 +211,7 @@ fun LeaveGameButton(onLeaveGameClicked: () -> Unit) {
     Button(
         modifier = Modifier
             .padding(vertical = 3.dp)
-            .width(125.dp),
+            .wrapContentWidth(),
         onClick = onLeaveGameClicked
     ) {
         Text(text = stringResource(R.string.leave_game))
@@ -217,9 +224,10 @@ fun TopWordBar(
     modifier: Modifier,
     currentWord: String,
     timeCount: Int,
-    drawViewModel: DrawViewModel
+    drawViewModel: DrawViewModel,
+    isDrawing: Boolean
 ) {
-
+    val gameRoom = GameData.currentGameRoom.observeAsState()
     var formattedTime = drawViewModel.formatTime(timeCount)
     var numberOfPlayers = GameData.currentGameRoom.value?.players?.size
     var currentRoundNumber = GameData.currentGameRoom.value?.getCurrentRoundNumber()
@@ -234,14 +242,12 @@ fun TopWordBar(
                 .padding(20.dp)
         ) {
             Column(modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)) {
-                Text(text = stringResource(if (drawViewModel.isDrawing.value) R.string.draw else R.string.guess) + ":")
+                Text(text = stringResource(if (isDrawing) R.string.draw else R.string.guess) + ":")
             }
             Column(modifier.padding(5.dp, 0.dp)) {
                 Text(
                     fontWeight = FontWeight.Bold,
-                    text = if (drawViewModel.isDrawing.value) currentWord else "_ ".repeat(
-                        currentWord.length
-                    )
+                    text = if (isDrawing) currentWord else gameRoom.value!!.getCurrentWordMask()
                 )
             }
             Spacer(modifier.weight(1f))

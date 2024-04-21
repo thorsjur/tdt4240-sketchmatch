@@ -1,47 +1,50 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.leaderboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.groupfive.sketchmatch.models.Player
-import com.groupfive.sketchmatch.viewmodels.LeaderboardViewModel
-import androidx.compose.material.icons.filled.Alarm
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
+import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.utils.getPlayerRankString
 import com.groupfive.sketchmatch.utils.getRoundString
 import com.groupfive.sketchmatch.view.draw.LeaveGameButton
+import com.groupfive.sketchmatch.viewmodels.LeaderboardViewModel
 
 @Composable
 fun Leaderboard(
@@ -61,14 +64,16 @@ fun Leaderboard(
             is Event.NavigateDrawerToChoose -> {
                 viewModel.clearAllCallbacks()
                 navController.popBackStack()
-                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+                navController.navigate(Screen.Draw.route)
             }
+
             is Event.NavigateToDraw -> {
                 viewModel.clearAllCallbacks()
                 navController.popBackStack()
-                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+                navController.navigate(Screen.Draw.route)
             }
-            null -> { }
+
+            null -> {}
         }
     }
 
@@ -81,30 +86,48 @@ fun Leaderboard(
                 contentDescription = null,
                 modifier = Modifier.size(250.dp)
             )
-            Row (
+
+
+            if (gameRoom?.gameStatus != GameRoomStatus.FINISHED) {
+                Text(
+                    text = String.format(
+                        stringResource(R.string.the_word_was_x),
+                        "\"${GameData.currentGameRoom.value?.word}\"" ?: "Unknown"
+                    ),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+
+            Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val gameStatus = gameRoom?.gameStatus
                 val title = if (gameStatus == GameRoomStatus.FINISHED) {
-                    "Game over!"
+                    // Get string from resources strings
+                    stringResource(R.string.game_over)
                 } else if (viewModel.secondsLeft != 0) {
                     //"Round ${gameRoom?.getCurrentRoundNumber()}"
                     getRoundString(roundNumber, totalNumberOfRounds)
                 } else {
-                    "${gameRoom?.getDrawingPlayerName()} is choosing a word"
+                    String.format(
+                        stringResource(R.string.wait_for_drawer),
+                        gameRoom?.getDrawingPlayerName()
+                    )
                 }
 
                 Text(
-
                     modifier = Modifier.padding(10.dp),
                     text = title,
                     style = MaterialTheme.typography.headlineLarge.copy(
-                        fontWeight = FontWeight.ExtraBold
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 25.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 )
 
                 if (gameStatus != GameRoomStatus.FINISHED &&
-                    viewModel.secondsLeft != 0) {
+                    viewModel.secondsLeft != 0
+                ) {
                     Icon(
                         modifier = Modifier.padding(vertical = 5.dp, horizontal = 15.dp),
                         imageVector = Icons.Filled.Alarm,
@@ -113,7 +136,8 @@ fun Leaderboard(
                     Text(
                         text = "${viewModel.secondsLeft}",
                         style = MaterialTheme.typography.headlineLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 25.sp
                         )
                     )
                 }

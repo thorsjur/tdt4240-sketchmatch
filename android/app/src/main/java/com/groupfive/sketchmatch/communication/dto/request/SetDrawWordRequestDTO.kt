@@ -1,10 +1,10 @@
 package com.groupfive.sketchmatch.communication.dto.request
 
-import com.groupfive.sketchmatch.Difficulty
+import com.groupfive.sketchmatch.store.Difficulty
 
-class SetDrawWordRequestDTO (
+class SetDrawWordRequestDTO(
     var drawWord: String = "null",
     var difficulty: Difficulty = Difficulty.EASY,
-    var gameRoomId: Int = 1)
-{
+    var gameRoomId: Int = 1
+) {
 }

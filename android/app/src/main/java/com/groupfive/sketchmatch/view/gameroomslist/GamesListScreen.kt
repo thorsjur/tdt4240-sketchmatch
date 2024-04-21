@@ -40,17 +40,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.groupfive.sketchmatch.R
+import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
 import com.groupfive.sketchmatch.view.mainmenu.CreateGamePopUp
-import com.groupfive.sketchmatch.viewmodels.CreateGameViewModel
 import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
 
 @Composable
 fun GamesListScreen(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
 ) {
     val context = LocalContext.current
     val viewModel: GameRoomsViewModel = viewModel()
@@ -58,35 +58,35 @@ fun GamesListScreen(
     var openCreateGamePopup by remember { mutableStateOf(false) }
     var openJoinGameRoomByCodePopup by remember { mutableStateOf(false) }
 
-    val successEvent by viewModel.successEvent.observeAsState()
-    val errorEvent by viewModel.errorEvent.observeAsState()
+    val gamesListEvents = viewModel.eventsFlow.collectAsState(initial = null)
+    val gamesListEventsValue = gamesListEvents.value
+
+    LaunchedEffect(gamesListEventsValue) {
+        when (gamesListEventsValue) {
+            is Event.RoomSuccessEvent -> {
+                viewModel.removeAllCallbacks()
+
+                Log.i("GamesListScreen", "Game room joined successfully")
+
+                navController.popBackStack()
+                navController.popBackStack()
+                viewModel.clearAllCallbacks()
+                navController.navigate(Screen.WaitingLobby.route)
+            }
+
+            is Event.RoomErrorEvent -> {
+                Log.i("GamesListScreen", "Error joining game room")
+            }
+
+            null -> {}
+        }
+    }
 
     // Handle back button press
     BackHandler {
         // Remove all callbacks for events from the server as we are leaving the screen and don't need them anymore to update the UI
         viewModel.removeAllCallbacks()
         navController.popBackStack()
-    }
-
-    successEvent?.getContentIfNotHandled()?.let {
-        viewModel.removeAllCallbacks()
-
-        Log.i("GamesListScreen", "Game room joined successfully")
-
-        viewModel.joinGameByCodeMessage.value?.let {
-            GamesListToastMaker(context, it)
-            Log.i("GamesListScreen", it)
-        }
-
-        navController.popBackStack()
-        navController.popBackStack()
-        viewModel.clearAllCallbacks()
-        navController.navigate(Screen.WaitingLobby.route)
-    }
-
-    errorEvent?.getContentIfNotHandled()?.let {
-        Log.i("GamesListScreen", "Error joining game room")
-        viewModel.joinGameByCodeMessage.value?.let { GamesListToastMaker(context, it) }
     }
 
     Surface(
@@ -196,13 +196,10 @@ fun GamesListScreen(
                 openJoinGameRoomByCodePopup = false
                 viewModel.removeAllCallbacks()
 
-                // TODO: Navigate to the game lobby screen
-                // TODO: Replace mockId with actual roomId
-                val mockId = 1234
                 navController.popBackStack()
                 navController.popBackStack()
                 viewModel.clearAllCallbacks()
-                navController.navigate(Screen.Draw.route + "/$mockId")
+                navController.navigate(Screen.Draw.route)
             }
         )
     }

@@ -56,7 +56,7 @@ fun WaitingLobby(
                 // Remove the current screen from the back stack
                 navController.popBackStack()
                 // Navigate to the draw screen
-                navController.navigate(Screen.Draw.route + "/${gameRoom?.id}")
+                navController.navigate(Screen.Draw.route)
             }
             null -> { }
         }
@@ -102,8 +102,10 @@ fun WaitingLobby(
             },
             confirmButton = {
                 Button(onClick = {
-                    viewModel.clearAllCallbacks()
-                    navController.navigate(Screen.MainMenu.route) },
+                    viewModel.leaveGameRoom()
+                        viewModel.clearAllCallbacks()
+                        navController.navigate(Screen.MainMenu.route)
+                    },
                     modifier
                         .fillMaxWidth()
                         .wrapContentWidth()) {

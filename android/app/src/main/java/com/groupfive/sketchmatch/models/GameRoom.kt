@@ -16,7 +16,10 @@ class GameRoom {
     var guessedCorrectly: List<String> = emptyList()
 
     fun getCurrentRoundNumber(): Int {
-        return drawingPlayer
+        return drawingPlayer +
+                (if (gameStatus == GameRoomStatus.FINISHED
+                    || gameStatus == GameRoomStatus.CHOOSING)
+                    0 else 1)
     }
 
     fun getTotalNumberOfRounds(): Int {
@@ -24,7 +27,7 @@ class GameRoom {
     }
 
     fun getDrawingPlayerId(): String {
-        if(drawingPlayer >= players.size) {
+        if (drawingPlayer >= players.size) {
             return "Unknown"
         }
 
@@ -32,12 +35,14 @@ class GameRoom {
     }
 
     fun getDrawingPlayerName(): String {
-        if(drawingPlayer >= players.size) {
+        if (drawingPlayer >= players.size) {
             return ""
         }
 
         return players[drawingPlayer].nickname
     }
+
+    fun getCurrentWordMask() = "_ ".repeat(word.length)
 }
 
 // Enum class for game room status

@@ -72,15 +72,17 @@ fun CreateGamePopUp(
     val events = viewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
 
-    LaunchedEffect(event) {
-        when (event) {
-            is Event.NavigateToWaitingLobby -> {
-                navController.popBackStack()
-                viewModel.clearAllCallbacks()
-                navController.navigate(Screen.WaitingLobby.route)
-                Log.i("CreateGamePopUp", "CREATE_GAME_EVENT_RECEIVED")
+    LaunchedEffect(key1 = viewModel) {
+        viewModel.eventsFlow.collect { event ->
+            when (event) {
+                is Event.NavigateToWaitingLobby -> {
+                    navController.popBackStack()
+                    viewModel.clearAllCallbacks()
+                    navController.navigate(Screen.WaitingLobby.route)
+                }
+
+                null -> {}
             }
-            null -> { }
         }
     }
 

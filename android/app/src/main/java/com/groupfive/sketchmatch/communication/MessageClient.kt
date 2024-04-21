@@ -3,8 +3,6 @@ package com.groupfive.sketchmatch.communication
 import android.util.Log
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.BuildConfig
-import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.MESSAGE_EVENT
 import com.groupfive.sketchmatch.communication.dto.request.CheckGuessRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.PublishPathRequestDTO
@@ -13,6 +11,7 @@ import com.groupfive.sketchmatch.communication.dto.request.RoundTimerUpdateReque
 import com.groupfive.sketchmatch.communication.dto.request.SetDrawWordRequestDTO
 import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
 import com.groupfive.sketchmatch.serialization.PathWrapperSerializer
+import com.groupfive.sketchmatch.store.Difficulty
 import dev.icerock.moko.socket.Socket
 import dev.icerock.moko.socket.SocketEvent
 import dev.icerock.moko.socket.SocketOptions
@@ -28,7 +27,7 @@ import java.net.URISyntaxException
  * per mobile client.
  */
 class MessageClient private constructor(
-    private val hwid: String? = null
+    private val uuid: String? = null
 ) {
 
     companion object {
@@ -36,9 +35,9 @@ class MessageClient private constructor(
         @Volatile
         private var instance: MessageClient? = null
 
-        fun getInstance(hwid: String? = null) =
+        fun getInstance(uuid: String? = null) =
             instance ?: synchronized(this) {
-                instance ?: MessageClient(hwid).also { instance = it }
+                instance ?: MessageClient(uuid).also { instance = it }
             }
     }
 
@@ -58,7 +57,7 @@ class MessageClient private constructor(
             val queryParams = mutableMapOf<String, String>()
 
             // Add the hardware ID to the query parameters
-            hwid?.let { queryParams["hwid"] = it }
+            uuid?.let { queryParams["hwid"] = it }
 
             socket = Socket(
                 endpoint = BuildConfig.SOCKET_IO_ADDRESS,
@@ -105,12 +104,6 @@ class MessageClient private constructor(
                 on(SocketEvent.Pong) {
                     println("pong")
                     Log.i("Socket", "Pong")
-                }
-
-                on(MESSAGE_EVENT) { msg ->
-                    println("Message: $msg")
-                    Log.i("Socket", "Message: $msg")
-                    invokeCallbacks(MESSAGE_EVENT, msg)
                 }
 
                 // On SET_NICKNAME_RESPONSE_EVENT
@@ -190,6 +183,18 @@ class MessageClient private constructor(
                 on(ResponseEvent.ROUND_IS_CREATED_RESPONSE.value) { msg ->
                     Log.i("Socket", "Round is created: $msg")
                     invokeCallbacks(ResponseEvent.ROUND_IS_CREATED_RESPONSE.value, msg)
+                }
+
+                // On PLAYER_JOINED_ROOM event
+                on(ResponseEvent.PLAYER_JOINED_ROOM.value) { msg ->
+                    Log.i("Socket", "Player joined room: $msg")
+                    invokeCallbacks(ResponseEvent.PLAYER_JOINED_ROOM.value, msg)
+                }
+
+                // On PLAYER_LEFT_ROOM event
+                on(ResponseEvent.PLAYER_LEFT_ROOM.value) { msg ->
+                    Log.i("Socket", "Player left room: $msg")
+                    invokeCallbacks(ResponseEvent.PLAYER_LEFT_ROOM.value, msg)
                 }
             }
         } catch (e: URISyntaxException) {
@@ -323,7 +328,7 @@ class MessageClient private constructor(
         if (list == null) {
             eventCallbacks[event] = mutableListOf(callback)
         } else {
-            list.add { callback }
+            list.add(callback)
         }
     }
 

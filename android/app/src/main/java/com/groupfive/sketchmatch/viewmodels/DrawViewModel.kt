@@ -2,7 +2,6 @@ package com.groupfive.sketchmatch.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
@@ -10,24 +9,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.gson.Gson
-import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
+import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.Difficulty
 import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.store.WordRepository
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
-
-    private val roomId: String = checkNotNull(savedStateHandle["roomId"])
 
     private val _showWordDialog = mutableStateOf(true)
     val showWordDialog: State<Boolean> = _showWordDialog
@@ -72,6 +69,8 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
+    fun handleRender(controller: DrawController) = controller.reset()
+
     // Load initial words
     init {
         Log.i("DrawViewModel", "DrawViewModel created")
@@ -102,7 +101,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
             GameData.currentGameRoom.postValue(gameRoom.gameRoom)
 
-            if(gameRoom.gameRoom.gameStatus == GameRoomStatus.FINISHED) {
+            if (gameRoom.gameRoom.gameStatus == GameRoomStatus.FINISHED) {
                 sendEvent(Event.NavigateToLeaderboard)
             }
         }
@@ -227,6 +226,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     fun goBackToMainMenu(navController: NavController) {
         dismissWordDialog()
         navController.navigate(Screen.MainMenu.route)
+        client.sendMessage(RequestEvent.LEAVE_ROOM.value, "")
     }
 
     fun formatTime(timeCount: Int): String {

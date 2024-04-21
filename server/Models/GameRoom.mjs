@@ -38,8 +38,48 @@ export class GameRoom extends EventEmitter {
         }
     }
 
+    // Remove player by ID
+    removePlayerById(playerId) {
+        if(this.gameStatus != GameStatus.WAITING) {
+            this.endGame();
+        }
+
+        this.players = this.players.filter((player) => player.id !== playerId);
+
+        if(this.players.length === 0) {
+            this.destroy();
+        } else {
+            this.emit('player_left_room', this);
+        }
+    }
+
+    // Remove player by hwid
+    removePlayerByHwid(playerHwid) {
+        if(this.gameStatus != GameStatus.WAITING) {
+            this.endGame();
+        }
+
+        this.players = this.players.filter((player) => player.hwid !== playerHwid);
+
+        if(this.players.length === 0) {
+            this.destroy();
+        } else {
+            this.emit('player_left_room', this);
+        }
+    }
+
     removePlayer(player) {
+        if(this.gameStatus != GameStatus.WAITING) {
+            this.endGame();
+        }
+        
         this.players = this.players.filter((p) => p.id !== player.id);
+
+        if(this.players.length === 0) {
+            this.destroy();
+        } else {
+            this.emit('player_left_room', this);
+        }
     }
 
     getRoomId() {
@@ -125,6 +165,9 @@ export class GameRoom extends EventEmitter {
         this.setGameStatus(GameStatus.FINISHED);
         this.emit('round_finished', this);
         this.clearPlayerPoints();
+
+        // Remove the game room from the repository
+        this.destroy();
     }
 
     clearPlayerPoints() {
@@ -150,6 +193,10 @@ export class GameRoom extends EventEmitter {
         this.wordDifficultyPoints = null;
         this.guessedCorrectly = [];
         this.stopTimer = false;
+    }
+
+    destroy() {
+        this.emit('game_room_destroyed', this);
     }
 
     getCurrentRoundNumber() {

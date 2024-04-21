@@ -34,6 +34,7 @@ class LeaderboardViewModel : ViewModel() {
             eventChannel.send(event)
         }
     }
+
     init {
         client.addCallback(ResponseEvent.ROUND_FINISHED_RESPONSE.value) { message ->
             Log.i("LeaderboardViewModel", "ROUND_FINISHED_RESPONSE: $message")

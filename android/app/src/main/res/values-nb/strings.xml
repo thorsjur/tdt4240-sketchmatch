@@ -75,4 +75,7 @@
     <string name="players_waiting">Spillere: %1$s</string>
     <string name="wait_for_drawer">Venter på at %1$s skal velge et ord å tegne</string>
     <string name="drawing_player">Spilleren som skal tegne denne runden:</string>
+    <string name="game_over">Spillet er over!</string>
+    <string name="player_x_choosing_word">Spiller %1$s velger et ord</string>
+    <string name="the_word_was_x">Ordet var %1$s!</string>
 </resources>
