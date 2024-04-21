@@ -1,4 +1,4 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.store
 
 object WordRepository {
     val easyWords = listOf("cat", "sun", "cup")

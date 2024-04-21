@@ -1,6 +1,5 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.draw
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -46,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
@@ -103,9 +103,11 @@ fun GuessScreen(
         }
     }
 
-    Box (modifier = modifier
-        .fillMaxWidth(),
-        contentAlignment = Alignment.Center){
+    Box(
+        modifier = modifier
+            .fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
         Column {
             Surface(
                 modifier = modifier

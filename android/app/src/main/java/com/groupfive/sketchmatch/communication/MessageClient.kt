@@ -3,8 +3,6 @@ package com.groupfive.sketchmatch.communication
 import android.util.Log
 import com.google.gson.Gson
 import com.groupfive.sketchmatch.BuildConfig
-import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.MESSAGE_EVENT
 import com.groupfive.sketchmatch.communication.dto.request.CheckGuessRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.CreateGameRequestDTO
 import com.groupfive.sketchmatch.communication.dto.request.PublishPathRequestDTO
@@ -13,6 +11,7 @@ import com.groupfive.sketchmatch.communication.dto.request.RoundTimerUpdateReque
 import com.groupfive.sketchmatch.communication.dto.request.SetDrawWordRequestDTO
 import com.groupfive.sketchmatch.serialization.DrawBoxPayLoadSerializer
 import com.groupfive.sketchmatch.serialization.PathWrapperSerializer
+import com.groupfive.sketchmatch.store.Difficulty
 import dev.icerock.moko.socket.Socket
 import dev.icerock.moko.socket.SocketEvent
 import dev.icerock.moko.socket.SocketOptions
@@ -105,12 +104,6 @@ class MessageClient private constructor(
                 on(SocketEvent.Pong) {
                     println("pong")
                     Log.i("Socket", "Pong")
-                }
-
-                on(MESSAGE_EVENT) { msg ->
-                    println("Message: $msg")
-                    Log.i("Socket", "Message: $msg")
-                    invokeCallbacks(MESSAGE_EVENT, msg)
                 }
 
                 // On SET_NICKNAME_RESPONSE_EVENT

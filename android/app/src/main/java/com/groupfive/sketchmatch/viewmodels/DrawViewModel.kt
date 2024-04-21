@@ -9,8 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.gson.Gson
-import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.WordRepository
 import com.groupfive.sketchmatch.communication.MessageClient
 import com.groupfive.sketchmatch.communication.RequestEvent
 import com.groupfive.sketchmatch.communication.ResponseEvent
@@ -18,7 +16,9 @@ import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatus
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.Difficulty
 import com.groupfive.sketchmatch.store.GameData
+import com.groupfive.sketchmatch.store.WordRepository
 import io.ak1.drawbox.DrawController
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow

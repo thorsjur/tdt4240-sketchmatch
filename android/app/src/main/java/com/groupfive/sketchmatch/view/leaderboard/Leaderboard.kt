@@ -1,4 +1,4 @@
-package com.groupfive.sketchmatch
+package com.groupfive.sketchmatch.view.leaderboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.models.Player

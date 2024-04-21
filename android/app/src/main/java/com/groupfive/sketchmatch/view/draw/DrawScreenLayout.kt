@@ -36,13 +36,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.groupfive.sketchmatch.Difficulty
-import com.groupfive.sketchmatch.GuessScreen
 import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.models.GameRoomStatus
 import com.groupfive.sketchmatch.models.Player
 import com.groupfive.sketchmatch.navigator.Screen
+import com.groupfive.sketchmatch.store.Difficulty
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
 import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
