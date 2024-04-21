@@ -14,9 +14,7 @@ fun getPlayerRankString(rank: Int): String {
 fun getRoundString(roundNumber: Int, numberOfRounds: Int): String {
     return if (roundNumber == 1) {
         "Score after 1 round"
-    } else if (roundNumber < numberOfRounds) {
-        "Score after $roundNumber rounds"
     } else {
-        "Final score"
+        "Score after $roundNumber rounds"
     }
 }
