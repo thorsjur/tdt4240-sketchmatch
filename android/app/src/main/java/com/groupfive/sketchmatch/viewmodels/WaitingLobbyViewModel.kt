@@ -10,19 +10,18 @@ import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.GameRoomUpdateStatusResponseDTO
 import com.groupfive.sketchmatch.communication.dto.response.JoinGameResponseDTO
 import com.groupfive.sketchmatch.models.Event
-import com.groupfive.sketchmatch.models.GameRoom
 import com.groupfive.sketchmatch.store.GameData
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class WaitingLobbyViewModel: ViewModel() {
+class WaitingLobbyViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
 
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: Event) {
+    private fun sendEvent(event: Event) {
         viewModelScope.launch {
             eventChannel.send(event)
         }

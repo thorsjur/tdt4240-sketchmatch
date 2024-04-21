@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,12 +44,9 @@ import com.groupfive.sketchmatch.viewmodels.SetNicknameViewModel
 @Composable
 fun UsernameEnterDialog(
     modifier: Modifier = Modifier,
-    onSubmit: (String) -> Unit,
     onSuccess: (String) -> Unit,
     viewModel: SetNicknameViewModel = viewModel()
 ){
-    val context = LocalContext.current
-
     val setNicknameIsSuccess by viewModel.nicknameSetStatus.observeAsState(false)
     val nickname by viewModel.nickname.observeAsState("")
 
@@ -143,7 +139,6 @@ fun UsernameEnterDialogContent(
 fun UsernameEnterDialogPreview() {
     SketchmatchTheme {
         UsernameEnterDialog(
-            onSubmit = {},
             onSuccess = { _ ->
             }
         )

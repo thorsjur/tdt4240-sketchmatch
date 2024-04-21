@@ -13,7 +13,6 @@ class SetDrawWordViewModel : ViewModel() {
     private val client = MessageClient.getInstance()
 
     init {
-
         // Add a callback to handle incoming guess_updated message
         client.addCallback(ResponseEvent.SET_DRAW_WORD_RESPONSE.value) { message ->
             Log.i("SetDrawWordViewModel", "SET_DRAW_WORD_RESPONSE_EVENT: $message")

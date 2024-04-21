@@ -1,7 +1,6 @@
 package com.groupfive.sketchmatch.view.mainmenu
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -41,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,11 +49,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.groupfive.sketchmatch.view.misc.AlertPopup
 import com.groupfive.sketchmatch.R
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.ui.theme.SketchmatchTheme
+import com.groupfive.sketchmatch.view.misc.AlertPopup
 import com.groupfive.sketchmatch.viewmodels.CreateGameViewModel
 
 @Composable
@@ -92,13 +90,14 @@ fun CreateGamePopUp(
             numOfPlayers = numOfPlayers,
             onNumOfPlayersChanged = { newNumOfPlayers -> numOfPlayers = newNumOfPlayers },
             gameNameString = gameNameString,
-            onSetGameNameString = { newGameNameString -> gameNameString = newGameNameString } ,
-            onCreateGameRoom = { onOpenCreateGamePopup(false)
+            onSetGameNameString = { newGameNameString -> gameNameString = newGameNameString },
+            onCreateGameRoom = {
+                onOpenCreateGamePopup(false)
                 viewModel.createGameRoom(gameNameString, numOfPlayers)
             }
         )
     }
-    if (createGameIsError){
+    if (createGameIsError) {
         AlertPopup(
             onDismissRequest = { viewModel.isError.postValue(false) },
             onConfirmation = { viewModel.isError.postValue(false) },
@@ -111,13 +110,14 @@ fun CreateGamePopUp(
 }
 
 @Composable
-fun CreateGameDialog(numOfPlayers: Int,
-                     onNumOfPlayersChanged: (Int) -> Unit,
-                     onDismissRequest: () -> Unit,
-                     onCreateGameRoom: () -> Unit,
-                     gameNameString: String,
-                     onSetGameNameString: (String) -> Unit,
-                     ) {
+fun CreateGameDialog(
+    numOfPlayers: Int,
+    onNumOfPlayersChanged: (Int) -> Unit,
+    onDismissRequest: () -> Unit,
+    onCreateGameRoom: () -> Unit,
+    gameNameString: String,
+    onSetGameNameString: (String) -> Unit,
+) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -136,7 +136,8 @@ fun CreateGameDialog(numOfPlayers: Int,
                 numOfPlayers = numOfPlayers,
                 onNumOfPlayersChanged = onNumOfPlayersChanged,
                 gameNameString = gameNameString,
-                onSetGameNameString = onSetGameNameString)
+                onSetGameNameString = onSetGameNameString
+            )
         }
     }
 }
@@ -152,7 +153,7 @@ fun CreateGameDialogContent(
 ) {
     val enableConfirm = gameNameString.isNotBlank() && numOfPlayers in 2..5
 
-    Column (horizontalAlignment = Alignment.CenterHorizontally){
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.create_game_room_popup_title),
             style = MaterialTheme.typography.headlineMedium.copy(
@@ -169,7 +170,8 @@ fun CreateGameDialogContent(
             textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
             shape = RoundedCornerShape(8.dp),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = MaterialTheme.colorScheme.onPrimary),
+                containerColor = MaterialTheme.colorScheme.onPrimary
+            ),
             placeholder = { Text(stringResource(R.string.create_game_room_popup_example_name)) },
             modifier = Modifier
                 .padding(top = 20.dp, start = 20.dp, end = 20.dp)
@@ -191,7 +193,8 @@ fun CreateGameDialogContent(
                 .padding(bottom = 10.dp)
                 .width(150.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.onPrimaryContainer),
+                containerColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
             onClick = onCreateGameRoom,
             enabled = enableConfirm,
         ) {
@@ -252,7 +255,7 @@ fun Stepper(
 @Composable
 fun PopupPreview() {
     SketchmatchTheme {
-        Surface (modifier = Modifier.fillMaxSize()){
+        Surface(modifier = Modifier.fillMaxSize()) {
             CreateGamePopUp(
                 navController = rememberNavController(),
                 openCreateGamePopup = false,

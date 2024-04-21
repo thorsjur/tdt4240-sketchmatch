@@ -80,9 +80,7 @@ fun MainMenuScreen(
     if (player?.nickname.isNullOrEmpty()) {
         UsernameEnterDialog(
             modifier = Modifier,
-            onSubmit = { username ->
-            },
-            onSuccess = { message ->
+            onSuccess = { _ ->
                 // Show a toast message to the user
                 Toast.makeText(
                     context,

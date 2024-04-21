@@ -52,7 +52,6 @@ fun GamesListScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
 ) {
-    val context = LocalContext.current
     val viewModel: GameRoomsViewModel = viewModel()
     val gameRooms by viewModel.gameRooms.observeAsState()
     var openCreateGamePopup by remember { mutableStateOf(false) }
@@ -269,7 +268,7 @@ fun GamesListToastMaker(
     context: Context = LocalContext.current,
     messageId: String
 ) {
-    var message = when (messageId) {
+    val message = when (messageId) {
         "game_room_enter_success" -> stringResource(id = R.string.game_room_enter_success)
         "game_room_already_full" -> stringResource(id = R.string.game_room_already_full)
         "game_room_not_found" -> stringResource(id = R.string.game_room_not_found)

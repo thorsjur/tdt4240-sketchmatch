@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -24,10 +23,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+class DrawViewModel : ViewModel() {
 
     private val _showWordDialog = mutableStateOf(true)
-    val showWordDialog: State<Boolean> = _showWordDialog
 
     private val _currentWord = mutableStateOf("")
     val currentWord: State<String> = _currentWord
@@ -35,7 +33,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     private val _currentGuess = mutableStateOf("")
     val currentGuess: State<String> = _currentGuess
 
-    private val _isTimerRunning = mutableStateOf(false)
     private var _isColorBarVisible = mutableStateOf(false)
     val isColorBarVisible: State<Boolean> = _isColorBarVisible
 
@@ -53,9 +50,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     private val _hardWord = mutableStateOf("")
     val hardWord: State<String> = _hardWord
 
-    private val _isDrawing = mutableStateOf(true)
-    val isDrawing: State<Boolean> = _isDrawing
-
     private val client = MessageClient.getInstance()
 
     val gameRoom = GameData.currentGameRoom
@@ -63,7 +57,7 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     private val eventChannel = Channel<Event>(Channel.BUFFERED)
     val eventsFlow = eventChannel.receiveAsFlow()
 
-    fun sendEvent(event: Event) {
+    private fun sendEvent(event: Event) {
         viewModelScope.launch {
             eventChannel.send(event)
         }
@@ -109,37 +103,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         generateWords()
     }
 
-    // Remove all callbacks
-    fun clearCallbacks() {
-        client.removeAllCallbacks(ResponseEvent.ROUND_STARTED_RESPONSE.value)
-        client.removeAllCallbacks(ResponseEvent.OPEN_LEADERBOARD_RESPONSE.value)
-        client.removeAllCallbacks(ResponseEvent.ROUND_FINISHED_RESPONSE.value)
-
-        // Remove timer ticker callback
-        client.removeAllCallbacks(ResponseEvent.ROUND_TIMER_TICK_RESPONSE.value)
-        client.removeAllCallbacks(ResponseEvent.LEADERBOARD_TIMER_TICK_RESPONSE.value)
-
-        // Remove set Word callbacks
-        client.removeAllCallbacks(ResponseEvent.SET_DRAW_WORD_RESPONSE.value)
-
-        // Remove drawing transmit callbacks
-        client.removeAllCallbacks(ResponseEvent.ROUND_IS_CREATED_RESPONSE.value)
-        client.removeAllCallbacks(ResponseEvent.DRAW_PAYLOAD_PUBLISHED.value)
-    }
-
-    /*
-    fun submitGuess() {
-        val guess = currentGuess.value
-        // TODO: Add the required functionality to the server for handling guesses.
-    }
-
-    fun subscribeToRoom(controller: DrawController) = client.subscribeToRoom(
-        roomId = roomId.toInt()
-    ) { controller.importPath(it) }
-
-    fun unsubscribeFromRoom() = client.unsubscribeFromRoom(roomId.toInt())
-    */
-
     fun publishFullDrawBoxPayload(controller: DrawController) {
         val currentGameRoom = gameRoom.value
         if (currentGameRoom != null) {
@@ -149,36 +112,12 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
-    /*
-    private suspend fun handleTimer() {
-        while (_timeCount.intValue > 0 && _isTimerRunning.value) {
-            delay(1000)
-            _timeCount.value--
-        }
-        //_players.value = _players.value.map { it.copy(isComplete = true) }
-    }
-    */
-
     fun onWordChosen(word: String) {
         viewModelScope.launch {
             _currentWord.value = word
             _showWordDialog.value = false
-            //toggleTimerRunning()
         }
     }
-
-    /*
-    private fun toggleTimerRunning() {
-        viewModelScope.launch {
-            _isTimerRunning.value = !_isTimerRunning.value
-            handleTimer()
-        }
-    }
-
-    fun toggleIsDrawing() {
-        _isDrawing.value = !_isDrawing.value
-    }
-    */
 
     fun toggleColorBarVisibility() {
         if (_isSizePickerVisible.value) {
@@ -239,7 +178,6 @@ class DrawViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         val formattedSeconds = seconds.toString().padStart(2, '0')
 
         // Combine minutes and seconds into a "MM:SS" format
-        val formattedTime = "$formattedMinutes:$formattedSeconds"
-        return formattedTime
+        return "$formattedMinutes:$formattedSeconds"
     }
 }

@@ -5,8 +5,6 @@ open class Event {
     object NavigateToLeaderboard : Event()
     object NavigateDrawerToChoose : Event()
     object NavigateToWaitingLobby : Event()
-    object CorrectGuessEvent : Event()
-    object IncorrectGuessEvent : Event()
     object RoomErrorEvent : Event()
     object RoomSuccessEvent : Event()
     object GuessAnswerEvent : Event()

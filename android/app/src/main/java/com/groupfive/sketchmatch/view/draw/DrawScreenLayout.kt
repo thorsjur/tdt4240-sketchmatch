@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
@@ -45,7 +44,6 @@ import com.groupfive.sketchmatch.navigator.Screen
 import com.groupfive.sketchmatch.store.Difficulty
 import com.groupfive.sketchmatch.store.GameData
 import com.groupfive.sketchmatch.viewmodels.DrawViewModel
-import com.groupfive.sketchmatch.viewmodels.GameRoomsViewModel
 import com.groupfive.sketchmatch.viewmodels.GuessViewModel
 import com.groupfive.sketchmatch.viewmodels.RoundTimerUpdateViewModel
 import com.groupfive.sketchmatch.viewmodels.SetDrawWordViewModel
@@ -55,11 +53,10 @@ fun DrawScreenLayout(
     modifier: Modifier = Modifier,
     navController: NavController,
     drawViewModel: DrawViewModel = viewModel(),
-    guessViewModel: GuessViewModel = viewModel(),
-    gameRoomViewModel: GameRoomsViewModel = viewModel()
+    guessViewModel: GuessViewModel = viewModel()
 ) {
     val currentWord =
-        drawViewModel.currentWord.value // TODO: Change to use word from setDrawWordViewModel
+        drawViewModel.currentWord.value
     val roundTimerUpdateViewModel: RoundTimerUpdateViewModel = viewModel()
     val timeCount by roundTimerUpdateViewModel.updatedTimerTick.observeAsState(60)
 
@@ -69,7 +66,7 @@ fun DrawScreenLayout(
     val events = drawViewModel.eventsFlow.collectAsState(initial = null)
     val event = events.value // allow Smart cast
 
-    var playerIsDrawing = gameRoom?.getDrawingPlayerId() == player?.id
+    val playerIsDrawing = gameRoom?.getDrawingPlayerId() == player?.id
 
     LaunchedEffect(event) {
         when (event) {
@@ -90,8 +87,7 @@ fun DrawScreenLayout(
     ) {
         WordChoiceDialog(
             drawViewModel = drawViewModel,
-            onDismissRequest = drawViewModel::dismissWordDialog,
-            roundTimerUpdateViewModel = roundTimerUpdateViewModel,
+            onDismissRequest = drawViewModel::dismissWordDialog
         )
     } else {
         Surface(modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -115,8 +111,7 @@ fun DrawScreenLayout(
                 if (playerIsDrawing) {
                     DrawScreen(
                         modifier = Modifier.weight(1f),
-                        drawViewModel = drawViewModel,
-                        navController = navController
+                        drawViewModel = drawViewModel
                     )
                 } else {
                     GuessScreen(
@@ -145,8 +140,7 @@ fun DrawScreenLayout(
 @Composable
 fun WordChoiceDialog(
     drawViewModel: DrawViewModel,
-    onDismissRequest: () -> Unit,
-    roundTimerUpdateViewModel: RoundTimerUpdateViewModel,
+    onDismissRequest: () -> Unit
 ) {
     val easyWord by drawViewModel.easyWord
     val mediumWord by drawViewModel.mediumWord
@@ -163,21 +157,21 @@ fun WordChoiceDialog(
                     stringResource(R.string.easy_word),
                     easyWord
                 ) {
-                    drawViewModel.onWordChosen(easyWord);
-                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY);
+                    drawViewModel.onWordChosen(easyWord)
+                    setDrawWordViewModel.setDrawWord(easyWord, Difficulty.EASY)
                 }
                 WordButton(
                     stringResource(R.string.medium_word),
                     mediumWord
                 ) {
-                    drawViewModel.onWordChosen(mediumWord);
+                    drawViewModel.onWordChosen(mediumWord)
                     setDrawWordViewModel.setDrawWord(mediumWord, Difficulty.MEDIUM)
                 }
                 WordButton(
                     stringResource(R.string.hard_word),
                     hardWord
                 ) {
-                    drawViewModel.onWordChosen(hardWord);
+                    drawViewModel.onWordChosen(hardWord)
                     setDrawWordViewModel.setDrawWord(hardWord, Difficulty.HARD)
                 }
             }
@@ -228,9 +222,9 @@ fun TopWordBar(
     isDrawing: Boolean
 ) {
     val gameRoom = GameData.currentGameRoom.observeAsState()
-    var formattedTime = drawViewModel.formatTime(timeCount)
-    var numberOfPlayers = GameData.currentGameRoom.value?.players?.size
-    var currentRoundNumber = GameData.currentGameRoom.value?.getCurrentRoundNumber()
+    val formattedTime = drawViewModel.formatTime(timeCount)
+    val numberOfPlayers = GameData.currentGameRoom.value?.players?.size
+    val currentRoundNumber = GameData.currentGameRoom.value?.getCurrentRoundNumber()
 
     Surface(
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15F),
@@ -262,7 +256,7 @@ fun TopWordBar(
                         imageVector = Icons.Filled.Alarm, contentDescription = "Alarm icon",
                         tint = MaterialTheme.colorScheme.inverseSurface
                     )
-                    Text(text = "$formattedTime")
+                    Text(text = formattedTime)
                 }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -290,11 +284,11 @@ fun PlayersIconsBar(modifier: Modifier, currentPlayers: List<Player>) {
                     modifier = Modifier.size(50.dp)
                 )
 
-                var completed: Boolean = true;
+                var completed = true
 
                 // Check if player id is found in the list of players who guessed correctly
                 if (GameData.currentGameRoom.value?.guessedCorrectly?.contains(player.id) == false) {
-                    completed = false;
+                    completed = false
                 }
 
                 // If the player's action is complete, overlay a green-tinted checkmark

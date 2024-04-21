@@ -55,6 +55,7 @@ fun HelpScreen(
     BackHandler {
         navController.popBackStack()
     }
+    
 
     val desc1 = arrayOf(stringResource(R.string.desc1_1), stringResource(R.string.desc1_2), stringResource(
         R.string.desc1_3

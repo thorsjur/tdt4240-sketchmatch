@@ -10,10 +10,8 @@ import com.groupfive.sketchmatch.communication.ResponseEvent
 import com.groupfive.sketchmatch.communication.dto.response.CreateGameResponseDTO
 import com.groupfive.sketchmatch.models.Event
 import com.groupfive.sketchmatch.store.GameData
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class CreateGameViewModel : ViewModel() {
