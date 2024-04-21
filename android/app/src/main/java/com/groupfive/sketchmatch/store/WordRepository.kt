@@ -1,9 +1,51 @@
 package com.groupfive.sketchmatch.store
 
 object WordRepository {
-    val easyWords = listOf("cat", "sun", "cup")
-    val mediumWords = listOf("guitar", "penguin", "balloon")
-    val hardWords = listOf("submarine", "microscope", "chandelier")
+    private val easyWords =
+        listOf(
+            "cat",
+            "sun",
+            "cup",
+            "dog",
+            "house",
+            "tree",
+            "cake",
+            "book",
+            "flower",
+            "train",
+            "clock",
+            "shoe"
+        )
+    private val mediumWords =
+        listOf(
+            "guitar",
+            "penguin",
+            "balloon",
+            "elephant",
+            "camera",
+            "pizza",
+            "skateboard",
+            "beehive",
+            "rainbow",
+            "lighthouse",
+            "kangaroo",
+            "magnet"
+        )
+    private val hardWords =
+        listOf(
+            "submarine",
+            "microscope",
+            "chandelier",
+            "tornado",
+            "volcano",
+            "parachute",
+            "avalanche",
+            "shrimp",
+            "helicopter",
+            "igloo",
+            "koala",
+            "shampoo"
+        )
 
     fun getRandomWord(difficulty: Difficulty): String {
         return when (difficulty) {
